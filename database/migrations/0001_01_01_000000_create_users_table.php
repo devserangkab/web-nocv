@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('avatar')->nullable()->comment('Path avatar user di disk public');
             $table->rememberToken();
             $table->timestamps();
         });
