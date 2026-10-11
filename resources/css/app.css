@@ -107,3 +107,69 @@
     --ina-guide-800: var(--ina-primary-300);
     --ina-guide-900: var(--ina-primary-200);
 }
+
+/* =========================== */
+/* Dark mode: lembut, tidak menyilaukan */
+/* =========================== */
+[data-theme='dark'] {
+    /* Charcoal, bukan hitam murni — mengurangi glare */
+    --ina-background-primary: #232527;
+    --ina-background-secondary: #1a1b1d;
+    --ina-background-tertiary: #33353a;
+    --ina-content-primary: #e9e9eb;
+    --ina-content-secondary: #a8a9ad;
+    --ina-content-tertiary: #75777c;
+    --ina-stroke-primary: #3a3c41;
+    --ina-stroke-secondary: #65686d;
+
+    /* Surface tints (badge, banner, soft state) mengikuti gelap, bukan menempel putih */
+    --ina-guide-50: #0d1c30;
+    --ina-guide-100: #13253d;
+    --ina-guide-200: #1a3351;
+    --ina-negative-50: #2b1215;
+    --ina-negative-100: #371a1d;
+    --ina-negative-200: #442326;
+    --ina-negative-300: #5c3437;
+    --ina-negative-600: #ff6b6b;
+    --ina-positive-50: #122417;
+    --ina-positive-100: #183021;
+    --ina-positive-200: #1f3c2a;
+    --ina-positive-300: #254831;
+    --ina-positive-600: #4ce160;
+    --ina-warning-50: #2b230c;
+    --ina-warning-100: #373012;
+    --ina-warning-200: #443b16;
+    --ina-warning-300: #574a1c;
+    --ina-warning-500: #ffcc14;
+
+    /* Skala neutral Tailwind dibalik: kelas literal bg-neutral-* / hover:bg-neutral-* ikut gelap */
+    --color-neutral-25: #1b1c1e;
+    --color-neutral-50: #222427;
+    --color-neutral-100: #2b2d31;
+    --color-neutral-200: #3b3e43;
+    --color-neutral-300: #4b4f55;
+    --color-neutral-400: #87898e;
+    --color-neutral-500: #9a9ca1;
+    --color-neutral-600: #b4b6bb;
+    --color-neutral-700: #ced0d4;
+    --color-neutral-800: #e4e5e7;
+    --color-neutral-900: #f2f3f5;
+}
+
+[data-theme='dark'][data-brand='serangkab'] {
+    /* Hover neutral brand serangkab mengikuti gelap (bukan abu muda) */
+    --ina-neutral-hover: var(--ina-neutral-800) !important;
+}
+
+[data-theme='dark'][data-brand='serangkab'] {
+    /* Guide brand: tint gelap untuk latar aktif, langkah terang untuk teks/fokus/ikon */
+    --ina-guide-50: color-mix(in srgb, var(--ina-primary-500) 12%, var(--ina-background-secondary));
+    --ina-guide-100: color-mix(in srgb, var(--ina-primary-500) 18%, var(--ina-background-secondary));
+    --ina-guide-200: color-mix(in srgb, var(--ina-primary-500) 26%, var(--ina-background-secondary));
+    --ina-guide-500: color-mix(in srgb, var(--ina-primary-500) 70%, #f4f6f5);
+    --ina-guide-600: color-mix(in srgb, var(--ina-primary-500) 55%, #f4f6f5);
+    --ina-guide-700: var(--ina-guide-600);
+
+    /* Tombol primary di dark: tosca lebih terang agar teks putih terbaca nyaman */
+    --ina-primary-primary: color-mix(in srgb, var(--ina-primary-500) 55%, #f4f6f5);
+}

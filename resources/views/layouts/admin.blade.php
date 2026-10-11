@@ -1,14 +1,28 @@
+<?php
+    // Tema server-authoritative dari cookie (dievaluasi sebelum <html>)
+    $theme = request()->cookie('theme') === 'dark' ? 'dark' : 'light';
+?>
 <!DOCTYPE html>
-<html lang="id" data-theme="light" data-brand="serangkab">
+<html lang="id" data-theme="{{ $theme }}" data-brand="serangkab">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         <title>{{ $title ?? 'Dashboard' }} | {{ config('app.name', 'Laravel') }}</title>
 
-        {{-- Anti-FOUC: terapkan tema tersimpan sebelum paint --}}
+        {{-- Anti-FOUC + sinkron cookie: localStorage jadi sumber, cookie ditulis bila belum ada --}}
         <script>
-            document.documentElement.dataset.theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+            (function () {
+                var saved = localStorage.getItem('theme');
+                if ((saved === 'dark' || saved === 'light')) {
+                    if (document.cookie.indexOf('theme=') === -1) {
+                        document.cookie = 'theme=' + saved + '; path=/; max-age=31536000; samesite=lax';
+                    }
+                    if (saved !== document.documentElement.dataset.theme) {
+                        document.documentElement.dataset.theme = saved;
+                    }
+                }
+            })();
         </script>
 
         <!-- Fonts -->
@@ -262,7 +276,8 @@
                             type="button"
                             class="flex h-8 w-8 items-center justify-center rounded-md text-content-tertiary transition-colors duration-150 hover:bg-background-tertiary hover:text-content-primary"
                             x-data="{ dark: document.documentElement.dataset.theme === 'dark' }"
-                            x-on:click="dark = !dark; localStorage.setItem('theme', dark ? 'dark' : 'light'); document.documentElement.dataset.theme = dark ? 'dark' : 'light'"
+                            x-on:theme-sync.window="dark = $event.detail.dark"
+                            x-on:click="dark = !dark; localStorage.setItem('theme', dark ? 'dark' : 'light'); document.cookie = 'theme=' + (dark ? 'dark' : 'light') + '; path=/; max-age=31536000; samesite=lax'; document.documentElement.dataset.theme = dark ? 'dark' : 'light'"
                             aria-label="Ganti tema"
                         >
                             <svg class="h-4 w-4" x-show="!dark" x-cloak xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">

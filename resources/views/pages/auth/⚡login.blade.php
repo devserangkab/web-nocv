@@ -41,7 +41,8 @@ new class extends Component
             type="button"
             class="flex h-9 w-9 items-center justify-center rounded-md border border-stroke-primary bg-background-primary text-content-tertiary transition-colors duration-150 hover:text-content-primary"
             x-data="{ dark: document.documentElement.dataset.theme === 'dark' }"
-            x-on:click="dark = !dark; localStorage.setItem('theme', dark ? 'dark' : 'light'); document.documentElement.dataset.theme = dark ? 'dark' : 'light'"
+            x-on:theme-sync.window="dark = $event.detail.dark"
+            x-on:click="dark = !dark; localStorage.setItem('theme', dark ? 'dark' : 'light'); document.cookie = 'theme=' + (dark ? 'dark' : 'light') + '; path=/; max-age=31536000; samesite=lax'; document.documentElement.dataset.theme = dark ? 'dark' : 'light'"
             aria-label="Ganti tema"
         >
             {{-- Bulan (tampilkan saat light) --}}
