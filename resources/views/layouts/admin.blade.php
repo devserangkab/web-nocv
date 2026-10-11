@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light" data-brand="serangkab">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>{{ $title ?? 'Dashboard' }} | {{ config('app.name', 'Laravel') }}</title>
+
+        {{-- Anti-FOUC: terapkan tema tersimpan sebelum paint --}}
+        <script>
+            document.documentElement.dataset.theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+        </script>
+
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link href="https://fonts.bunny.net/css?family=inter:400,500,600" rel="stylesheet" />
+
+        <!-- Styles / Scripts -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+        @livewireStyles
+    </head>
+    <body class="min-h-screen bg-background-secondary text-content-primary antialiased" x-data="{ menuOpen: false, profileOpen: false }" @keydown.escape.window="menuOpen = false; profileOpen = false">
+        {{-- Sidebar — off-canvas di mobile, permanen di >= lg --}}
+        <aside
+            class="fixed inset-y-0 left-0 z-40 w-72 border-r border-stroke-primary bg-background-primary transition-transform duration-300 lg:translate-x-0"
+            :class="menuOpen ? 'translate-x-0' : '-translate-x-full'"
+        >
+            {{-- Brand --}}
+            <div class="flex h-16 items-center gap-3 border-b border-stroke-primary px-6">
+                <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-guide-500 text-white">
+                    <i class="ti ti-sitemap text-xl"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="truncate text-sm font-semibold text-content-primary">{{ config('app.name', 'Laravel') }}</p>
+                    <p class="truncate text-xs text-content-tertiary">Panel Admin</p>
+                </div>
+            </div>
+
+            {{-- Menu --}}
+            <nav class="space-y-1 px-4 py-4">
+                <a
+                    href="{{ route('admin.dashboard') }}"
+                    wire:navigate
+                    class="flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-content-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-content-primary data-current:bg-guide-50 data-current:text-guide-600"
+                >
+                    <i class="ti ti-layout-dashboard text-lg"></i>
+                    Dashboard
+                </a>
+                <a
+                    href="{{ route('admin.server-rooms.index') }}"
+                    wire:navigate
+                    class="flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-content-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-content-primary data-current:bg-guide-50 data-current:text-guide-600"
+                >
+                    <i class="ti ti-building text-lg"></i>
+                    Server Room
+                </a>
+
+                {{-- Grup: Asset Fisik --}}
+                <div class="pt-5">
+                    <p class="px-3 pb-2 text-xs font-medium text-content-tertiary">Asset Fisik</p>
+                    <a
+                        href="{{ route('admin.assets.racks.index') }}"
+                        wire:navigate
+                        class="flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-content-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-content-primary data-current:bg-guide-50 data-current:text-guide-600"
+                    >
+                        <i class="ti ti-server-2 text-lg"></i>
+                        Rack
+                    </a>
+                    <a
+                        href="{{ route('admin.assets.servers.index') }}"
+                        wire:navigate
+                        class="flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-content-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-content-primary data-current:bg-guide-50 data-current:text-guide-600"
+                    >
+                        <i class="ti ti-server text-lg"></i>
+                        Server
+                    </a>
+                </div>
+
+                {{-- Grup: Asset Digital --}}
+                <div class="pt-5">
+                    <p class="px-3 pb-2 text-xs font-medium text-content-tertiary">Asset Digital</p>
+                    <a
+                        href="{{ route('admin.assets.proxmox.index') }}"
+                        wire:navigate
+                        class="flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-content-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-content-primary data-current:bg-guide-50 data-current:text-guide-600"
+                    >
+                        <i class="ti ti-stack-2 text-lg"></i>
+                        Proxmox
+                    </a>
+                    <a
+                        href="{{ route('admin.assets.vms.index') }}"
+                        wire:navigate
+                        class="flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-content-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-content-primary data-current:bg-guide-50 data-current:text-guide-600"
+                    >
+                        <i class="ti ti-box-multiple-3 text-lg"></i>
+                        Virtual Machine
+                    </a>
+                    <a
+                        href="{{ route('admin.assets.panels.index') }}"
+                        wire:navigate
+                        class="flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-content-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-content-primary data-current:bg-guide-50 data-current:text-guide-600"
+                    >
+                        <i class="ti ti-app-window text-lg"></i>
+                        Panels
+                    </a>
+                </div>
+
+                {{-- Grup: Application --}}
+                <div class="pt-5">
+                    <p class="px-3 pb-2 text-xs font-medium text-content-tertiary">Application</p>
+                    <a
+                        href="{{ route('admin.applications.index') }}"
+                        wire:navigate
+                        class="flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-content-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-content-primary data-current:bg-guide-50 data-current:text-guide-600"
+                    >
+                        <i class="ti ti-apps text-lg"></i>
+                        Applications
+                    </a>
+                </div>
+
+                {{-- Grup: Data Management --}}
+                <div class="pt-5">
+                    <p class="px-3 pb-2 text-xs font-medium text-content-tertiary">Data Management</p>
+                    <a
+                        href="{{ route('admin.users.index') }}"
+                        wire:navigate
+                        class="flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-content-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-content-primary data-current:bg-guide-50 data-current:text-guide-600"
+                    >
+                        <i class="ti ti-users text-lg"></i>
+                        Users
+                    </a>
+                    <a
+                        href="{{ route('admin.roles.index') }}"
+                        wire:navigate
+                        class="flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-content-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-content-primary data-current:bg-guide-50 data-current:text-guide-600"
+                    >
+                        <i class="ti ti-shield-check text-lg"></i>
+                        Roles
+                    </a>
+                    <a
+                        href="{{ route('admin.institutions.index') }}"
+                        wire:navigate
+                        class="flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-content-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-content-primary data-current:bg-guide-50 data-current:text-guide-600"
+                    >
+                        <i class="ti ti-building text-lg"></i>
+                        Institutions
+                    </a>
+                </div>
+            </nav>
+
+            {{-- User — klik untuk buka menu akun --}}
+            <div
+                class="absolute inset-x-0 bottom-0 border-t border-stroke-primary p-4"
+                @click.outside="profileOpen = false"
+            >
+                <button
+                    type="button"
+                    class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left transition-colors duration-150 hover:bg-background-tertiary"
+                    aria-haspopup="menu"
+                    aria-controls="profile-menu"
+                    :aria-expanded="profileOpen.toString()"
+                    @click="profileOpen = !profileOpen"
+                >
+                    <span class="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-guide-50 text-sm font-medium text-guide-600">
+                        @if (auth()->user()?->avatar !== null)
+                            <img src="{{ asset('storage/'.auth()->user()->avatar) }}" alt="{{ auth()->user()?->name }}" class="h-9 w-9 object-cover">
+                        @else
+                            {{ collect(str_split(optional(auth()->user())->name ?? '?', 1))->take(2)->map(fn ($c) => strtoupper($c))->implode('') }}
+                        @endif
+                    </span>
+                    <span class="min-w-0 flex-1">
+                        <span class="block truncate text-sm font-medium text-content-primary" title="{{ auth()->user()?->name }}">
+                            {{ auth()->user()?->name }}
+                        </span>
+                        <span class="block truncate text-xs text-content-tertiary" title="{{ auth()->user()?->email }}">
+                            {{ auth()->user()?->email }}
+                        </span>
+                    </span>
+                    <i class="ti ti-chevron-up text-base text-content-tertiary transition-transform duration-200" :class="profileOpen && 'rotate-180'" aria-hidden="true"></i>
+                </button>
+
+                {{-- Menu akun --}}
+                <div
+                    id="profile-menu"
+                    role="menu"
+                    aria-label="Menu akun"
+                    x-cloak
+                    x-show="profileOpen"
+                    x-transition:enter="transition duration-150 ease-out"
+                    x-transition:enter-start="opacity-0 translate-y-1"
+                    x-transition:enter-end="opacity-100 translate-y-0"
+                    x-transition:leave="transition duration-100 ease-in"
+                    x-transition:leave-start="opacity-100 translate-y-0"
+                    x-transition:leave-end="opacity-0 translate-y-1"
+                    class="absolute bottom-full left-4 right-4 z-50 mb-2 rounded-lg border border-stroke-primary bg-background-primary p-1.5 shadow-lg"
+                >
+                    <a
+                        href="{{ route('admin.settings.index') }}"
+                        wire:navigate
+                        role="menuitem"
+                        @click="profileOpen = false"
+                        class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-sm text-content-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-content-primary"
+                    >
+                        <i class="ti ti-settings text-base" aria-hidden="true"></i>
+                        <span>Settings</span>
+                    </a>
+
+                    <div class="my-1.5 border-t border-stroke-primary"></div>
+
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button
+                            type="submit"
+                            role="menuitem"
+                            class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-sm text-negative-500 transition-colors duration-150 hover:bg-negative-50"
+                        >
+                            <i class="ti ti-logout text-base" aria-hidden="true"></i>
+                            <span>Keluar</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </aside>
+
+        {{-- Overlay (mobile) --}}
+        <div
+            class="fixed inset-0 z-30 bg-black/50 lg:hidden"
+            x-show="menuOpen"
+            x-on:click="menuOpen = false"
+            x-transition.opacity
+            x-cloak
+        ></div>
+
+        {{-- Konten --}}
+        <div class="flex min-h-screen flex-col pl-0 lg:pl-72">
+            {{-- Topbar --}}
+            <header class="sticky top-0 z-20 border-b border-stroke-primary bg-background-primary">
+                <div class="flex h-16 items-center justify-between px-4 sm:px-6">
+                    <div class="flex items-center gap-3">
+                        {{-- Tombol menu (mobile) --}}
+                        <button
+                            type="button"
+                            class="flex h-10 w-10 items-center justify-center rounded-lg text-content-primary hover:bg-background-tertiary lg:hidden"
+                            x-on:click="menuOpen = true"
+                            aria-label="Buka menu"
+                        >
+                            <i class="ti ti-menu-2 text-lg"></i>
+                        </button>
+
+                        {{-- Breadcrumb --}}
+                        <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-sm">
+                            <span class="text-content-tertiary">Admin</span>
+                            <i class="ti ti-chevron-right text-sm text-content-tertiary" aria-hidden="true"></i>
+                            <span class="font-medium text-content-primary">{{ $title ?? 'Dashboard' }}</span>
+                        </nav>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        {{-- Toggle tema --}}
+                        <button
+                            type="button"
+                            class="flex h-8 w-8 items-center justify-center rounded-md text-content-tertiary transition-colors duration-150 hover:bg-background-tertiary hover:text-content-primary"
+                            x-data="{ dark: document.documentElement.dataset.theme === 'dark' }"
+                            x-on:click="dark = !dark; localStorage.setItem('theme', dark ? 'dark' : 'light'); document.documentElement.dataset.theme = dark ? 'dark' : 'light'"
+                            aria-label="Ganti tema"
+                        >
+                            <svg class="h-4 w-4" x-show="!dark" x-cloak xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"></path>
+                            </svg>
+                            <svg class="h-4 w-4" x-show="dark" x-cloak xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"></path>
+                            </svg>
+                        </button>
+
+                </div>
+            </header>
+
+            {{-- Konten halaman --}}
+            <main class="flex-1 p-4 sm:p-6">
+                {{ $slot }}
+            </main>
+        </div>
+
+        @livewireScripts
+    </body>
+</html>

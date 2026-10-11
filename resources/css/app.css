@@ -1,0 +1,109 @@
+@import '@idds/styles';
+@import '@idds/styles/tailwind/css/idds.css';
+@import 'tailwindcss';
+
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+        'Noto Color Emoji';
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+/* Fokus / ring field: brand + soft ring (semua tema, dipandu token) */
+.ina-text-field__wrapper:focus-within,
+.ina-text-area__wrapper:focus-within,
+.ina-input-search__wrapper:focus-within {
+    border-color: var(--ina-guide-300);
+    box-shadow: 0 0 0 2px var(--ina-guide-100);
+    outline: none;
+}
+
+/*
+ * Select dropdown (IDDS): ring fokus halus, bukan ring inset IDDS bawaan
+ * (inset 0 0 0 2px content-primary) yang tampak seperti border dobel saat trigger di-klik.
+ */
+.ina-select-dropdown__trigger:focus-within {
+    border-color: var(--ina-guide-300);
+    box-shadow: 0 0 0 2px var(--ina-guide-100);
+    background: var(--ina-background-primary, #ffffff);
+}
+
+.ina-select-dropdown__trigger--status-error:focus-within {
+    border-color: var(--ina-negative-600);
+    box-shadow: 0 0 0 2px var(--ina-negative-100);
+}
+
+/* IDDS card sebagai wadah konten: anak melebar penuh */
+.ina-card--stack {
+    align-items: stretch;
+}
+
+/*
+ * Brand mode "serangkab" — instansi Kabupaten Serang.
+ * Warna institusi (dipilih manual): #1B604E (primary utama) & #1C6053.
+ * Skala dibangun via color-mix() dari dua warna tersebut — glossy tosca-gelap,
+ * berbeda dari pemdi yang mengandalkan biru INAgov.
+ */
+[data-brand='serangkab'] {
+    /* Primary Colors — skala beranchor #1B604E / #1C6053 */
+    --ina-primary-25: color-mix(in srgb, #1B604E 8%, white);
+    --ina-primary-50: color-mix(in srgb, #1B604E 14%, white);
+    --ina-primary-100: color-mix(in srgb, #1B604E 24%, white);
+    --ina-primary-200: color-mix(in srgb, #1B604E 38%, white);
+    --ina-primary-300: color-mix(in srgb, #1B604E 55%, white);
+    --ina-primary-400: color-mix(in srgb, #1B604E 75%, white);
+    --ina-primary-500: #1C6053;
+    --ina-primary-600: #1B604E;
+    --ina-primary-700: color-mix(in srgb, #1B604E 75%, black);
+    --ina-primary-800: color-mix(in srgb, #1B604E 55%, black);
+    --ina-primary-900: color-mix(in srgb, #1B604E 35%, black);
+    --ina-primary-primary: #1B604E;
+    --ina-brand-hover: var(--ina-primary-400) !important;
+    --ina-neutral-hover: var(--ina-neutral-100) !important;
+
+    /* Secondary Colors - Hijau pendamping (skala resmi paket) */
+    --ina-secondary-25: var(--ina-green-50);
+    --ina-secondary-50: var(--ina-green-50);
+    --ina-secondary-100: var(--ina-green-100);
+    --ina-secondary-200: var(--ina-green-200);
+    --ina-secondary-300: var(--ina-green-300);
+    --ina-secondary-400: var(--ina-green-400);
+    --ina-secondary-500: var(--ina-green-500);
+    --ina-secondary-600: var(--ina-green-600);
+    --ina-secondary-700: var(--ina-green-700);
+    --ina-secondary-800: var(--ina-green-800);
+    --ina-secondary-900: var(--ina-green-900);
+
+    /* Accent */
+    --ina-accent-yellow: var(--ina-lime-400);
+
+    /* Guide (fokus, link, status aktif) mengikuti brand */
+    --ina-guide-50: var(--ina-primary-25);
+    --ina-guide-100: var(--ina-primary-50);
+    --ina-guide-200: var(--ina-primary-100);
+    --ina-guide-300: var(--ina-primary-200);
+    --ina-guide-400: var(--ina-primary-300);
+    --ina-guide-500: var(--ina-primary-500);
+    --ina-guide-600: var(--ina-primary-600);
+    --ina-guide-700: var(--ina-primary-700);
+    --ina-guide-800: var(--ina-primary-800);
+    --ina-guide-900: var(--ina-primary-900);
+}
+
+[data-theme='dark'][data-brand='serangkab'] {
+    --ina-primary-primary: var(--ina-primary-400);
+    --ina-primary-hover: var(--ina-primary-400);
+
+    /* Guide dipetakan ke langkah terang agar link/fokus/ikon kontras di gelap */
+    --ina-guide-200: var(--ina-primary-200);
+    --ina-guide-300: var(--ina-primary-300);
+    --ina-guide-400: var(--ina-primary-400);
+    --ina-guide-500: var(--ina-primary-300);
+    --ina-guide-600: var(--ina-primary-400);
+    --ina-guide-700: var(--ina-primary-400);
+    --ina-guide-800: var(--ina-primary-300);
+    --ina-guide-900: var(--ina-primary-200);
+}
