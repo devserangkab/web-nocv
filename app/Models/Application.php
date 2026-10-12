@@ -53,4 +53,9 @@ class Application extends Model
     {
         return $this->hasMany(Developer::class, 'application_id', 'application_id');
     }
+
+    public function hostings(): HasMany
+    {
+        return $this->hasMany(Hosting::class, 'application_id', 'application_id');
+    }
 }
