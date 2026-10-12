@@ -25,8 +25,10 @@ class Server extends Model
         'location_id',
         'position',
         'brand',
+        'storage_size',
         'storage',
-        'ram',
+        'memory_size',
+        'memory',
         'cpu',
         'static_ip',
         'username',
@@ -38,8 +40,8 @@ class Server extends Model
     {
         return [
             'position' => 'integer',
-            'storage' => 'integer',
-            'ram' => 'integer',
+            'storage_size' => 'integer',
+            'memory_size' => 'integer',
             'static_ip' => EncryptedAttr::class,
             'username' => EncryptedAttr::class,
             'password' => EncryptedAttr::class,

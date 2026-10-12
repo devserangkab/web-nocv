@@ -42,10 +42,16 @@ new class extends Component
     public string $brand = '';
 
     #[Validate('nullable|integer|min:0', message: 'Storage harus berupa angka megabyte (MB).')]
+    public string $storage_size = '';
+
+    #[Validate('max:255', message: 'Spesifikasi storage maksimal 255 karakter.')]
     public string $storage = '';
 
-    #[Validate('nullable|integer|min:0', message: 'RAM harus berupa angka megabyte (MB).')]
-    public string $ram = '';
+    #[Validate('nullable|integer|min:0', message: 'Memory harus berupa angka megabyte (MB).')]
+    public string $memory_size = '';
+
+    #[Validate('max:255', message: 'Spesifikasi memory maksimal 255 karakter.')]
+    public string $memory = '';
 
     #[Validate('max:255', message: 'CPU maksimal 255 karakter.')]
     public string $cpu = '';
@@ -97,8 +103,10 @@ new class extends Component
         $this->location_id = (string) $server->location_id;
         $this->position = (string) $server->position;
         $this->brand = (string) $server->brand;
+        $this->storage_size = (string) $server->storage_size;
         $this->storage = (string) $server->storage;
-        $this->ram = (string) $server->ram;
+        $this->memory_size = (string) $server->memory_size;
+        $this->memory = (string) $server->memory;
         $this->cpu = (string) $server->cpu;
         $this->static_ip = (string) $server->static_ip;
         $this->os = (string) $server->os;
@@ -129,8 +137,10 @@ new class extends Component
             'location_id' => $this->location_id === '' ? null : $this->location_id,
             'position' => $this->position === '' ? null : (int) $this->position,
             'brand' => $this->brand === '' ? null : $this->brand,
-            'storage' => $this->storage === '' ? null : (int) $this->storage,
-            'ram' => $this->ram === '' ? null : (int) $this->ram,
+            'storage_size' => $this->storage_size === '' ? null : (int) $this->storage_size,
+            'storage' => $this->storage === '' ? null : $this->storage,
+            'memory_size' => $this->memory_size === '' ? null : (int) $this->memory_size,
+            'memory' => $this->memory === '' ? null : $this->memory,
             'cpu' => $this->cpu === '' ? null : $this->cpu,
             'static_ip' => $this->static_ip === '' ? null : $this->static_ip,
             'os' => $this->os === '' ? null : $this->os,
@@ -186,8 +196,10 @@ new class extends Component
         $this->location_id = '';
         $this->position = '';
         $this->brand = '';
+        $this->storage_size = '';
         $this->storage = '';
-        $this->ram = '';
+        $this->memory_size = '';
+        $this->memory = '';
         $this->cpu = '';
         $this->static_ip = '';
         $this->os = '';
@@ -223,7 +235,9 @@ new class extends Component
                     $query->where('server_name', 'like', "%{$this->search}%")
                         ->orWhere('brand', 'like', "%{$this->search}%")
                         ->orWhere('cpu', 'like', "%{$this->search}%")
-                        ->orWhere('os', 'like', "%{$this->search}%");
+                        ->orWhere('os', 'like', "%{$this->search}%")
+                        ->orWhere('storage', 'like', "%{$this->search}%")
+                        ->orWhere('memory', 'like', "%{$this->search}%");
                 })
             )
             ->orderBy('position')
@@ -399,70 +413,113 @@ new class extends Component
     @if (count($this->raks()) > 0)
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 mt-8 ">
             @foreach ($this->raks() as $rak)
-                <section class="p-4">
-                    <div class="flex flex-wrap items-center gap-3">
+                <section class="">
+                    <div class="ina-card ina-card--stack p-2">
+                        <div class="flex flex-wrap items-center gap-3">
 
-                        <i class="ti ti-server text-lg text-content-tertiary" aria-hidden="true"></i>
-                        <h2 class="text-base font-semibold text-content-primary">{{ $rak['label'] }}</h2>
-                        @if ($rak['code'] !== null)
-                            <span class="text-[12px] text-content-tertiary">{{ $rak['code'] }}</span>
-                        @endif
-                        <span class="ina-badge ina-badge--soft ina-badge--neutral ina-badge--sm">
-                            {{ $rak['servers']->count() }} unit
-                        </span>
-                        @if ($rak['location'] !== null)
-                            <span class="ina-badge ina-badge--soft ina-badge--info ina-badge--sm">
-                                <i class="ti ti-map-pin text-sm" aria-hidden="true"></i>
-                                {{ $rak['location'] }}
+                            <i class="ti ti-server text-lg text-content-tertiary" aria-hidden="true"></i>
+                            <h2 class="text-base font-semibold text-content-primary">{{ $rak['label'] }}</h2>
+                            @if ($rak['code'] !== null)
+                                <span class="text-[12px] text-content-tertiary">{{ $rak['code'] }}</span>
+                            @endif
+                            <span class="ina-badge ina-badge--soft ina-badge--neutral ina-badge--sm">
+                                {{ $rak['servers']->count() }} unit
                             </span>
-                        @endif
+                            @if ($rak['location'] !== null)
+                                <span class="ina-badge ina-badge--soft ina-badge--info ina-badge--sm">
+                                    <i class="ti ti-map-pin text-sm" aria-hidden="true"></i>
+                                    {{ $rak['location'] }}
+                                </span>
+                            @endif
+                        </div>
                     </div>
     
                     {{-- <div class="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3"> --}}
                     <div class="mt-3 flex flex-col gap-4">
                         @foreach ($rak['servers'] as $server)
-                            <div class="ina-card ina-card--stack p-5">
-                                <div class="flex items-start justify-between gap-2">
+                            <div class="ina-card ina-card--stack p-5" x-data="{ open: false }">
+                                <button
+                                    type="button"
+                                    class="flex w-full cursor-pointer items-start justify-between gap-2 text-left"
+                                    @click="open = !open"
+                                    :aria-expanded="open.toString()"
+                                    aria-label="Tampilkan detail {{ $server->server_name }}"
+                                >
                                     <div class="min-w-0">
                                         <div class="flex items-center gap-2">
                                             <h3 class="truncate text-base font-semibold text-content-primary" title="{{ $server->server_name }}">
                                                 {{ $server->server_name }}
                                             </h3>
-                                            <span class="shrink-0 text-[12px] text-content-tertiary">{{ $server->server_id }}</span>
                                         </div>
-                                        <p class="mt-0.5 truncate text-sm text-content-secondary" title="{{ $server->brand }}">
+                                        <p class="mt-0.5 break-words text-sm text-content-secondary" title="{{ $server->brand }}">
                                             {{ $server->brand ?? '-' }}
                                         </p>
                                     </div>
-                                    @if ($rak['code'] !== null)
-                                        <span class="ina-badge ina-badge--soft ina-badge--brand ina-badge--md">
-                                            Pos {{ $server->position ?? '-' }}
-                                        </span>
-                                    @endif
-                                </div>
+                                    <span class="flex shrink-0 items-center gap-2">
+                                        @if ($rak['code'] !== null)
+                                            <span class="ina-badge ina-badge--soft ina-badge--brand ina-badge--md whitespace-nowrap">
+                                                Pos {{ $server->position ?? '-' }}
+                                            </span>
+                                        @endif
+                                        <i class="ti ti-chevron-down text-lg text-content-tertiary transition-transform duration-200" :class="open && 'rotate-180'" aria-hidden="true"></i>
+                                    </span>
+                                </button>
     
-                                <dl class="mt-4 space-y-2 border-t border-stroke-primary pt-4 text-sm">
-                                    <div class="flex items-center justify-between gap-3">
-                                        <dt class="text-content-tertiary">Storage</dt>
-                                        <dd class="font-medium text-content-primary">{{ $server->storage !== null ? number_format($server->storage / 1024).' GB' : '-' }}</dd>
+                                <div
+                                    class="grid transition-[grid-template-rows] duration-300 ease-in-out"
+                                    :class="open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'"
+                                >
+                                    <div class="overflow-hidden">
+                                        <dl class="mt-4 space-y-2 border-t border-stroke-primary pt-4">
+                                    <div>
+                                        <div class="flex items-center justify-between gap-3">
+                                            <dt class="text-[11px] font-medium uppercase tracking-wide text-content-tertiary">Storage</dt>
+                                            @if ($server->storage_size !== null)
+                                                <span class="text-[11px] text-content-tertiary">{{ number_format($server->storage_size / 1024) }} GB</span>
+                                            @endif
+                                        </div>
+                                        <dd class="mt-0.5 text-[13px] font-medium leading-relaxed text-content-primary break-words" title="{{ $server->storage ?? '-' }}">
+                                            {{ $server->storage ?? '-' }}
+                                        </dd>
                                     </div>
-                                    <div class="flex items-center justify-between gap-3">
-                                        <dt class="text-content-tertiary">RAM</dt>
-                                        <dd class="font-medium text-content-primary">{{ $server->ram !== null ? number_format($server->ram / 1024).' GB' : '-' }}</dd>
+                                    <div>
+                                        <div class="flex items-center justify-between gap-3">
+                                            <dt class="text-[11px] font-medium uppercase tracking-wide text-content-tertiary">Memory</dt>
+                                            @if ($server->memory_size !== null)
+                                                <span class="text-[11px] text-content-tertiary">{{ number_format($server->memory_size / 1024) }} GB</span>
+                                            @endif
+                                        </div>
+                                        <dd class="mt-0.5 text-[13px] font-medium leading-relaxed text-content-primary break-words" title="{{ $server->memory ?? '-' }}">
+                                            {{ $server->memory ?? '-' }}
+                                        </dd>
                                     </div>
-                                    <div class="flex items-center justify-between gap-3">
-                                        <dt class="text-content-tertiary">CPU</dt>
-                                        <dd class="truncate font-medium text-content-primary" title="{{ $server->cpu }}">{{ $server->cpu ?? '-' }}</dd>
+                                    <div>
+                                        <div class="flex items-center justify-between gap-3">
+                                            <dt class="text-[11px] font-medium uppercase tracking-wide text-content-tertiary">CPU</dt>
+                                        </div>
+                                        <dd class="mt-0.5 text-[13px] font-medium leading-relaxed text-content-primary break-words" title="{{ $server->cpu }}">
+                                            {{ $server->cpu ?? '-' }}
+                                        </dd>
                                     </div>
-                                    <div class="flex items-center justify-between gap-3">
-                                        <dt class="text-content-tertiary">Static IP</dt>
-                                        <dd class="text-[13px] font-medium text-content-primary" title="{{ $server->static_ip }}">{{ $server->static_ip ?? '-' }}</dd>
+                                    <div>
+                                        <div class="flex items-center justify-between gap-3">
+                                            <dt class="text-[11px] font-medium uppercase tracking-wide text-content-tertiary">Static IP</dt>
+                                        </div>
+                                        <dd class="mt-0.5 text-[13px] font-medium leading-relaxed text-content-primary" title="{{ $server->static_ip }}">
+                                            {{ $server->static_ip ?? '-' }}
+                                        </dd>
                                     </div>
-                                    <div class="flex items-center justify-between gap-3">
-                                        <dt class="text-content-tertiary">OS</dt>
-                                        <dd class="truncate font-medium text-content-primary" title="{{ $server->os }}">{{ $server->os ?? '-' }}</dd>
+                                    <div>
+                                        <div class="flex items-center justify-between gap-3">
+                                            <dt class="text-[11px] font-medium uppercase tracking-wide text-content-tertiary">OS</dt>
+                                        </div>
+                                        <dd class="mt-0.5 text-[13px] font-medium leading-relaxed text-content-primary break-words" title="{{ $server->os }}">
+                                            {{ $server->os ?? '-' }}
+                                        </dd>
                                     </div>
-                                </dl>
+                                        </dl>
+                                    </div>
+                                </div>
 
                                 <div class="mt-3 flex flex-wrap items-center gap-2">
                                     @if ($server->effective() !== null)
@@ -651,17 +708,56 @@ new class extends Component
 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="ina-text-field">
-                        <label for="storage" class="ina-text-field__label">
+                        <label for="storage_size" class="ina-text-field__label">
                             Storage (MB)
                         </label>
-                        <div class="ina-text-field__wrapper ina-text-field__wrapper--size-md {{ $errors->has('storage') ? 'ina-text-field__wrapper--status-error' : '' }}">
+                        <div class="ina-text-field__wrapper ina-text-field__wrapper--size-md {{ $errors->has('storage_size') ? 'ina-text-field__wrapper--status-error' : '' }}">
                             <input
                                 type="number"
                                 min="0"
+                                id="storage_size"
+                                wire:model="storage_size"
+                                class="ina-text-field__input"
+                                placeholder="475000"
+                            >
+                        </div>
+                        @error('storage_size')
+                            <p class="mt-1.5 text-sm text-negative-500">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="ina-text-field">
+                        <label for="memory_size" class="ina-text-field__label">
+                            Memory (MB)
+                        </label>
+                        <div class="ina-text-field__wrapper ina-text-field__wrapper--size-md {{ $errors->has('memory_size') ? 'ina-text-field__wrapper--status-error' : '' }}">
+                            <input
+                                type="number"
+                                min="0"
+                                id="memory_size"
+                                wire:model="memory_size"
+                                class="ina-text-field__input"
+                                placeholder="64081"
+                            >
+                        </div>
+                        @error('memory_size')
+                            <p class="mt-1.5 text-sm text-negative-500">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="ina-text-field">
+                        <label for="storage" class="ina-text-field__label">
+                            Spesifikasi Storage
+                        </label>
+                        <div class="ina-text-field__wrapper ina-text-field__wrapper--size-md {{ $errors->has('storage') ? 'ina-text-field__wrapper--status-error' : '' }}">
+                            <input
+                                type="text"
                                 id="storage"
                                 wire:model="storage"
                                 class="ina-text-field__input"
-                                placeholder="2048"
+                                placeholder="HPE 3.8TB 15K RPM HDD"
                             >
                         </div>
                         @error('storage')
@@ -670,20 +766,19 @@ new class extends Component
                     </div>
 
                     <div class="ina-text-field">
-                        <label for="ram" class="ina-text-field__label">
-                            RAM (MB)
+                        <label for="memory" class="ina-text-field__label">
+                            Spesifikasi Memory
                         </label>
-                        <div class="ina-text-field__wrapper ina-text-field__wrapper--size-md {{ $errors->has('ram') ? 'ina-text-field__wrapper--status-error' : '' }}">
+                        <div class="ina-text-field__wrapper ina-text-field__wrapper--size-md {{ $errors->has('memory') ? 'ina-text-field__wrapper--status-error' : '' }}">
                             <input
-                                type="number"
-                                min="0"
-                                id="ram"
-                                wire:model="ram"
+                                type="text"
+                                id="memory"
+                                wire:model="memory"
                                 class="ina-text-field__input"
-                                placeholder="131072"
+                                placeholder="HPE 64GB (4x16GB) DDR4 2666MT/s"
                             >
                         </div>
-                        @error('ram')
+                        @error('memory')
                             <p class="mt-1.5 text-sm text-negative-500">{{ $message }}</p>
                         @enderror
                     </div>

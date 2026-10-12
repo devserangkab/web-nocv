@@ -15,8 +15,10 @@ return new class extends Migration
             $table->string('rack_id', 9)->nullable();
             $table->unsignedInteger('position')->nullable();
             $table->string('brand')->nullable();
-            $table->unsignedBigInteger('storage')->nullable()->comment('Kapasitas dalam megabyte (MB)');
-            $table->unsignedBigInteger('ram')->nullable()->comment('Kapasitas dalam megabyte (MB)');
+            $table->unsignedBigInteger('storage_size')->nullable()->comment('Kapasitas penyimpanan dalam megabyte (MB)');
+            $table->string('storage')->nullable()->comment('Spesifikasi disk, mis. HPE 3.8TB 15K RPM HDD');
+            $table->unsignedBigInteger('memory_size')->nullable()->comment('Kapasitas memori dalam megabyte (MB)');
+            $table->string('memory')->nullable()->comment('Spesifikasi memori, mis. HPE 64GB (4x16GB) DDR4 2666MT/s');
             $table->string('cpu')->nullable();
             $table->text('static_ip')->nullable()->comment('Static IP server, terenkripsi');
             $table->string('username')->nullable()->comment('Username kredensial server, terenkripsi');
