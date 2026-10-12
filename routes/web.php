@@ -17,6 +17,7 @@ Route::middleware('auth')->group(function () {
     Route::livewire('/admin/institutions', 'pages::admin.management.institution-index')->name('admin.institutions.index');
     Route::livewire('/admin/settings', 'pages::admin.settings')->name('admin.settings.index');
     Route::livewire('/admin/applications', 'pages::admin.application.application-index')->name('admin.applications.index');
+    Route::livewire('/admin/applications/detail/{applicationId}', 'pages::admin.application.application-show')->name('admin.applications.show');
 
     Route::post('/logout', function () {
         Auth::guard('web')->logout();

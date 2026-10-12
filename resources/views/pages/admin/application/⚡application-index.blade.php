@@ -527,6 +527,15 @@ new class extends Component
                                 <td class="h-14 max-w-xs truncate px-4 text-content-secondary" title="{{ $application->domain }}">{{ $application->domain ?? '-' }}</td>
                                 <td class="h-14 px-4">
                                     <div class="flex items-center justify-end gap-1">
+                                        <a
+                                            href="{{ route('admin.applications.show', $application->application_id) }}"
+                                            wire:navigate
+                                            class="flex h-8 w-8 items-center justify-center rounded-md text-content-tertiary transition-colors duration-150 hover:bg-background-tertiary hover:text-content-primary"
+                                            aria-label="Detail {{ $application->name }}"
+                                            title="Detail"
+                                        >
+                                            <i class="ti ti-eye text-base"></i>
+                                        </a>
                                         <button
                                             type="button"
                                             wire:click="edit({{ $application->id }})"
