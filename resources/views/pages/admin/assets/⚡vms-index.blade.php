@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\VmsStatus;
 use App\Models\Proxmox;
 use App\Models\Vms;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -56,7 +57,8 @@ new class extends Component
     #[Validate('max:255', message: 'OS maksimal 255 karakter.')]
     public string $os = '';
 
-    public bool $status = false;
+    #[Validate('in:ON,OFF,DESTROYED', message: 'Status harus ON, OFF, atau DESTROYED.')]
+    public string $status = VmsStatus::Off->value;
 
     #[Validate('max:1000', message: 'Note maksimal 1000 karakter.')]
     public string $note = '';
@@ -97,7 +99,7 @@ new class extends Component
         $this->ram = (string) $vm->ram;
         $this->storage = (string) $vm->storage;
         $this->os = (string) $vm->os;
-        $this->status = (bool) $vm->status;
+        $this->status = $vm->status?->value ?? VmsStatus::Off->value;
         $this->note = (string) $vm->note;
         $this->username = (string) $vm->username;
         $this->password = '';
@@ -177,7 +179,7 @@ new class extends Component
         $this->ram = '';
         $this->storage = '';
         $this->os = '';
-        $this->status = false;
+        $this->status = VmsStatus::Off->value;
         $this->note = '';
         $this->username = '';
         $this->password = '';
@@ -329,8 +331,8 @@ new class extends Component
                                 <td class="h-10 px-4 text-right text-content-primary">{{ $vm->storage !== null ? number_format($vm->storage / 1024).' GB' : '-' }}</td>
                                 <td class="h-10 px-4 text-content-secondary">{{ $vm->os ?? '-' }}</td>
                                 <td class="h-10 px-4">
-                                    <span class="ina-badge ina-badge--soft {{ $vm->status ? 'ina-badge--positive' : 'ina-badge--neutral' }} ina-badge--sm">
-                                        {{ $vm->status ? 'On' : 'Off' }}
+                                    <span class="ina-badge ina-badge--soft ina-badge--sm {{ $vm->status === VmsStatus::On ? 'ina-badge--positive' : ($vm->status === VmsStatus::Destroyed ? 'ina-badge--warning' : 'ina-badge--neutral') }}">
+                                        {{ $vm->status->value }}
                                     </span>
                                 </td>
                                 <td class="h-10 max-w-xs truncate px-4 text-content-secondary" title="{{ $vm->note }}">{{ $vm->note ?? '-' }}</td>
@@ -654,17 +656,20 @@ new class extends Component
                 </div>
 
                 {{-- Status â€” Toggle IDDS --}}
-                <div class="ina-toggle ina-toggle--size-sm" x-data="{ status: $wire.entangle('status') }">
-                    <input
-                        type="checkbox"
-                        class="ina-toggle__input"
-                        x-model="status"
-                        aria-label="Status VM"
-                    >
-                    <div class="ina-toggle__track" :class="status ? 'ina-toggle__track--checked' : ''">
-                        <div class="ina-toggle__thumb" :class="status ? 'ina-toggle__thumb--checked' : ''"></div>
-                    </div>
-                    <span class="text-sm font-medium text-content-primary" x-text="status ? 'On' : 'Off'"></span>
+                <div class="ina-text-field">
+                    <label for="vm-status" class="ina-text-field__label">
+                        Status
+                    </label>
+                    <x-idds.select
+                        wire-prop="status"
+                        :value="$status"
+                        :options="collect(VmsStatus::cases())->map(fn ($s) => ['value' => $s->value, 'label' => $s->value])->all()"
+                        aria-label="Pilih status VM"
+                        :error="$errors->has('status')"
+                    />
+                    @error('status')
+                        <p class="mt-1.5 text-sm text-negative-500">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="flex justify-end gap-2 pt-2">

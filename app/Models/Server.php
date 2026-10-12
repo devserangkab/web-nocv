@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ServerStatus;
 use App\Models\Casts\EncryptedAttr;
 use App\Models\Concerns\GeneratesCode;
 use Illuminate\Database\Eloquent\Model;
@@ -17,6 +18,10 @@ class Server extends Model
     protected static string $codePrefix = 'SVR-';
 
     protected static int $codeLength = 9;
+
+    protected $attributes = [
+        'status' => 'OFF',
+    ];
 
     protected $fillable = [
         'server_id',
@@ -34,6 +39,7 @@ class Server extends Model
         'username',
         'password',
         'os',
+        'status',
     ];
 
     protected function casts(): array
@@ -42,6 +48,7 @@ class Server extends Model
             'position' => 'integer',
             'storage_size' => 'integer',
             'memory_size' => 'integer',
+            'status' => ServerStatus::class,
             'static_ip' => EncryptedAttr::class,
             'username' => EncryptedAttr::class,
             'password' => EncryptedAttr::class,

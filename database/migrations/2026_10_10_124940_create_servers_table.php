@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('username')->nullable()->comment('Username kredensial server, terenkripsi');
             $table->text('password')->nullable()->comment('Password kredensial server, terenkripsi');
             $table->string('os')->nullable();
+            $table->string('status', 10)->default('OFF')->comment('ON/OFF (App\Enums\ServerStatus)');
             $table->string('location_id', 9)->nullable()->comment('Lokasi langsung untuk server tanpa rack');
             $table->timestamps();
 

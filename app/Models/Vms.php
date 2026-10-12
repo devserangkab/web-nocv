@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\VmsStatus;
 use App\Models\Casts\EncryptedAttr;
 use App\Models\Concerns\GeneratesCode;
 use Illuminate\Database\Eloquent\Model;
@@ -18,6 +19,10 @@ class Vms extends Model
     protected static string $codePrefix = 'VMS-';
 
     protected static int $codeLength = 9;
+
+    protected $attributes = [
+        'status' => 'OFF',
+    ];
 
     protected $fillable = [
         'vm_id',
@@ -42,7 +47,7 @@ class Vms extends Model
             'cpu' => 'integer',
             'ram' => 'integer',
             'storage' => 'integer',
-            'status' => 'boolean',
+            'status' => VmsStatus::class,
             'local_ip' => EncryptedAttr::class,
             'public_ip' => EncryptedAttr::class,
             'username' => EncryptedAttr::class,

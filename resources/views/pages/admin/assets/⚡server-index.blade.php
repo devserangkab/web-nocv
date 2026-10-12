@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ServerStatus;
 use App\Models\Location;
 use App\Models\Rack;
 use App\Models\Server;
@@ -52,6 +53,9 @@ new class extends Component
 
     #[Validate('max:255', message: 'Spesifikasi memory maksimal 255 karakter.')]
     public string $memory = '';
+
+    #[Validate('in:ON,OFF', message: 'Status harus ON atau OFF.')]
+    public string $status = ServerStatus::Off->value;
 
     #[Validate('max:255', message: 'CPU maksimal 255 karakter.')]
     public string $cpu = '';
@@ -107,6 +111,7 @@ new class extends Component
         $this->storage = (string) $server->storage;
         $this->memory_size = (string) $server->memory_size;
         $this->memory = (string) $server->memory;
+        $this->status = $server->status?->value ?? ServerStatus::Off->value;
         $this->cpu = (string) $server->cpu;
         $this->static_ip = (string) $server->static_ip;
         $this->os = (string) $server->os;
@@ -141,6 +146,7 @@ new class extends Component
             'storage' => $this->storage === '' ? null : $this->storage,
             'memory_size' => $this->memory_size === '' ? null : (int) $this->memory_size,
             'memory' => $this->memory === '' ? null : $this->memory,
+            'status' => $this->status,
             'cpu' => $this->cpu === '' ? null : $this->cpu,
             'static_ip' => $this->static_ip === '' ? null : $this->static_ip,
             'os' => $this->os === '' ? null : $this->os,
@@ -200,6 +206,7 @@ new class extends Component
         $this->storage = '';
         $this->memory_size = '';
         $this->memory = '';
+        $this->status = ServerStatus::Off->value;
         $this->cpu = '';
         $this->static_ip = '';
         $this->os = '';
@@ -456,6 +463,9 @@ new class extends Component
                                         </p>
                                     </div>
                                     <span class="flex shrink-0 items-center gap-2">
+                                        <span class="ina-badge ina-badge--soft ina-badge--sm {{ $server->status === ServerStatus::On ? 'ina-badge--positive' : 'ina-badge--neutral' }} whitespace-nowrap">
+                                            {{ $server->status->value }}
+                                        </span>
                                         @if ($rak['code'] !== null)
                                             <span class="ina-badge ina-badge--soft ina-badge--brand ina-badge--md whitespace-nowrap">
                                                 Pos {{ $server->position ?? '-' }}
@@ -782,6 +792,22 @@ new class extends Component
                             <p class="mt-1.5 text-sm text-negative-500">{{ $message }}</p>
                         @enderror
                     </div>
+                </div>
+
+                <div class="ina-text-field">
+                    <label for="server-status" class="ina-text-field__label">
+                        Status
+                    </label>
+                    <x-idds.select
+                        wire-prop="status"
+                        :value="$status"
+                        :options="collect(ServerStatus::cases())->map(fn ($s) => ['value' => $s->value, 'label' => $s->value])->all()"
+                        aria-label="Pilih status server"
+                        :error="$errors->has('status')"
+                    />
+                    @error('status')
+                        <p class="mt-1.5 text-sm text-negative-500">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="ina-text-field">

@@ -22,7 +22,7 @@ return new class extends Migration
             $table->unsignedBigInteger('ram')->nullable()->comment('Kapasitas dalam megabyte (MB)');
             $table->unsignedBigInteger('storage')->nullable()->comment('Kapasitas dalam megabyte (MB)');
             $table->string('os')->nullable();
-            $table->boolean('status')->default(false)->comment('true = on, false = off');
+            $table->string('status', 10)->default('OFF')->comment('ON/OFF/DESTROYED (App\Enums\VmsStatus)');
             $table->text('note')->nullable();
             $table->timestamps();
 
