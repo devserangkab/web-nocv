@@ -5,12 +5,14 @@ namespace App\Models;
 use App\Enums\PanelType;
 use App\Models\Casts\EncryptedAttr;
 use App\Models\Concerns\GeneratesCode;
+use App\Models\Concerns\OwnsMedia;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Panel extends Model
 {
     use GeneratesCode;
+    use OwnsMedia;
 
     protected $table = 'panels';
 

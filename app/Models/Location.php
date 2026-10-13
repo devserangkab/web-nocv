@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use App\Models\Concerns\GeneratesCode;
+use App\Models\Concerns\OwnsMedia;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Location extends Model
 {
     use GeneratesCode;
+    use OwnsMedia;
 
     protected static string $codeColumn = 'location_id';
 
