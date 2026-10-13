@@ -2,9 +2,9 @@
 
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use App\Actions\Management\UpdateProfile;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
-use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
@@ -17,26 +17,16 @@ new class extends Component
     #[Layout('layouts::admin')]
     #[Title('Settings')]
 
-    #[Validate('required', message: 'Name wajib diisi.')]
-    #[Validate('max:255', message: 'Name maksimal 255 karakter.')]
     public string $name = '';
 
-    #[Validate('required', message: 'Email wajib diisi.')]
-    #[Validate('email', message: 'Email harus format email yang valid.')]
     public string $email = '';
 
-    #[Validate('nullable', message: 'Password minimal 8 karakter.')]
-    #[Validate('min:8', message: 'Password minimal 8 karakter.')]
-    #[Validate('same:passwordConfirmation', message: 'Konfirmasi password tidak cocok.')]
     public string $password = '';
 
     public string $passwordConfirmation = '';
 
     public string $current_password = '';
 
-    #[Validate('nullable', message: 'Avatar harus berupa gambar (jpg, png, svg, webp).')]
-    #[Validate('image', message: 'Avatar harus berupa gambar (jpg, png, svg, webp).')]
-    #[Validate('max:2048', message: 'Avatar maksimal 2 MB.')]
     public $avatar = null; // @var TemporaryUploadedFile|null
 
     public string $avatar_path = '';
@@ -62,57 +52,21 @@ new class extends Component
 
     public function save(): void
     {
-        $this->validate();
-
         /** @var User $user */
         $user = auth()->user();
 
-        $emailTaken = User::query()
-            ->where('email', $this->email)
-            ->where('id', '!=', $user->id)
-            ->exists();
-
-        if ($emailTaken) {
-            $this->addError('email', 'Email sudah dipakai.');
-
-            return;
-        }
-
-        if ($this->password !== '') {
-            if ($this->current_password === '') {
-                $this->addError('current_password', 'Password saat ini wajib diisi bila mengganti password.');
-
-                return;
-            }
-
-            if (! Hash::check($this->current_password, $user->password)) {
-                $this->addError('current_password', 'Password saat ini tidak sesuai.');
-
-                return;
-            }
-        }
-
-        $data = [
-            'name' => $this->name,
-            'email' => $this->email,
-        ];
-
-        if ($this->password !== '') {
-            $data['password'] = $this->password; // cast 'hashed' langsung menghash
-        }
-
-        if ($this->avatar instanceof TemporaryUploadedFile) {
-            $data['avatar'] = $this->avatar->store('avatars', 'public');
-        } else {
-            $data['avatar'] = $this->avatar_path === '' ? null : $this->avatar_path;
-        }
-
-        // Bersihkan file avatar lama bila diganti/dihapus (avatar_path bisa dikosongkan si hapus)
-        if (! blank($user->avatar) && $user->avatar !== $data['avatar']) {
-            Storage::disk('public')->delete($user->avatar);
-        }
-
-        $user->update($data);
+        app(UpdateProfile::class)(
+            $user,
+            [
+                'name' => $this->name,
+                'email' => $this->email,
+                'password' => $this->password,
+                'passwordConfirmation' => $this->passwordConfirmation,
+                'current_password' => $this->current_password,
+            ],
+            $this->avatar,
+            $this->avatar_path,
+        );
 
         // Sinkron ulang properti tampilan
         $this->fillFromUser($user->refresh());

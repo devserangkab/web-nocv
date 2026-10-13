@@ -3,9 +3,12 @@
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use App\Actions\Management\CreateRole;
+use App\Actions\Management\DeleteRole;
+use App\Actions\Management\UpdateRole;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
-use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Spatie\Permission\Models\Permission;
@@ -28,8 +31,6 @@ new class extends Component
 
     public ?int $deletingId = null;
 
-    #[Validate('required', message: 'Nama role wajib diisi.')]
-    #[Validate('max:255', message: 'Nama role maksimal 255 karakter.')]
     public string $name = '';
 
     /**
@@ -69,26 +70,15 @@ new class extends Component
 
     public function save(): void
     {
-        $this->validate();
-
-        $taken = Role::query()
-            ->where('name', $this->name)
-            ->when($this->editingId !== null, fn ($query) => $query->where('id', '!=', $this->editingId))
-            ->exists();
-
-        if ($taken) {
-            $this->addError('name', 'Nama role sudah dipakai.');
-
-            return;
-        }
+        $data = [
+            'name' => $this->name,
+            'permissions' => $this->permissions,
+        ];
 
         if ($this->editingId !== null) {
-            $role = Role::findById($this->editingId, 'web');
-            $role->update(['name' => $this->name]);
-            $role->syncPermissions($this->permissions);
+            app(UpdateRole::class)(Role::findById($this->editingId, 'web'), $data);
         } else {
-            $role = Role::create(['name' => $this->name, 'guard_name' => 'web']);
-            $role->syncPermissions($this->permissions);
+            app(CreateRole::class)($data);
         }
 
         $this->showModal = false;
@@ -106,19 +96,15 @@ new class extends Component
         $role = $this->deletingId !== null ? Role::findById($this->deletingId, 'web') : null;
 
         if ($role !== null) {
-            if ($role->name === 'superadmin') {
-                $this->addError('deletingId', 'Role superadmin tidak bisa dihapus.');
+            try {
+                app(DeleteRole::class)($role);
+            } catch (ValidationException $e) {
+                foreach ($e->errors()['deletingId'] ?? [] as $message) {
+                    $this->addError('deletingId', $message);
+                }
 
                 return;
             }
-
-            if ($role->users()->exists()) {
-                $this->addError('deletingId', 'Role masih dipakai oleh '.User::role($role->name)->count().' user.');
-
-                return;
-            }
-
-            $role->delete();
         }
 
         $this->showDeleteModal = false;

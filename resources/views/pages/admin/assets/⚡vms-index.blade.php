@@ -4,9 +4,11 @@ use App\Enums\VmsStatus;
 use App\Models\Proxmox;
 use App\Models\Vms;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use App\Actions\Assets\CreateVms;
+use App\Actions\Assets\DeleteVms;
+use App\Actions\Assets\UpdateVms;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
-use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -29,44 +31,30 @@ new class extends Component
 
     public ?int $deletingId = null;
 
-    #[Validate('required', message: 'Host Proxmox wajib dipilih.')]
     public string $proxmox_id = '';
 
-    #[Validate('nullable|integer|min:1', message: 'VMID harus berupa angka (minimal 1).')]
     public string $proxmox_number = '';
 
-    #[Validate('required', message: 'Nama VM wajib diisi.')]
-    #[Validate('max:255', message: 'Nama VM maksimal 255 karakter.')]
     public string $name = '';
 
-    #[Validate('nullable|ip', message: 'Local IP harus berupa alamat IP yang valid.')]
     public string $local_ip = '';
 
-    #[Validate('nullable|ip', message: 'Public IP harus berupa alamat IP yang valid.')]
     public string $public_ip = '';
 
-    #[Validate('nullable|integer|min:1', message: 'CPU harus berupa jumlah core (minimal 1).')]
     public string $cpu = '';
 
-    #[Validate('nullable|integer|min:0', message: 'RAM harus berupa angka megabyte (MB).')]
     public string $ram = '';
 
-    #[Validate('nullable|integer|min:0', message: 'Storage harus berupa angka megabyte (MB).')]
     public string $storage = '';
 
-    #[Validate('max:255', message: 'OS maksimal 255 karakter.')]
     public string $os = '';
 
-    #[Validate('in:ON,OFF,DESTROYED', message: 'Status harus ON, OFF, atau DESTROYED.')]
     public string $status = VmsStatus::Off->value;
 
-    #[Validate('max:1000', message: 'Note maksimal 1000 karakter.')]
     public string $note = '';
 
-    #[Validate('max:255', message: 'Username maksimal 255 karakter.')]
     public string $username = '';
 
-    #[Validate('max:255', message: 'Password maksimal 255 karakter.')]
     public string $password = '';
 
     public function updatedSearch(): void
@@ -109,7 +97,6 @@ new class extends Component
 
     public function save(): void
     {
-        $this->validate();
 
         $data = [
             'proxmox_id' => $this->proxmox_id,
@@ -123,21 +110,14 @@ new class extends Component
             'os' => $this->os === '' ? null : $this->os,
             'status' => $this->status,
             'note' => $this->note === '' ? null : $this->note,
+            'username' => $this->username,
+            'password' => $this->password,
         ];
 
-        // Kredensial: kosong saat edit = biarkan nilai lama
-        if ($this->editingId === null || $this->username !== '') {
-            $data['username'] = $this->username === '' ? null : $this->username;
-        }
-
-        if ($this->editingId === null || $this->password !== '') {
-            $data['password'] = $this->password === '' ? null : $this->password;
-        }
-
         if ($this->editingId !== null) {
-            Vms::findOrFail($this->editingId)->update($data);
+            app(UpdateVms::class)(Vms::findOrFail($this->editingId), $data);
         } else {
-            Vms::create($data);
+            app(CreateVms::class)($data);
         }
 
         $this->showModal = false;
@@ -153,7 +133,7 @@ new class extends Component
     public function delete(): void
     {
         if ($this->deletingId !== null) {
-            Vms::findOrFail($this->deletingId)->delete();
+            app(DeleteVms::class)(Vms::findOrFail($this->deletingId));
         }
 
         $this->showDeleteModal = false;

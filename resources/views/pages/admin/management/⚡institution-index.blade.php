@@ -2,9 +2,11 @@
 
 use App\Models\Institution;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use App\Actions\Management\CreateInstitution;
+use App\Actions\Management\DeleteInstitution;
+use App\Actions\Management\UpdateInstitution;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
-use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -25,12 +27,8 @@ new class extends Component
 
     public ?int $deletingId = null;
 
-    #[Validate('required', message: 'Name wajib diisi.')]
-    #[Validate('max:255', message: 'Name maksimal 255 karakter.')]
     public string $name = '';
 
-    #[Validate('required', message: 'Singkatan wajib diisi.')]
-    #[Validate('max:50', message: 'Singkatan maksimal 50 karakter.')]
     public string $abbreviation = '';
 
     public function updatedSearch(): void
@@ -57,39 +55,15 @@ new class extends Component
 
     public function save(): void
     {
-        $this->validate();
-
-        $nameTaken = Institution::query()
-            ->where('name', $this->name)
-            ->when($this->editingId !== null, fn ($query) => $query->where('id', '!=', $this->editingId))
-            ->exists();
-
-        if ($nameTaken) {
-            $this->addError('name', 'Nama institution sudah dipakai.');
-
-            return;
-        }
-
-        $abbreviationTaken = Institution::query()
-            ->where('abbreviation', $this->abbreviation)
-            ->when($this->editingId !== null, fn ($query) => $query->where('id', '!=', $this->editingId))
-            ->exists();
-
-        if ($abbreviationTaken) {
-            $this->addError('abbreviation', 'Singkatan sudah dipakai.');
-
-            return;
-        }
-
         $data = [
             'name' => $this->name,
             'abbreviation' => $this->abbreviation,
         ];
 
         if ($this->editingId !== null) {
-            Institution::findOrFail($this->editingId)->update($data);
+            app(UpdateInstitution::class)(Institution::findOrFail($this->editingId), $data);
         } else {
-            Institution::create($data);
+            app(CreateInstitution::class)($data);
         }
 
         $this->showModal = false;
@@ -105,7 +79,7 @@ new class extends Component
     public function delete(): void
     {
         if ($this->deletingId !== null) {
-            Institution::findOrFail($this->deletingId)->delete();
+            app(DeleteInstitution::class)(Institution::findOrFail($this->deletingId));
         }
 
         $this->showDeleteModal = false;

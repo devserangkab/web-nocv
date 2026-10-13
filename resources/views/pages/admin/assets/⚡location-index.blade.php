@@ -2,9 +2,12 @@
 
 use App\Models\Location;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use App\Actions\Locations\CreateLocation;
+use App\Actions\Locations\DeleteLocation;
+use App\Actions\Locations\UpdateLocation;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
-use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -25,11 +28,8 @@ new class extends Component
 
     public ?int $deletingId = null;
 
-    #[Validate('required', message: 'Nama server room wajib diisi.')]
-    #[Validate('max:255', message: 'Nama server room maksimal 255 karakter.')]
     public string $name = '';
 
-    #[Validate('max:255', message: 'Alamat maksimal 255 karakter.')]
     public string $address = '';
 
     public function updatedSearch(): void
@@ -56,17 +56,15 @@ new class extends Component
 
     public function save(): void
     {
-        $this->validate();
-
         $data = [
             'name' => $this->name,
             'address' => $this->address === '' ? null : $this->address,
         ];
 
         if ($this->editingId !== null) {
-            Location::findOrFail($this->editingId)->update($data);
+            app(UpdateLocation::class)(Location::findOrFail($this->editingId), $data);
         } else {
-            Location::create($data);
+            app(CreateLocation::class)($data);
         }
 
         $this->showModal = false;
@@ -83,13 +81,15 @@ new class extends Component
     {
         $location = Location::with('racks')->findOrFail($this->deletingId);
 
-        if ($location->racks()->exists()) {
-            $this->addError('deletingId', 'Tidak dapat dihapus karena masih ada rack di server room ini.');
+        try {
+            app(DeleteLocation::class)($location);
+        } catch (ValidationException $e) {
+            foreach ($e->errors()['deletingId'] ?? [] as $message) {
+                $this->addError('deletingId', $message);
+            }
 
             return;
         }
-
-        $location->delete();
 
         $this->showDeleteModal = false;
         $this->deletingId = null;

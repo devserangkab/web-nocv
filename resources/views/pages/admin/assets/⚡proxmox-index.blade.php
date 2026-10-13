@@ -3,9 +3,11 @@
 use App\Models\Proxmox;
 use App\Models\Server;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use App\Actions\Assets\CreateProxmox;
+use App\Actions\Assets\DeleteProxmox;
+use App\Actions\Assets\UpdateProxmox;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
-use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -26,23 +28,16 @@ new class extends Component
 
     public ?int $deletingId = null;
 
-    #[Validate('required', message: 'Nama Proxmox wajib diisi.')]
-    #[Validate('max:255', message: 'Nama Proxmox maksimal 255 karakter.')]
     public string $name = '';
 
-    #[Validate('nullable|url', message: 'URL harus berupa alamat URL yang valid (contoh: https://10.10.1.11:8006).')]
     public string $url = '';
 
-    #[Validate('max:20', message: 'Version maksimal 20 karakter.')]
     public string $version = '';
 
-    #[Validate('max:255', message: 'Username maksimal 255 karakter.')]
     public string $username = '';
 
-    #[Validate('max:255', message: 'Password maksimal 255 karakter.')]
     public string $password = '';
 
-    #[Validate('nullable|exists:servers,server_id', message: 'Server tidak ditemukan.')]
     public string $assign_server_id = '';
 
     public function updatedSearch(): void
@@ -73,42 +68,19 @@ new class extends Component
 
     public function save(): void
     {
-        $this->validate();
-
-        // Satu server maksimal satu Proxmox (server optional).
-        if ($this->assign_server_id !== '') {
-            $taken = Proxmox::query()
-                ->where('server_id', $this->assign_server_id)
-                ->when($this->editingId !== null, fn ($query) => $query->where('id', '!=', $this->editingId))
-                ->exists();
-
-            if ($taken) {
-                $this->addError('assign_server_id', 'Server sudah memiliki Proxmox.');
-
-                return;
-            }
-        }
-
         $data = [
             'name' => $this->name,
             'url' => $this->url === '' ? null : $this->url,
             'version' => $this->version === '' ? null : $this->version,
-            'server_id' => $this->assign_server_id === '' ? null : $this->assign_server_id,
+            'assign_server_id' => $this->assign_server_id,
+            'username' => $this->username,
+            'password' => $this->password,
         ];
 
-        // Kredensial: kosong saat edit = biarkan nilai lama
-        if ($this->editingId === null || $this->username !== '') {
-            $data['username'] = $this->username === '' ? null : $this->username;
-        }
-
-        if ($this->editingId === null || $this->password !== '') {
-            $data['password'] = $this->password === '' ? null : $this->password;
-        }
-
         if ($this->editingId !== null) {
-            Proxmox::findOrFail($this->editingId)->update($data);
+            app(UpdateProxmox::class)(Proxmox::findOrFail($this->editingId), $data);
         } else {
-            Proxmox::create($data);
+            app(CreateProxmox::class)($data);
         }
 
         $this->showModal = false;
@@ -124,7 +96,7 @@ new class extends Component
     public function delete(): void
     {
         if ($this->deletingId !== null) {
-            Proxmox::findOrFail($this->deletingId)->delete();
+            app(DeleteProxmox::class)(Proxmox::findOrFail($this->deletingId));
         }
 
         $this->showDeleteModal = false;

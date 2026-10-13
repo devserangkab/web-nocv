@@ -2,9 +2,12 @@
 
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use App\Actions\Management\CreateUser;
+use App\Actions\Management\DeleteUser;
+use App\Actions\Management\UpdateUser;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
-use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Spatie\Permission\Models\Role;
@@ -28,22 +31,14 @@ new class extends Component
 
     public ?int $deletingId = null;
 
-    #[Validate('required', message: 'Name wajib diisi.')]
-    #[Validate('max:255', message: 'Name maksimal 255 karakter.')]
     public string $name = '';
 
-    #[Validate('required', message: 'Email wajib diisi.')]
-    #[Validate('email', message: 'Email harus format email yang valid.')]
     public string $email = '';
 
-    #[Validate('nullable', message: 'Password minimal 8 karakter.')]
-    #[Validate('min:8', message: 'Password minimal 8 karakter.')]
-    #[Validate('same:passwordConfirmation', message: 'Konfirmasi password tidak cocok.')]
     public string $password = '';
 
     public string $passwordConfirmation = '';
 
-    #[Validate('required', message: 'Role wajib dipilih.')]
     public string $role = '';
 
     public function updatedSearch(): void
@@ -78,42 +73,19 @@ new class extends Component
 
     public function save(): void
     {
-        $this->validate();
-
-        if ($this->editingId === null && $this->password === '') {
-            $this->addError('password', 'Password wajib diisi.');
-
-            return;
-        }
-
-        $taken = User::query()
-            ->where('email', $this->email)
-            ->when($this->editingId !== null, fn ($query) => $query->where('id', '!=', $this->editingId))
-            ->exists();
-
-        if ($taken) {
-            $this->addError('email', 'Email sudah terdaftar.');
-
-            return;
-        }
-
         $data = [
             'name' => $this->name,
             'email' => $this->email,
+            'password' => $this->password,
+            'passwordConfirmation' => $this->passwordConfirmation,
+            'role' => $this->role,
         ];
 
-        if ($this->password !== '') {
-            $data['password'] = $this->password;
-        }
-
-        // Field password ter-cast 'hashed', jadi teks polos langsung menyimpan versi hash.
-        $user = $this->editingId !== null ? User::findOrFail($this->editingId) : User::create($data);
-
         if ($this->editingId !== null) {
-            $user->update($data);
+            app(UpdateUser::class)(User::findOrFail($this->editingId), $data);
+        } else {
+            app(CreateUser::class)($data);
         }
-
-        $user->syncRoles([$this->role]);
 
         $this->showModal = false;
         $this->resetForm();
@@ -130,19 +102,15 @@ new class extends Component
         $user = $this->deletingId !== null ? User::find($this->deletingId) : null;
 
         if ($user !== null) {
-            if ($user->id === auth()->id()) {
-                $this->addError('deletingId', 'Tidak bisa menghapus akun sendiri.');
+            try {
+                app(DeleteUser::class)($user);
+            } catch (ValidationException $e) {
+                foreach ($e->errors()['deletingId'] ?? [] as $message) {
+                    $this->addError('deletingId', $message);
+                }
 
                 return;
             }
-
-            if ($user->hasRole('superadmin')) {
-                $this->addError('deletingId', 'User superadmin tidak bisa dihapus.');
-
-                return;
-            }
-
-            $user->delete();
         }
 
         $this->showDeleteModal = false;

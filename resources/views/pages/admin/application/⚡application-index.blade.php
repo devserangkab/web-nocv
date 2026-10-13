@@ -1,5 +1,7 @@
 <?php
 
+use App\Actions\Applications\DeleteApplication;
+use App\Actions\Applications\StoreApplication;
 use App\Enums\ApplicationStatus;
 use App\Enums\ApplicationType;
 use App\Enums\DeveloperType;
@@ -8,14 +10,12 @@ use App\Models\Developer;
 use App\Models\Institution;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
-use Livewire\Attributes\Validate;
 use Livewire\Component;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
-use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 new class extends Component
 {
@@ -39,46 +39,30 @@ new class extends Component
 
     public ?int $deletingId = null;
 
-    #[Validate('required', message: 'Name wajib diisi.')]
-    #[Validate('max:255', message: 'Name maksimal 255 karakter.')]
     public string $name = '';
 
-    #[Validate('max:50', message: 'Singkatan maksimal 50 karakter.')]
     public string $abbreviation = '';
 
-    #[Validate('max:1000', message: 'Description maksimal 1000 karakter.')]
     public string $description = '';
 
-    #[Validate('required', message: 'Status wajib dipilih.')]
     public string $status = '';
 
-    #[Validate('required', message: 'Jenis application wajib dipilih.')]
     public string $type = '';
 
     public string $requested_by = '';
 
-    #[Validate('max:255', message: 'Domain maksimal 255 karakter.')]
     public string $domain = '';
 
-    #[Validate('nullable', message: 'Repo URL harus berupa URL yang valid (contoh: https://github.com/org/repo).')]
-    #[Validate('max:255', message: 'Repo URL maksimal 255 karakter.')]
-    #[Validate('url', message: 'Repo URL harus berupa URL yang valid (contoh: https://github.com/org/repo).')]
     public string $repo_url = '';
 
-    #[Validate('nullable', message: 'Icon harus berupa gambar (jpg, png, svg, webp).')]
-    #[Validate('image', message: 'Icon harus berupa gambar (jpg, png, svg, webp).')]
-    #[Validate('max:2048', message: 'Icon maksimal 2 MB.')]
     public $icon = null; // @var TemporaryUploadedFile|null|min:0
 
     public string $icon_path = '';
 
-    #[Validate('max:255', message: 'Framework maksimal 255 karakter.')]
     public string $framework = '';
 
-    #[Validate('max:255', message: 'Language maksimal 255 karakter.')]
     public string $language = '';
 
-    #[Validate('max:255', message: 'Database maksimal 255 karakter.')]
     public string $database = '';
 
     /**
@@ -156,73 +140,29 @@ new class extends Component
 
     public function save(): void
     {
-        $this->validate();
-
-        $nameTaken = Application::query()
-            ->where('name', $this->name)
-            ->when($this->editingId !== null, fn ($query) => $query->where('id', '!=', $this->editingId))
-            ->exists();
-
-        if ($nameTaken) {
-            $this->addError('name', 'Nama application sudah dipakai.');
-
-            return;
-        }
-
-        // Repeater: baris sudah diisi dan terisi parsial atau user ganda ditolak
-        $rows = collect($this->developerRows)->filter(fn ($row) => filled($row['user_id']) || filled($row['type']));
-
-        if ($rows->contains(fn ($row) => blank($row['user_id']) || blank($row['type']))) {
-            $this->addError('developers', 'Developer dan jenisnya wajib diisi lengkap.');
-
-            return;
-        }
-
-        if ($rows->pluck('user_id')->duplicates()->isNotEmpty()) {
-            $this->addError('developers', 'Developer tidak boleh didaftar dua kali.');
-
-            return;
-        }
-
+        // Validasi dinormalisasi di action; baris developer & icon ikut di-manage action.
         $data = [
             'name' => $this->name,
             'abbreviation' => $this->abbreviation === '' ? null : $this->abbreviation,
             'description' => $this->description === '' ? null : $this->description,
-            'status' => ApplicationStatus::from($this->status),
-            'type' => ApplicationType::from($this->type),
+            'status' => $this->status,
+            'type' => $this->type,
             'requested_by' => $this->requested_by === '' ? null : (int) $this->requested_by,
             'domain' => $this->domain === '' ? null : $this->domain,
             'repo_url' => $this->repo_url === '' ? null : $this->repo_url,
             'framework' => $this->framework === '' ? null : $this->framework,
             'language' => $this->language === '' ? null : $this->language,
             'database' => $this->database === '' ? null : $this->database,
+            'icon' => $this->icon,
+            'existing_icon_path' => $this->icon_path,
+            'developers' => $this->developerRows,
         ];
 
-        // Icon: upload baru menggantikan yang lama
-        if ($this->icon instanceof TemporaryUploadedFile) {
-            if ($this->icon_path !== '') {
-                Storage::disk('public')->delete($this->icon_path);
-            }
-
-            $data['icon'] = $this->icon->store('applications', 'public');
-        } else {
-            $data['icon'] = $this->icon_path === '' ? null : $this->icon_path;
-        }
-
         if ($this->editingId !== null) {
-            $application = Application::findOrFail($this->editingId);
-            $application->update($data);
+            app(StoreApplication::class)(Application::findOrFail($this->editingId), $data);
         } else {
-            $application = Application::create($data);
+            app(StoreApplication::class)(new Application, $data);
         }
-
-        // Sinkronisasi repeater developer: bersihkan lama, tulis ulang sesuai baris valid
-        $application->developers()->delete();
-        $rows->each(fn ($row) => $application->developers()->create([
-            'developer_id' => (int) $row['user_id'],
-            'type' => DeveloperType::from($row['type']),
-        ]));
-
         $this->showModal = false;
         $this->resetForm();
     }
@@ -238,11 +178,7 @@ new class extends Component
         if ($this->deletingId !== null) {
             $application = Application::findOrFail($this->deletingId);
 
-            if ($application->icon !== null) {
-                Storage::disk('public')->delete($application->icon);
-            }
-
-            $application->delete(); // pivot developers ikut via FK cascade
+            app(DeleteApplication::class)($application);
         }
 
         $this->showDeleteModal = false;

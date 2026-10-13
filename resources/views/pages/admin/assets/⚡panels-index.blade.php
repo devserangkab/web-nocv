@@ -5,9 +5,11 @@ use App\Models\Panel;
 use App\Models\Server;
 use App\Models\Vms;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use App\Actions\Assets\CreatePanel;
+use App\Actions\Assets\DeletePanel;
+use App\Actions\Assets\UpdatePanel;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
-use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -30,29 +32,20 @@ new class extends Component
 
     public ?int $deletingId = null;
 
-    #[Validate('required', message: 'Host wajib dipilih.')]
     public string $host = '';
 
-    #[Validate('required', message: 'Nama panel wajib diisi.')]
-    #[Validate('max:255', message: 'Nama panel maksimal 255 karakter.')]
     public string $name = '';
 
-    #[Validate('required', message: 'Jenis panel wajib dipilih.')]
     public string $type = '';
 
-    #[Validate('nullable|url', message: 'Internet address harus berupa URL yang valid (contoh: https://panel.domain:7800).')]
     public string $internet_address = '';
 
-    #[Validate('nullable|url', message: 'Internal address harus berupa URL yang valid (contoh: https://10.10.1.11:7800).')]
     public string $internal_address = '';
 
-    #[Validate('max:20', message: 'Version maksimal 20 karakter.')]
     public string $version = '';
 
-    #[Validate('max:255', message: 'Username maksimal 255 karakter.')]
     public string $username = '';
 
-    #[Validate('max:255', message: 'Password maksimal 255 karakter.')]
     public string $password = '';
 
     public function updatedSearch(): void
@@ -92,45 +85,21 @@ new class extends Component
 
     public function save(): void
     {
-        $this->validate();
-
-        [$kind, $code] = explode(':', $this->host, 2);
-
-        if ($kind === 'vm' && ! Vms::where('vm_id', $code)->exists()) {
-            $this->addError('host', 'VM tidak ditemukan.');
-
-            return;
-        }
-
-        if ($kind === 'srv' && ! Server::where('server_id', $code)->exists()) {
-            $this->addError('host', 'Server tidak ditemukan.');
-
-            return;
-        }
-
         $data = [
-            'vm_id' => $kind === 'vm' ? $code : null,
-            'server_id' => $kind === 'srv' ? $code : null,
+            'host' => $this->host,
             'name' => $this->name,
+            'type' => $this->type,
             'internet_address' => $this->internet_address === '' ? null : $this->internet_address,
             'internal_address' => $this->internal_address === '' ? null : $this->internal_address,
-            'type' => PanelType::from($this->type),
             'version' => $this->version === '' ? null : $this->version,
+            'username' => $this->username,
+            'password' => $this->password,
         ];
 
-        // Kredensial: kosong saat edit = biarkan nilai lama
-        if ($this->editingId === null || $this->username !== '') {
-            $data['username'] = $this->username === '' ? null : $this->username;
-        }
-
-        if ($this->editingId === null || $this->password !== '') {
-            $data['password'] = $this->password === '' ? null : $this->password;
-        }
-
         if ($this->editingId !== null) {
-            Panel::findOrFail($this->editingId)->update($data);
+            app(UpdatePanel::class)(Panel::findOrFail($this->editingId), $data);
         } else {
-            Panel::create($data);
+            app(CreatePanel::class)($data);
         }
 
         $this->showModal = false;
@@ -146,7 +115,7 @@ new class extends Component
     public function delete(): void
     {
         if ($this->deletingId !== null) {
-            Panel::findOrFail($this->deletingId)->delete();
+            app(DeletePanel::class)(Panel::findOrFail($this->deletingId));
         }
 
         $this->showDeleteModal = false;

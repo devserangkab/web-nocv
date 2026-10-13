@@ -2,9 +2,12 @@
 
 use App\Models\Rack;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use App\Actions\Assets\CreateRack;
+use App\Actions\Assets\DeleteRack;
+use App\Actions\Assets\UpdateRack;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
-use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -27,19 +30,13 @@ new class extends Component
 
     public ?int $deletingId = null;
 
-    #[Validate('required', message: 'Lokasi rack wajib dipilih.')]
     public string $location_id = '';
 
-    #[Validate('required', message: 'Nama rack wajib diisi.')]
-    #[Validate('max:255', message: 'Nama rack maksimal 255 karakter.')]
     public string $name = '';
 
-    #[Validate('max:255', message: 'Brand maksimal 255 karakter.')]
     public string $brand = '';
 
-    #[Validate('nullable|max:7|regex:/^#([0-9A-Fa-f]{6})?$/i', message: 'Warna harus berupa kode warna (contoh: #1B604E).')]
     public string $color = '';
-    #[Validate('nullable|integer|min:1', message: 'Units harus berupa angka (minimal 1).')]
     public string $units = '';
 
     public function updatedSearch(): void
@@ -74,8 +71,6 @@ new class extends Component
 
     public function save(): void
     {
-        $this->validate();
-
         $data = [
             'location_id' => $this->location_id === '' ? null : $this->location_id,
             'name' => $this->name,
@@ -85,9 +80,9 @@ new class extends Component
         ];
 
         if ($this->editingId !== null) {
-            Rack::findOrFail($this->editingId)->update($data);
+            app(UpdateRack::class)(Rack::findOrFail($this->editingId), $data);
         } else {
-            Rack::create($data);
+            app(CreateRack::class)($data);
         }
 
         $this->showModal = false;
@@ -104,13 +99,16 @@ new class extends Component
     {
         $rack = Rack::with('servers')->findOrFail($this->deletingId);
 
-        if ($rack->servers()->exists()) {
-            $this->addError('deletingId', 'Tidak dapat dihapus karena masih ada server di dalam rack ini.');
+        try {
+            app(DeleteRack::class)($rack);
+        } catch (ValidationException $e) {
+            // Bonus biarkan modal terbuka — message berada di error bag deletingId
+            foreach ($e->errors()['deletingId'] ?? [] as $message) {
+                $this->addError('deletingId', $message);
+            }
 
             return;
         }
-
-        $rack->delete();
 
         $this->showDeleteModal = false;
         $this->deletingId = null;

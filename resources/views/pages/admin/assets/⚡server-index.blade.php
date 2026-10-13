@@ -5,9 +5,11 @@ use App\Models\Location;
 use App\Models\Rack;
 use App\Models\Server;
 use Illuminate\Support\Collection;
+use App\Actions\Assets\CreateServer;
+use App\Actions\Assets\DeleteServer;
+use App\Actions\Assets\UpdateServer;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
-use Livewire\Attributes\Validate;
 use Livewire\Component;
 
 new class extends Component
@@ -29,50 +31,34 @@ new class extends Component
 
     public ?int $deletingId = null;
 
-    #[Validate('required', message: 'Nama server wajib diisi.')]
-    #[Validate('max:255', message: 'Nama server maksimal 255 karakter.')]
     public string $server_name = '';
 
-    #[Validate('nullable|exists:racks,rack_id', message: 'Rack tidak ditemukan.')]
     public string $rack_id = '';
 
-    #[Validate('nullable|integer|min:1', message: 'Position harus berupa angka urutan (minimal 1).')]
     public string $position = '';
 
-    #[Validate('max:255', message: 'Brand maksimal 255 karakter.')]
     public string $brand = '';
 
-    #[Validate('nullable|integer|min:0', message: 'Storage harus berupa angka megabyte (MB).')]
     public string $storage_size = '';
 
-    #[Validate('max:255', message: 'Spesifikasi storage maksimal 255 karakter.')]
     public string $storage = '';
 
-    #[Validate('nullable|integer|min:0', message: 'Memory harus berupa angka megabyte (MB).')]
     public string $memory_size = '';
 
-    #[Validate('max:255', message: 'Spesifikasi memory maksimal 255 karakter.')]
     public string $memory = '';
 
-    #[Validate('in:ON,OFF', message: 'Status harus ON atau OFF.')]
     public string $status = ServerStatus::Off->value;
 
-    #[Validate('max:255', message: 'CPU maksimal 255 karakter.')]
     public string $cpu = '';
 
-    #[Validate('nullable|ip', message: 'Static IP harus berupa alamat IP yang valid.')]
     public string $static_ip = '';
 
-    #[Validate('nullable|exists:locations,location_id', message: 'Location tidak ditemukan.')]
     public string $location_id = '';
 
-    #[Validate('max:255', message: 'OS maksimal 255 karakter.')]
     public string $os = '';
 
-    #[Validate('max:255', message: 'Username maksimal 255 karakter.')]
     public string $username = '';
 
-    #[Validate('max:255', message: 'Password maksimal 255 karakter.')]
     public string $password = '';
 
     public function updatedRackId(string $value): void
@@ -123,19 +109,7 @@ new class extends Component
 
     public function save(): void
     {
-        $this->validate();
-
-        // Konsistensi: lokasi server mengikuti rak; wajib eksplisit untuk server tanpa rack.
-        if ($this->rack_id !== '') {
-            $this->location_id = (string) (Rack::with('location')->where('rack_id', $this->rack_id)->first()?->location?->location_id ?? '');
-        }
-
-        if ($this->rack_id === '' && $this->location_id === '') {
-            $this->addError('location_id', 'Location wajib dipilih untuk server tanpa rack.');
-
-            return;
-        }
-
+        // Semua rule & pesan validasi dimiliki oleh action (satu sumber kebenaran).
         $data = [
             'server_name' => $this->server_name,
             'rack_id' => $this->rack_id === '' ? null : $this->rack_id,
@@ -150,21 +124,14 @@ new class extends Component
             'cpu' => $this->cpu === '' ? null : $this->cpu,
             'static_ip' => $this->static_ip === '' ? null : $this->static_ip,
             'os' => $this->os === '' ? null : $this->os,
+            'username' => $this->username,
+            'password' => $this->password,
         ];
 
-        // Kredensial: kosong saat edit = biarkan nilai lama
-        if ($this->editingId === null || $this->username !== '') {
-            $data['username'] = $this->username === '' ? null : $this->username;
-        }
-
-        if ($this->editingId === null || $this->password !== '') {
-            $data['password'] = $this->password === '' ? null : $this->password;
-        }
-
         if ($this->editingId !== null) {
-            Server::findOrFail($this->editingId)->update($data);
+            app(UpdateServer::class)(Server::findOrFail($this->editingId), $data);
         } else {
-            Server::create($data);
+            app(CreateServer::class)($data);
         }
 
         $this->showModal = false;
@@ -180,7 +147,7 @@ new class extends Component
     public function delete(): void
     {
         if ($this->deletingId !== null) {
-            Server::findOrFail($this->deletingId)->delete();
+            app(DeleteServer::class)(Server::findOrFail($this->deletingId));
         }
 
         $this->showDeleteModal = false;
