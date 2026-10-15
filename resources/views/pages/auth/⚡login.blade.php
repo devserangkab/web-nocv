@@ -215,23 +215,23 @@ new class extends Component
                 </div>
 
                 <div
-                    class="mt-2 rounded-lg border border-stroke-primary bg-background-secondary px-4 py-3 transition-all duration-300 ease-out"
+                    class="mt-2 rounded-sm border gap-2 flex flex-col justify-center border-stroke-primary bg-background-secondary px-4 py-3 transition-all duration-300 ease-out"
                     x-show="shown"
                     x-cloak
                 >
                     <p
-                        class="flex flex-wrap items-center justify-center gap-1 font-[Cambria,Georgia,serif] text-xl text-content-primary"
+                        class="flex flex-wrap items-center gap-1 font-[Cambria,Georgia,serif] text-2xl text-content-primary"
                         title="{{ $captchaQuestion }}"
                     >
                         {!! $captchaQuestionHtml !!}
                     </p>
 
-                    <div class="mt-3 grid grid-cols-4 gap-2">
+                    <div class="mt-3 grid grid-cols-4 gap-2 w-full">
                         @foreach ($captchaOptions as $option)
                             <button
                                 type="button"
                                 wire:click="$set('captchaAnswer', '{{ $option }}')"
-                                class="rounded-lg border px-2 py-2 text-center text-sm font-medium transition-colors duration-150 {{ $captchaAnswer === (string) $option ? 'border-transparent bg-guide-500 text-white' : 'border-stroke-primary bg-background-primary text-content-primary hover:border-guide-500' }}"
+                                class="rounded-sm border px-2 py-2 text-center text-sm font-medium transition-colors duration-150 {{ $captchaAnswer === (string) $option ? 'border-transparent bg-guide-500 text-white' : 'border-stroke-primary bg-background-primary text-content-primary hover:border-guide-500' }}"
                             >
                                 {{ $option }}
                             </button>
