@@ -393,24 +393,14 @@ new class extends Component
         <div class="mt-6">{{ $panels->links('vendor.pagination.tailwind') }}</div>
     @else
         {{-- Empty state (IDDS) --}}
-        <div class="ina-card ina-card--stack mt-4 items-center px-6 py-12 text-center">
-            <x-asset.illustration name="{{ $search !== '' ? 'noresult' : 'nodata' }}" size="sm" />
+        <div class="ina-card ina-card--stack mt-4 px-6 py-12 text-center">
+            <x-asset.illustration name="{{ $search !== '' || $typeFilter !== 'ALL' ? 'noresult' : 'nodata' }}" size="sm" />
             <h2 class="mt-4 text-base font-semibold text-content-primary">
                 {{ $search !== '' || $typeFilter !== 'ALL' ? 'Tidak ada panel untuk filter ini' : 'Belum ada panel' }}
             </h2>
-            <p class="mt-2 max-w-sm text-sm text-content-secondary">
+            <p class="mt-2 mx-auto max-w-sm text-sm text-content-secondary">
                 {{ $search !== '' || $typeFilter !== 'ALL' ? 'Ubah kata kunci atau filter jenis.' : 'Panel yang ditambahkan akan tampil di sini, terpasang di VM atau server.' }}
             </p>
-            @if ($search === '' && $typeFilter === 'ALL')
-                <button type="button" wire:click="openCreate" class="ina-button ina-button--primary ina-button--md mt-6">
-                    <i class="ti ti-plus text-lg" aria-hidden="true"></i>
-                    Tambah Panel
-                </button>
-            @else
-                <button type="button" wire:click="$set('typeFilter', 'ALL'); $set('search', '')" class="ina-button ina-button--secondary ina-button--md mt-6">
-                    Bersihkan Filter
-                </button>
-            @endif
         </div>
     @endif
 

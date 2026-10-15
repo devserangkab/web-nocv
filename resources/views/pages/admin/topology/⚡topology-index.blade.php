@@ -439,13 +439,10 @@ new class extends Component
         </div>
     @else
         {{-- Empty state (IDDS) --}}
-        <div class="ina-card ina-card--stack mt-4 items-center px-6 py-12 text-center">
+        <div class="ina-card ina-card--stack mt-4 px-6 py-12 text-center">
             <x-asset.illustration name="{{ $search !== '' ? 'noresult' : 'nodata' }}" size="sm" />
             <h2 class="mt-4 text-base font-semibold text-content-primary">Tidak ada aset yang cocok</h2>
-            <p class="mt-2 max-w-sm text-sm text-content-secondary">Ubah kata kunci pencarian, aktifkan jenis aset yang tersembunyi, atau bersihkan filter.</p>
-            <button type="button" wire:click="$set('search', ''); showAllTypes" class="ina-button ina-button--secondary ina-button--md mt-6">
-                Bersihkan Filter
-            </button>
+            <p class="mt-2 mx-auto max-w-sm text-sm text-content-secondary">Ubah kata kunci pencarian atau aktifkan jenis aset yang tersembunyi.</p>
         </div>
     @endif
 </div>

@@ -124,26 +124,14 @@ use App\Models\Vms;
     <div class="mt-6">{{ $vms->links('vendor.pagination.tailwind') }}</div>
 @else
     {{-- Empty state (IDDS) --}}
-    <div class="ina-card ina-card--stack mt-4 items-center px-6 py-12 text-center">
-        <x-asset.illustration name="{{ $vmSearch !== '' ? 'noresult' : 'nodata' }}" size="sm" />
-            <i class="ti ti-box-multiple-3 text-2xl text-content-tertiary"></i>
-        </div>
+    <div class="ina-card ina-card--stack mt-4 px-6 py-12 text-center">
+        <x-asset.illustration name="{{ $vmSearch !== '' || $proxmoxFilter !== 'ALL' ? 'noresult' : 'nodata' }}" size="sm" />
         <h2 class="mt-4 text-base font-semibold text-content-primary">
             {{ $vmSearch !== '' || $proxmoxFilter !== 'ALL' ? 'Tidak ada VM untuk filter ini' : 'Belum ada VM' }}
         </h2>
-        <p class="mt-2 max-w-sm text-sm text-content-secondary">
+        <p class="mt-2 mx-auto max-w-sm text-sm text-content-secondary">
             {{ $vmSearch !== '' || $proxmoxFilter !== 'ALL' ? 'Ubah kata kunci atau filter host.' : 'VM yang ditambahkan akan tampil di sini, terhubung ke host Proxmox.' }}
         </p>
-        @if ($vmSearch === '' && $proxmoxFilter === 'ALL')
-            <button type="button" wire:click="openVmsCreate" class="ina-button ina-button--primary ina-button--md mt-6">
-                <i class="ti ti-plus text-lg" aria-hidden="true"></i>
-                Tambah VM
-            </button>
-        @else
-            <button type="button" wire:click="$set('proxmoxFilter', 'ALL'); $set('vmSearch', '')" class="ina-button ina-button--secondary ina-button--md mt-6">
-                Bersihkan Filter
-            </button>
-        @endif
     </div>
 @endif
 

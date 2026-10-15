@@ -281,22 +281,14 @@ new class extends Component
         <div class="mt-6">{{ $roles->links('vendor.pagination.tailwind') }}</div>
     @else
         {{-- Empty state (IDDS) --}}
-        <div class="ina-card ina-card--stack mt-4 items-center px-6 py-12 text-center">
-            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-background-tertiary">
-                <i class="ti ti-shield-check text-2xl text-content-tertiary"></i>
-            </div>
+        <div class="ina-card ina-card--stack mt-4 px-6 py-12 text-center">
+            <x-asset.illustration name="{{ $search !== '' ? 'noresult' : 'nodata' }}" size="sm" />
             <h2 class="mt-4 text-base font-semibold text-content-primary">
                 {{ $search !== '' ? 'Tidak ada role untuk pencarian ini' : 'Belum ada role' }}
             </h2>
-            <p class="mt-2 max-w-sm text-sm text-content-secondary">
+            <p class="mt-2 mx-auto max-w-sm text-sm text-content-secondary">
                 {{ $search !== '' ? 'Ubah kata kunci pencarian.' : 'Role yang ditambahkan akan tampil di sini berserta permission-nya.' }}
             </p>
-            @if ($search === '')
-                <button type="button" wire:click="openCreate" class="ina-button ina-button--primary ina-button--md mt-6">
-                    <i class="ti ti-plus text-lg" aria-hidden="true"></i>
-                    Tambah Role
-                </button>
-            @endif
         </div>
     @endif
 

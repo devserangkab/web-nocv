@@ -216,20 +216,14 @@ new class extends Component
         <div class="mt-6">{{ $reports->links('vendor.pagination.tailwind') }}</div>
     @else
         {{-- Empty state (IDDS) --}}
-        <div class="ina-card ina-card--stack mt-4 items-center px-6 py-12 text-center">
+        <div class="ina-card ina-card--stack mt-4 px-6 py-12 text-center">
             <x-asset.illustration name="{{ $search !== '' ? 'noresult' : 'nodata' }}" size="sm" />
             <h2 class="mt-4 text-base font-semibold text-content-primary">
                 {{ $search !== '' ? 'Tidak ada laporan untuk "'.$search.'"' : 'Belum ada laporan bulanan' }}
             </h2>
-            <p class="mt-2 max-w-sm text-sm text-content-secondary">
+            <p class="mt-2 mx-auto max-w-sm text-sm text-content-secondary">
                 {{ $search !== '' ? 'Coba kata kunci lain.' : 'Buat laporan untuk suatu periode, pilih uraian kerja dari aktivitas, tulis pendahuluan & kesimpulan, lalu cetak.' }}
             </p>
-            @if ($search === '')
-                <button type="button" wire:click="openCreate" class="ina-button ina-button--primary ina-button--md mt-6">
-                    <i class="ti ti-file-plus text-lg" aria-hidden="true"></i>
-                    Buat Laporan
-                </button>
-            @endif
         </div>
     @endif
 

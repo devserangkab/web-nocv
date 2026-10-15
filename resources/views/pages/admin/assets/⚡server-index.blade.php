@@ -542,24 +542,14 @@ new class extends Component
     @else
 
         {{-- Empty state (IDDS) --}}
-        <div class="ina-card ina-card--stack mt-4 items-center px-6 py-12 text-center">
+        <div class="ina-card ina-card--stack mt-4 px-6 py-12 text-center">
             <x-asset.illustration name="{{ $search !== '' ? 'noresult' : 'nodata' }}" size="sm" />
             <h2 class="mt-4 text-base font-semibold text-content-primary">
                 {{ $search !== '' ? 'Tidak ada hasil untuk "'.$search.'"' : 'Belum ada server' }}
             </h2>
-            <p class="mt-2 max-w-sm text-sm text-content-secondary">
+            <p class="mt-2 mx-auto max-w-sm text-sm text-content-secondary">
                 {{ $search !== '' ? 'Coba kata kunci lain atau bersihkan pencarian.' : 'Server yang ditambahkan akan tampil di sini. Mulai dengan mengisi data server pertama.' }}
             </p>
-            @if ($search === '')
-                <button type="button" wire:click="openCreate" class="ina-button ina-button--primary ina-button--md mt-6">
-                    <i class="ti ti-plus text-lg" aria-hidden="true"></i>
-                    Tambah Server
-                </button>
-            @else
-                <button type="button" wire:click="$set('search', '')" class="ina-button ina-button--secondary ina-button--md mt-6">
-                    Bersihkan Pencarian
-                </button>
-            @endif
         </div>
     @endif
 

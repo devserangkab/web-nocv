@@ -114,26 +114,14 @@ use App\Models\Proxmox;
     <div class="mt-6">{{ $proxmoxs->links('vendor.pagination.tailwind') }}</div>
 @else
     {{-- Empty state (IDDS) --}}
-    <div class="ina-card ina-card--stack mt-4 items-center px-6 py-12 text-center">
+    <div class="ina-card ina-card--stack mt-4 px-6 py-12 text-center">
         <x-asset.illustration name="{{ $proxmoxSearch !== '' ? 'noresult' : 'nodata' }}" size="sm" />
-            <i class="ti ti-virtualization text-2xl text-content-tertiary"></i>
-        </div>
         <h2 class="mt-4 text-base font-semibold text-content-primary">
             {{ $proxmoxSearch !== '' ? 'Tidak ada hasil untuk "'.$proxmoxSearch.'"' : 'Belum ada Proxmox' }}
         </h2>
-        <p class="mt-2 max-w-sm text-sm text-content-secondary">
+        <p class="mt-2 mx-auto max-w-sm text-sm text-content-secondary">
             {{ $proxmoxSearch !== '' ? 'Coba kata kunci lain atau bersihkan pencarian.' : 'Host Proxmox yang ditambahkan akan tampil di sini.' }}
         </p>
-        @if ($proxmoxSearch === '')
-            <button type="button" wire:click="openProxmoxCreate" class="ina-button ina-button--primary ina-button--md mt-6">
-                <i class="ti ti-plus text-lg" aria-hidden="true"></i>
-                Tambah Proxmox
-            </button>
-        @else
-            <button type="button" wire:click="$set('proxmoxSearch', '')" class="ina-button ina-button--secondary ina-button--md mt-6">
-                Bersihkan Pencarian
-            </button>
-        @endif
     </div>
 @endif
 

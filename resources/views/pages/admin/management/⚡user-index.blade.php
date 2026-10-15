@@ -296,26 +296,14 @@ new class extends Component
         <div class="mt-6">{{ $users->links('vendor.pagination.tailwind') }}</div>
     @else
         {{-- Empty state (IDDS) --}}
-        <div class="ina-card ina-card--stack mt-4 items-center px-6 py-12 text-center">
-            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-background-tertiary">
-                <i class="ti ti-users text-2xl text-content-tertiary"></i>
-            </div>
+        <div class="ina-card ina-card--stack mt-4 px-6 py-12 text-center">
+            <x-asset.illustration name="{{ $search !== '' || $roleFilter !== 'ALL' ? 'noresult' : 'nodata' }}" size="sm" />
             <h2 class="mt-4 text-base font-semibold text-content-primary">
                 {{ $search !== '' || $roleFilter !== 'ALL' ? 'Tidak ada user untuk filter ini' : 'Belum ada user' }}
             </h2>
-            <p class="mt-2 max-w-sm text-sm text-content-secondary">
+            <p class="mt-2 mx-auto max-w-sm text-sm text-content-secondary">
                 {{ $search !== '' || $roleFilter !== 'ALL' ? 'Ubah kata kunci atau filter role.' : 'User yang ditambahkan akan tampil di sini berserta role-nya.' }}
             </p>
-            @if ($search === '' && $roleFilter === 'ALL')
-                <button type="button" wire:click="openCreate" class="ina-button ina-button--primary ina-button--md mt-6">
-                    <i class="ti ti-plus text-lg" aria-hidden="true"></i>
-                    Tambah User
-                </button>
-            @else
-                <button type="button" wire:click="$set('roleFilter', 'ALL'); $set('search', '')" class="ina-button ina-button--secondary ina-button--md mt-6">
-                    Bersihkan Filter
-                </button>
-            @endif
         </div>
     @endif
 
