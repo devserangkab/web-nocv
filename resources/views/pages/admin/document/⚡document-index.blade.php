@@ -493,9 +493,7 @@ new class extends Component
     @else
         {{-- Empty state (IDDS) --}}
         <div class="ina-card ina-card--stack mt-4 items-center px-6 py-12 text-center">
-            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-background-tertiary">
-                <i class="ti ti-folder text-2xl text-content-tertiary"></i>
-            </div>
+            <x-asset.illustration name="{{ $search !== '' ? 'noresult' : 'nodata' }}" size="sm" />
             <h2 class="mt-4 text-base font-semibold text-content-primary">
                 {{ $search !== '' || $entityFilter !== 'ALL' || $categoryFilter !== 'ALL' || $dateFrom !== '' || $dateTo !== '' ? 'Tidak ada dokumen untuk filter ini' : 'Belum ada dokumen' }}
             </h2>

@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Nas extends Model
 {
     use GeneratesCode;
+
     /** @use HasFactory<NasFactory> */
     use HasFactory;
 
@@ -36,6 +37,7 @@ class Nas extends Model
         'brand',
         'storage_size',
         'bays',
+        'position',
         'raid_level',
         'os',
         'static_ip',
@@ -49,6 +51,7 @@ class Nas extends Model
         return [
             'storage_size' => 'integer',
             'bays' => 'integer',
+            'position' => 'integer',
             'status' => NasStatus::class,
             'static_ip' => EncryptedAttr::class,
             'username' => EncryptedAttr::class,

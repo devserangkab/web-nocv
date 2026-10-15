@@ -1,8 +1,10 @@
-<?php
+﻿<?php
 
 use App\Models\Activity;
 use App\Models\Document;
+use App\Models\Nas;
 use App\Models\Rack;
+use App\Models\Server;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -19,7 +21,7 @@ new class extends Component
     public function mount(string $rackId): void
     {
         $this->rack = Rack::query()
-            ->with(['location', 'servers'])
+            ->with(['location', 'servers', 'nas'])
             ->where('rack_id', $rackId)
             ->firstOrFail();
 
@@ -35,6 +37,40 @@ new class extends Component
             ['key' => 'activities', 'label' => 'Aktivitas', 'icon' => 'ti-activity', 'count' => Activity::where('subject_type', Rack::class)->where('subject_id', $this->rack->id)->count()],
             ['key' => 'gallery', 'label' => 'Gallery', 'icon' => 'ti-photo', 'count' => $this->rack->medias()->count()],
         ];
+    }
+
+    /**
+     * Isi rak gabungan (Server + NAS) terurut position Ã¢â‚¬â€ kosong di akhir.
+     */
+    public function rackItems()
+    {
+        $rack = $this->rack;
+
+        return $rack
+            ->servers()
+            ->get()
+            ->map(fn (Server $s) => (object) [
+                'kind' => 'server',
+                'id' => $s->id,
+                'code' => $s->server_id,
+                'name' => $s->server_name,
+                'brand' => $s->brand,
+                'position' => $s->position,
+                'detail' => $s->brand ?? '-',
+                'url' => route('admin.assets.servers.show', $s->server_id),
+            ])
+            ->concat($rack->nas()->get()->map(fn (Nas $n) => (object) [
+                'kind' => 'nas',
+                'id' => $n->id,
+                'code' => $n->nas_id,
+                'name' => $n->name,
+                'brand' => $n->brand,
+                'position' => $n->position,
+                'detail' => ($n->bays !== null ? $n->bays.' bay' : '-').($n->raid_level !== null ? ' Ã‚Â· '.$n->raid_level : ''),
+                'url' => route('admin.assets.nas.show', $n->nas_id),
+            ]))
+            ->sortBy(fn ($item) => $item->position ?? PHP_INT_MAX)
+            ->values();
     }
 };
 ?>
@@ -122,39 +158,55 @@ new class extends Component
     {{-- Tab: Relasi --}}
     @if ($tab === 'relations')
         <div class="mt-4">
+            @php $rackItems = $this->rackItems(); @endphp
             <div class="ina-card ina-card--stack p-6">
-                <h2 class="text-base font-semibold text-content-primary">Server dalam Rack</h2>
-                <p class="mt-0.5 text-sm text-content-secondary">Server yang ditempatkan di {{ $rack->name }}.</p>
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                        <h2 class="text-base font-semibold text-content-primary">Isi Rack</h2>
+                        <p class="mt-0.5 text-sm text-content-secondary">Server &amp; NAS yang ditempatkan di {{ $rack->name }}.</p>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs text-content-secondary">
+                        <span><span class="font-semibold text-content-primary">{{ $rack->servers->count() }}</span> server</span>
+                        <span><span class="font-semibold text-content-primary">{{ $rack->nas->count() }}</span> NAS</span>
+                    </div>
+                </div>
 
-                @if ($rack->servers->isNotEmpty())
+                @if ($rackItems->isNotEmpty())
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm">
                             <thead>
                                 <tr class="border-b border-stroke-primary bg-background-secondary text-left text-[12px] font-medium text-content-secondary">
+                                    <th scope="col" class="h-10 px-4 font-medium text-right">U</th>
+                                    <th scope="col" class="h-10 px-4 font-medium">Perangkat</th>
                                     <th scope="col" class="h-10 px-4 font-medium">Kode</th>
                                     <th scope="col" class="h-10 px-4 font-medium">Nama</th>
-                                    <th scope="col" class="h-10 px-4 font-medium">Brand</th>
-                                    <th scope="col" class="h-10 px-4 font-medium text-right">Posisi</th>
+                                    <th scope="col" class="h-10 px-4 font-medium">Info</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($rack->servers as $server)
-                                    <tr class="border-b border-stroke-primary transition-colors duration-150 h-14 last:border-b-0 hover:bg-neutral-50" wire:key="srv-{{ $server->id }}">
-                                        <td class="h-14 px-4 text-[13px] text-content-primary">{{ $server->server_id }}</td>
+                                @foreach ($rackItems as $item)
+                                    <tr class="border-b border-stroke-primary transition-colors duration-150 h-14 last:border-b-0 hover:bg-neutral-50" wire:key="item-{{ $item->kind }}-{{ $item->id }}">
+                                        <td class="h-14 px-4 text-right text-content-secondary">{{ $item->position !== null ? 'U'.$item->position : '-' }}</td>
+                                        <td class="h-14 px-4">
+                                            <span class="ina-badge ina-badge--soft ina-badge--sm {{ $item->kind === 'server' ? 'ina-badge--brand' : 'ina-badge--info' }}">
+                                                {{ $item->kind === 'server' ? 'Server' : 'NAS' }}
+                                            </span>
+                                        </td>
+                                        <td class="h-14 px-4 text-[13px] text-content-primary">{{ $item->code }}</td>
                                         <td class="h-14 max-w-xs truncate px-4 font-medium">
-                                            <a href="{{ route('admin.assets.servers.show', $server->server_id) }}" wire:navigate class="text-content-primary hover:text-guide-600" title="{{ $server->server_name }}">
-                                                {{ $server->server_name }}
+                                            <a href="{{ $item->url }}" wire:navigate class="text-content-primary hover:text-guide-600" title="{{ $item->name }}">
+                                                {{ $item->name }}
                                             </a>
                                         </td>
-                                        <td class="h-14 px-4 text-content-secondary">{{ $server->brand ?? '-' }}</td>
-                                        <td class="h-14 px-4 text-right text-content-secondary">{{ $server->position !== null ? 'U'.$server->position : '-' }}</td>
+                                        <td class="h-14 px-4 text-content-secondary">{{ $item->detail }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
                     </div>
                 @else
-                    <p class="py-6 text-center text-sm text-content-tertiary">Belum ada server di rack ini.</p>
+                    <x-asset.illustration name="nodata" size="sm" />
+                    <p class="mt-4 text-center text-sm text-content-tertiary">Belum ada isi rack.</p>
                 @endif
             </div>
         </div>

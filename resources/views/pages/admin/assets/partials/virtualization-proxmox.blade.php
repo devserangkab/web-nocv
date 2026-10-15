@@ -1,7 +1,7 @@
 <?php
 /**
- * Partial tab Proxmox — menyertakan tabel, modal, dan filter.
- * Property & method diambil dari komponen induk ⚡virtualization-index.
+ * Partial tab Proxmox â€” menyertakan tabel, modal, dan filter.
+ * Property & method diambil dari komponen induk âš¡virtualization-index.
  */
 use App\Models\Proxmox;
 ?>
@@ -115,7 +115,7 @@ use App\Models\Proxmox;
 @else
     {{-- Empty state (IDDS) --}}
     <div class="ina-card ina-card--stack mt-4 items-center px-6 py-12 text-center">
-        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-background-tertiary">
+        <x-asset.illustration name="{{ $proxmoxSearch !== '' ? 'noresult' : 'nodata' }}" size="sm" />
             <i class="ti ti-virtualization text-2xl text-content-tertiary"></i>
         </div>
         <h2 class="mt-4 text-base font-semibold text-content-primary">
@@ -258,7 +258,7 @@ use App\Models\Proxmox;
                             wire:model="proxmox_password"
                             class="ina-text-field__input"
                             autocomplete="new-password"
-                            placeholder="{{ $editingProxmoxId !== null ? 'Kosongkan bila tidak diubah' : '••••••••' }}"
+                            placeholder="{{ $editingProxmoxId !== null ? 'Kosongkan bila tidak diubah' : 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢' }}"
                         >
                     </div>
                     @error('password')

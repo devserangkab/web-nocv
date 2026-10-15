@@ -46,6 +46,8 @@ new class extends Component
 
     public string $bays = '';
 
+    public string $position = '';
+
     public string $raid_level = '';
 
     public string $os = '';
@@ -96,6 +98,7 @@ new class extends Component
         $this->brand = (string) $nas->brand;
         $this->storage_size = (string) $nas->storage_size;
         $this->bays = (string) $nas->bays;
+        $this->position = (string) $nas->position;
         $this->raid_level = (string) $nas->raid_level;
         $this->os = (string) $nas->os;
         $this->status = $nas->status?->value ?? NasStatus::Off->value;
@@ -116,6 +119,7 @@ new class extends Component
             'brand' => $this->brand === '' ? null : $this->brand,
             'storage_size' => $this->storage_size === '' ? null : (int) $this->storage_size,
             'bays' => $this->bays === '' ? null : (int) $this->bays,
+            'position' => $this->position === '' ? null : (int) $this->position,
             'raid_level' => $this->raid_level === '' ? null : $this->raid_level,
             'os' => $this->os === '' ? null : $this->os,
             'status' => $this->status,
@@ -166,6 +170,7 @@ new class extends Component
         $this->brand = '';
         $this->storage_size = '';
         $this->bays = '';
+        $this->position = '';
         $this->raid_level = '';
         $this->os = '';
         $this->status = NasStatus::Off->value;
@@ -298,6 +303,7 @@ new class extends Component
                             <th scope="col" class="h-10 px-4 font-medium">Brand</th>
                             <th scope="col" class="h-10 px-4 font-medium">Lokasi</th>
                             <th scope="col" class="h-10 px-4 font-medium text-right">Kapasitas</th>
+                            <th scope="col" class="h-10 px-4 font-medium text-right">Posisi</th>
                             <th scope="col" class="h-10 px-4 font-medium">RAID</th>
                             <th scope="col" class="h-10 px-4 font-medium">OS</th>
                             <th scope="col" class="h-10 px-4 font-medium">Status</th>
@@ -319,6 +325,7 @@ new class extends Component
                                     @endif
                                 </td>
                                 <td class="h-14 px-4 text-right text-content-primary">{{ $nas->storage_size !== null ? number_format($nas->storage_size / 1024).' GB' : '-' }}</td>
+                                <td class="h-14 px-4 text-right text-content-secondary">{{ $nas->position !== null ? 'U'.$nas->position : '-' }}</td>
                                 <td class="h-14 px-4 text-content-secondary">
                                     @if ($nas->raid_level !== null)
                                         <span class="ina-badge ina-badge--soft ina-badge--neutral ina-badge--sm">{{ $nas->raid_level }}</span>
@@ -371,26 +378,14 @@ new class extends Component
         <div class="mt-6">{{ $nasList->links('vendor.pagination.tailwind') }}</div>
     @else
         {{-- Empty state (IDDS) --}}
-        <div class="ina-card ina-card--stack mt-4 items-center px-6 py-12 text-center">
-            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-background-tertiary">
-                <i class="ti ti-database text-2xl text-content-tertiary"></i>
-            </div>
+        <div class="ina-card ina-card--stack mt-4 px-6 py-12 text-center">
+            <x-asset.illustration name="{{ $search !== '' || $statusFilter !== 'ALL' ? 'noresult' : 'nodata' }}" size="sm" />
             <h2 class="mt-4 text-base font-semibold text-content-primary">
                 {{ $search !== '' || $statusFilter !== 'ALL' ? 'Tidak ada NAS untuk filter ini' : 'Belum ada NAS' }}
             </h2>
-            <p class="mt-2 max-w-sm text-sm text-content-secondary">
+            <p class="mt-2 mx-auto max-w-sm text-sm text-content-secondary">
                 {{ $search !== '' || $statusFilter !== 'ALL' ? 'Ubah kata kunci atau bersihkan filter.' : 'Perangkat NAS yang ditambahkan akan tampil di sini — di rack atau langsung di server room.' }}
             </p>
-            @if ($search === '' && $statusFilter === 'ALL')
-                <button type="button" wire:click="openCreate" class="ina-button ina-button--primary ina-button--md mt-6">
-                    <i class="ti ti-database text-lg" aria-hidden="true"></i>
-                    Tambah NAS
-                </button>
-            @else
-                <button type="button" wire:click="$set('search', ''); $set('statusFilter', 'ALL')" class="ina-button ina-button--secondary ina-button--md mt-6">
-                    Bersihkan Filter
-                </button>
-            @endif
         </div>
     @endif
 
@@ -551,6 +546,28 @@ new class extends Component
                             >
                         </div>
                         @error('bays')
+                            <p class="mt-1.5 text-sm text-negative-500">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="ina-text-field" @if ($rack_id === '')
+                        style="display: none"
+                    @endif>
+                        <label for="nas_position" class="ina-text-field__label">
+                            Position (U)
+                        </label>
+                        <div class="ina-text-field__wrapper ina-text-field__wrapper--size-md {{ $errors->has('position') ? 'ina-text-field__wrapper--status-error' : '' }}">
+                            <input
+                                type="number"
+                                min="1"
+                                id="nas_position"
+                                wire:model="position"
+                                class="ina-text-field__input"
+                                placeholder="5"
+                            >
+                        </div>
+                        <p class="mt-1.5 text-xs text-content-tertiary">1 = paling atas di dalam rack.</p>
+                        @error('position')
                             <p class="mt-1.5 text-sm text-negative-500">{{ $message }}</p>
                         @enderror
                     </div>

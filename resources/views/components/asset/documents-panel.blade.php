@@ -59,9 +59,7 @@
     @else
         {{-- Empty state --}}
         <div class="flex flex-col items-center px-6 py-10 text-center">
-            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-background-tertiary">
-                <i class="ti ti-folder text-2xl text-content-tertiary"></i>
-            </div>
+            <x-asset.illustration name="nodata" size="sm" />
             <p class="mt-4 text-sm font-medium text-content-primary">Belum ada dokumen terkait</p>
             <p class="mt-2 max-w-sm text-sm text-content-secondary">Dokumen terkait {{ $name }} akan tampil di sini. Unggah lewat tombol di atas atau melalui menu Dokumentasi.</p>
         </div>

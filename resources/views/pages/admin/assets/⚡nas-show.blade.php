@@ -98,12 +98,16 @@ new class extends Component
                 <div class="pt-5">
                     <dl class="space-y-2 text-sm">
                         <div class="flex items-center justify-between gap-3">
-                            <dt class="text-content-tertiary">Total Storage</dt>
+                            <dt class="text-content-tertiary">Storage</dt>
                             <dd class="font-medium text-content-primary">{{ $nas->storage_size !== null ? number_format($nas->storage_size / 1024).' GB' : '-' }}</dd>
                         </div>
                         <div class="flex items-center justify-between gap-3">
                             <dt class="text-content-tertiary">Bays</dt>
                             <dd class="font-medium text-content-primary">{{ $nas->bays !== null ? $nas->bays.' slot' : '-' }}</dd>
+                        </div>
+                        <div class="flex items-center justify-between gap-3">
+                            <dt class="text-content-tertiary">Posisi</dt>
+                            <dd class="font-medium text-content-primary">{{ $nas->position !== null ? 'U'.$nas->position : ($nas->rack !== null ? '-' : 'Tanpa rack') }}</dd>
                         </div>
                         <div class="flex items-center justify-between gap-3">
                             <dt class="text-content-tertiary">RAID</dt>
@@ -190,7 +194,7 @@ new class extends Component
                             <a href="{{ route('admin.assets.racks.show', $nas->rack->rack_id) }}" wire:navigate class="block truncate text-sm font-medium text-content-primary hover:text-guide-600">
                                 {{ $nas->rack->name }}
                             </a>
-                            <p class="truncate text-xs text-content-tertiary">{{ $nas->rack->rack_id }} · {{ $nas->rack->servers->count() }} server</p>
+                            <p class="truncate text-xs text-content-tertiary">{{ $nas->rack->rack_id }} · {{ $nas->rack->servers->count() }} server{{ $nas->position !== null ? ' · posisi U'.$nas->position : '' }}</p>
                         </div>
                     </div>
                 @else

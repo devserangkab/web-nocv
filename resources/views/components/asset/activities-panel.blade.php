@@ -32,11 +32,11 @@
                         @endif
                         <p class="mt-1 text-xs text-content-tertiary">
                             {{ $activity->user?->name ?? 'Sistem' }}
-                            · {{ $activity->created_at->format('d M Y H:i') }}
+                            Â· {{ $activity->created_at->format('d M Y H:i') }}
                             @if ($activity->finished_at !== null)
-                                · Selesai {{ $activity->finished_at->format('d M Y H:i') }}
+                                Â· Selesai {{ $activity->finished_at->format('d M Y H:i') }}
                             @else
-                                · Berjalan
+                                Â· Berjalan
                             @endif
                         </p>
                     </div>
@@ -46,9 +46,7 @@
     @else
         {{-- Empty state --}}
         <div class="flex flex-col items-center px-6 py-10 text-center">
-            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-background-tertiary">
-                <i class="ti ti-activity text-2xl text-content-tertiary"></i>
-            </div>
+            <x-asset.illustration name="nodata" size="sm" />
             <p class="mt-4 text-sm font-medium text-content-primary">Belum ada aktivitas terkait</p>
             <p class="mt-2 max-w-sm text-sm text-content-secondary">Aktivitas akan muncul setelah pekerjaan dicatat melalui modul Aktivitas.</p>
         </div>
