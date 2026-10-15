@@ -2,6 +2,7 @@
 
 namespace App\Actions\Assets;
 
+use App\Actions\Activities\RecordActivity;
 use App\Models\Vms;
 use Illuminate\Support\Facades\Validator;
 
@@ -24,6 +25,8 @@ class UpdateVms
         }
 
         $vm->update($normalized);
+
+        app(RecordActivity::class)->audit($vm, 'Mengubah vm '.$vm->name.' ('.$vm->vm_id.')');
 
         return $vm;
     }

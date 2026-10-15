@@ -2,6 +2,7 @@
 
 namespace App\Actions\Assets;
 
+use App\Actions\Activities\RecordActivity;
 use App\Enums\PanelType;
 use App\Models\Panel;
 use App\Models\Server;
@@ -18,7 +19,11 @@ class CreatePanel
     {
         $data = Validator::make($data, static::rules(), static::messages())->validate();
 
-        return Panel::create($this->normalize($data));
+        $panel = Panel::create($this->normalize($data));
+
+        app(RecordActivity::class)->audit($panel, 'Menambahkan panel '.$panel->name.' ('.$panel->panel_id.')');
+
+        return $panel;
     }
 
     /**

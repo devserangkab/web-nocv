@@ -2,6 +2,7 @@
 
 namespace App\Actions\Locations;
 
+use App\Actions\Activities\RecordActivity;
 use App\Models\Location;
 use Illuminate\Support\Facades\Validator;
 
@@ -14,7 +15,11 @@ class CreateLocation
     {
         $data = Validator::make($data, static::rules(), static::messages())->validate();
 
-        return Location::create($this->normalize($data));
+        $location = Location::create($this->normalize($data));
+
+        app(RecordActivity::class)->audit($location, 'Menambahkan server room '.$location->name.' ('.$location->location_id.')');
+
+        return $location;
     }
 
     /**

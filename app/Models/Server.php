@@ -8,7 +8,9 @@ use App\Models\Concerns\GeneratesCode;
 use App\Models\Concerns\OwnsMedia;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Server extends Model
 {
@@ -78,5 +80,21 @@ class Server extends Model
     public function proxmox(): HasOne
     {
         return $this->hasOne(Proxmox::class, 'server_id', 'server_id');
+    }
+
+    /**
+     * Panel yang dipasang langsung di server (tanpa VM).
+     */
+    public function panels(): HasMany
+    {
+        return $this->hasMany(Panel::class, 'server_id', 'server_id');
+    }
+
+    /**
+     * Aplikasi yang dihosting langsung di server ini.
+     */
+    public function hostings(): MorphMany
+    {
+        return $this->morphMany(Hosting::class, 'hostable');
     }
 }

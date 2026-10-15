@@ -8,6 +8,8 @@ use App\Models\Concerns\GeneratesCode;
 use App\Models\Concerns\OwnsMedia;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Vms extends Model
 {
@@ -60,5 +62,21 @@ class Vms extends Model
     public function proxmox(): BelongsTo
     {
         return $this->belongsTo(Proxmox::class, 'proxmox_id', 'proxmox_id');
+    }
+
+    /**
+     * Panel yang dipasang langsung di VM ini.
+     */
+    public function panels(): HasMany
+    {
+        return $this->hasMany(Panel::class, 'vm_id', 'vm_id');
+    }
+
+    /**
+     * Aplikasi yang dihosting di VM ini.
+     */
+    public function hostings(): MorphMany
+    {
+        return $this->morphMany(Hosting::class, 'hostable');
     }
 }

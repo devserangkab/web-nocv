@@ -2,6 +2,7 @@
 
 namespace App\Actions\Assets;
 
+use App\Actions\Activities\RecordActivity;
 use App\Models\Rack;
 use Illuminate\Validation\ValidationException;
 
@@ -18,6 +19,10 @@ class DeleteRack
             ]);
         }
 
-        return $rack->delete();
+        $deleted = $rack->delete();
+
+        app(RecordActivity::class)->audit($rack, 'Menghapus rack '.($rack->name ?? '-').' ('.($rack->rack_id ?? '-').')');
+
+        return $deleted;
     }
 }

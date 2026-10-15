@@ -1,4 +1,5 @@
 import './bootstrap';
+import './richtext';
 
 import '@tabler/icons-webfont/dist/tabler-icons.min.css';
 

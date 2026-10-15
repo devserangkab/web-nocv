@@ -1,6 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\DB;
 use App\Models\Location;
+use App\Models\Server;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use App\Actions\Locations\CreateLocation;
 use App\Actions\Locations\DeleteLocation;
@@ -112,7 +114,7 @@ new class extends Component
     public function locations(): LengthAwarePaginator
     {
         return Location::query()
-            ->withCount('racks')
+            ->withCount(['racks', 'servers'])
             ->when($this->search !== '', fn ($query) => $query->where(function ($query) {
                 $query->where('name', 'like', "%{$this->search}%")
                     ->orWhere('address', 'like', "%{$this->search}%")
@@ -122,9 +124,27 @@ new class extends Component
             ->paginate(10);
     }
 
+    /**
+     * Jumlah server per server room mencakup server di dalam rack (mengikuti
+     * lokasi rack) dan server yang terhubung langsung tanpa rack.
+     *
+     * @return array<string, int>
+     */
+    public function serverCounts(): array
+    {
+        return Server::query()
+            ->selectRaw('COALESCE(r.location_id, s.location_id) as room, COUNT(*) as total')
+            ->from('servers as s')
+            ->leftJoin('racks as r', 'r.rack_id', '=', 's.rack_id')
+            ->whereRaw('COALESCE(r.location_id, s.location_id) IS NOT NULL')
+            ->groupByRaw('COALESCE(r.location_id, s.location_id)')
+            ->pluck('total', 'room')
+            ->all();
+    }
+
     public function deletingLocation(): ?Location
     {
-        return $this->deletingId !== null ? Location::withCount('racks')->find($this->deletingId) : null;
+        return $this->deletingId !== null ? Location::withCount(['racks', 'servers'])->find($this->deletingId) : null;
     }
 };
 ?>
@@ -159,7 +179,7 @@ new class extends Component
     </div>
 
     {{-- Table --}}
-    @php $locations = $this->locations(); @endphp
+    @php $locations = $this->locations(); $serverCounts = $this->serverCounts(); @endphp
     @if ($locations->count() > 0)
         <div class="mt-4 overflow-hidden rounded-lg border border-stroke-primary bg-background-primary">
             <div class="overflow-x-auto">
@@ -168,20 +188,31 @@ new class extends Component
                         <tr class="border-b border-stroke-primary bg-background-secondary text-left text-[12px] font-medium text-content-secondary">
                             <th scope="col" class="h-10 px-4 font-medium">Kode</th>
                             <th scope="col" class="h-10 px-4 font-medium">Nama</th>
-                            <th scope="col" class="h-10 px-4 font-medium">Alamat</th>
+                            <th scope="col" class="h-10 px-4 font-medium">Lokasi</th>
                             <th scope="col" class="h-10 px-4 font-medium text-right">Rack</th>
+                            <th scope="col" class="h-10 px-4 font-medium text-right">Server</th>
                             <th scope="col" class="h-10 px-4 font-medium text-right">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($locations as $location)
-                            <tr class="border-b border-stroke-primary transition-colors duration-150 h-14 last:border-b-0 hover:bg-neutral-50">
+                            <tr class="border-b border-stroke-primary transition-colors duration-150 h-14 last:border-b-0 hover:bg-neutral-50" wire:key="loc-{{ $location->id }}">
                                 <td class="h-10 px-4 text-[13px] text-content-primary">{{ $location->location_id }}</td>
                                 <td class="h-10 px-4 font-medium text-content-primary">{{ $location->name }}</td>
                                 <td class="h-10 max-w-xs truncate px-4 text-content-secondary" title="{{ $location->address }}">{{ $location->address ?? '-' }}</td>
                                 <td class="h-10 px-4 text-right text-content-primary">{{ $location->racks_count }} rack</td>
+                                <td class="h-10 px-4 text-right text-content-primary">{{ ($serverCounts[(string) $location->location_id] ?? 0) + $location->servers_count }} server</td>
                                 <td class="h-10 px-4">
                                     <div class="flex items-center justify-end gap-1">
+                                        <a
+                                            href="{{ route('admin.server-rooms.show', $location->location_id) }}"
+                                            wire:navigate
+                                            class="flex h-8 w-8 items-center justify-center rounded-md text-content-tertiary transition-colors duration-150 hover:bg-background-tertiary hover:text-content-primary"
+                                            aria-label="Detail {{ $location->name }}"
+                                            title="Detail"
+                                        >
+                                            <i class="ti ti-eye text-base"></i>
+                                        </a>
                                         <button
                                             type="button"
                                             wire:click="edit({{ $location->id }})"
@@ -338,14 +369,14 @@ new class extends Component
             @php $deleting = $this->deletingLocation(); @endphp
             <div class="flex items-start justify-between">
                 <div class="flex items-start gap-3">
-                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full {{ ($deleting?->racks_count ?? 0) > 0 ? 'bg-warning-50 text-warning-600' : 'bg-negative-50 text-negative-600' }}">
-                        <i class="ti {{ ($deleting?->racks_count ?? 0) > 0 ? 'ti-alert-circle' : 'ti-alert-triangle' }} text-lg"></i>
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full {{ ($deleting?->racks_count ?? 0) > 0 || ($deleting?->servers_count ?? 0) > 0 ? 'bg-warning-50 text-warning-600' : 'bg-negative-50 text-negative-600' }}">
+                        <i class="ti {{ ($deleting?->racks_count ?? 0) > 0 || ($deleting?->servers_count ?? 0) > 0 ? 'ti-alert-circle' : 'ti-alert-triangle' }} text-lg"></i>
                     </div>
                     <div>
                         <h2 class="text-lg font-semibold text-content-primary" id="location-delete-title">Hapus Server Room</h2>
                         <p class="mt-1 text-sm text-content-secondary">
-                            @if (($deleting?->racks_count ?? 0) > 0)
-                                <span class="font-medium text-content-primary">{{ $deleting?->name }}</span> masih memuat {{ $deleting?->racks_count }} rack. Hapus rack terlebih dahulu sebelum menghapus server room.
+                            @if (($deleting?->racks_count ?? 0) > 0 || ($deleting?->servers_count ?? 0) > 0)
+                                <span class="font-medium text-content-primary">{{ $deleting?->name }}</span> masih memuat {{ $deleting?->racks_count }} rack dan {{ $deleting?->servers_count }} server langsung. Lepaskan relasi terlebih dahulu sebelum menghapus server room.
                             @else
                                 Server room <span class="font-medium text-content-primary">{{ $deleting?->name ?? '-' }}</span> akan dihapus. Tindakan ini tidak bisa dibatalkan.
                             @endif
@@ -369,7 +400,7 @@ new class extends Component
                     class="ina-button ina-button--secondary ina-button--md bg-negative-600! text-white! hover:bg-negative-700!"
                     wire:loading.attr="disabled"
                     wire:click="delete"
-                    @if (($deleting?->racks_count ?? 0) > 0) disabled @endif
+                    @if (($deleting?->racks_count ?? 0) > 0 || ($deleting?->servers_count ?? 0) > 0) disabled @endif
                 >
                     Hapus
                 </button>

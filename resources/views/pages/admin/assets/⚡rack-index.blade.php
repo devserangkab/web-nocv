@@ -243,6 +243,15 @@ new class extends Component
                                 <td class="h-10 px-4 text-right text-content-primary">{{ $rack->servers_count }} unit</td>
                                 <td class="h-10 px-4">
                                     <div class="flex items-center justify-end gap-1">
+                                        <a
+                                            href="{{ route('admin.assets.racks.show', $rack->rack_id) }}"
+                                            wire:navigate
+                                            class="flex h-8 w-8 items-center justify-center rounded-md text-content-tertiary transition-colors duration-150 hover:bg-background-tertiary hover:text-content-primary"
+                                            aria-label="Detail {{ $rack->name }}"
+                                            title="Detail"
+                                        >
+                                            <i class="ti ti-eye text-base"></i>
+                                        </a>
                                         <button
                                             type="button"
                                             wire:click="edit({{ $rack->id }})"

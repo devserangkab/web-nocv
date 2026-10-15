@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\PanelType;
+use App\Models\Hosting;
 use App\Models\Panel;
 use App\Models\Server;
 use App\Models\Vms;
@@ -226,6 +227,32 @@ new class extends Component
             ->paginate(10);
     }
 
+    /**
+     * Jumlah application yang berjalan di host tempat tiap panel terpasang,
+     * dikelompokkan per kunci host ("vm:{id}" / "srv:{id}") dalam satu query.
+     *
+     * @return array<string, int>
+     */
+    public function applicationCounts(): array
+    {
+        $counts = [];
+
+        Hosting::query()
+            ->get()
+            ->groupBy(fn (Hosting $hosting) => $hosting->hostable_type.'#'.$hosting->hostable_id)
+            ->each(function ($group) use (&$counts) {
+                /** @var Hosting $hosting */
+                $hosting = $group->first();
+                $type = $hosting->hostable_type;
+
+                if ($type === Vms::class || $type === Server::class) {
+                    $counts[$type.'#'.$hosting->hostable_id] = $group->count();
+                }
+            });
+
+        return $counts;
+    }
+
     public function deletingPanel(): ?Panel
     {
         return $this->deletingId !== null ? Panel::with(['vm', 'server'])->find($this->deletingId) : null;
@@ -283,25 +310,27 @@ new class extends Component
                     <thead>
                         <tr class="border-b border-stroke-primary bg-background-secondary text-left text-[12px] font-medium text-content-secondary">
                             <th scope="col" class="h-10 px-4 font-medium">Kode</th>
+                            <th scope="col" class="h-10 px-4 font-medium">Nama</th>
                             <th scope="col" class="h-10 px-4 font-medium">Jenis</th>
-                            <th scope="col" class="h-10 px-4 font-medium">Name</th>
                             <th scope="col" class="h-10 px-4 font-medium">Host</th>
-                            <th scope="col" class="h-10 px-4 font-medium">Internet Address</th>
-                            <th scope="col" class="h-10 px-4 font-medium">Internal Address</th>
-                            <th scope="col" class="h-10 px-4 font-medium">Version</th>
+                            <th scope="col" class="h-10 px-4 font-medium">URL Eksternal</th>
+                            <th scope="col" class="h-10 px-4 font-medium">URL Internal</th>
+                            <th scope="col" class="h-10 px-4 font-medium">Versi</th>
+                            <th scope="col" class="h-10 px-4 font-medium text-right">Aplikasi</th>
                             <th scope="col" class="h-10 px-4 font-medium text-right">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
+                        @php $appCounts = $this->applicationCounts(); @endphp
                         @foreach ($panels as $panel)
-                            <tr class="border-b border-stroke-primary transition-colors duration-150 h-14 last:border-b-0 hover:bg-neutral-50">
+                            <tr class="border-b border-stroke-primary transition-colors duration-150 h-14 last:border-b-0 hover:bg-neutral-50" wire:key="pnl-{{ $panel->id }}">
                                 <td class="h-10 px-4 text-[13px] text-content-primary">{{ $panel->panel_id }}</td>
+                                <td class="h-10 px-4 font-medium text-content-primary">{{ $panel->name }}</td>
                                 <td class="h-10 px-4">
                                     <span class="ina-badge ina-badge--soft {{ $panel->type === PanelType::AaPanel ? 'ina-badge--info' : 'ina-badge--brand' }} ina-badge--sm">
                                         {{ $panel->type->value }}
                                     </span>
                                 </td>
-                                <td class="h-10 px-4 font-medium text-content-primary">{{ $panel->name }}</td>
                                 <td class="h-10 px-4 text-content-secondary">
                                     @if ($panel->vm !== null)
                                         {{ $panel->vm->name }}
@@ -316,8 +345,24 @@ new class extends Component
                                 <td class="h-10 max-w-xs truncate px-4 text-content-secondary" title="{{ $panel->internet_address }}">{{ $panel->internet_address ?? '-' }}</td>
                                 <td class="h-10 max-w-xs truncate px-4 text-content-secondary" title="{{ $panel->internal_address }}">{{ $panel->internal_address ?? '-' }}</td>
                                 <td class="h-10 px-4 text-content-secondary">{{ $panel->version ?? '-' }}</td>
+                                <td class="h-10 px-4 text-right text-content-primary">
+                                    @php
+                                        $hostType = $panel->vm !== null ? \App\Models\Vms::class : \App\Models\Server::class;
+                                        $hostId = $panel->vm?->id ?? $panel->server?->id;
+                                    @endphp
+                                    {{ $hostId !== null ? ($appCounts[$hostType.'#'.$hostId] ?? 0) : 0 }} app
+                                </td>
                                 <td class="h-10 px-4">
                                     <div class="flex items-center justify-end gap-1">
+                                        <a
+                                            href="{{ route('admin.assets.panels.show', $panel->panel_id) }}"
+                                            wire:navigate
+                                            class="flex h-8 w-8 items-center justify-center rounded-md text-content-tertiary transition-colors duration-150 hover:bg-background-tertiary hover:text-content-primary"
+                                            aria-label="Detail {{ $panel->name }}"
+                                            title="Detail"
+                                        >
+                                            <i class="ti ti-eye text-base"></i>
+                                        </a>
                                         <button
                                             type="button"
                                             wire:click="edit({{ $panel->id }})"

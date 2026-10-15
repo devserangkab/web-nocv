@@ -2,6 +2,7 @@
 
 namespace App\Actions\Assets;
 
+use App\Actions\Activities\RecordActivity;
 use App\Models\Panel;
 use Illuminate\Support\Facades\Validator;
 
@@ -24,6 +25,8 @@ class UpdatePanel
         }
 
         $panel->update($normalized);
+
+        app(RecordActivity::class)->audit($panel, 'Mengubah panel '.$panel->name.' ('.$panel->panel_id.')');
 
         return $panel;
     }

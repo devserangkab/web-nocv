@@ -2,6 +2,7 @@
 
 namespace App\Actions\Media;
 
+use App\Actions\Activities\RecordActivity;
 use App\Enums\MediaType;
 use App\Models\Media;
 use Illuminate\Database\Eloquent\Model;
@@ -33,7 +34,7 @@ class StoreMedia
         if ($file instanceof UploadedFile) {
             $mime = $file->getMimeType();
 
-            $data['file'] = $file->store('media', 'public');
+            $data['file'] = $file->store('media', 'private');
             $data['type'] ??= str_starts_with((string) $mime, 'video/') ? MediaType::Video->value : MediaType::Image->value;
         }
 
@@ -43,16 +44,20 @@ class StoreMedia
             ? $this->generateThumbnail((string) $data['file'])
             : null;
 
-        return $mediable->medias()->create($data);
+        $media = $mediable->medias()->create($data);
+
+        app(RecordActivity::class)->audit($media, 'Menambahkan media '.($media->title ?? $media->media_id));
+
+        return $media;
     }
 
     /**
      * Generate thumbnail max 150x150 px menjaga aspect ratio (fit, tanpa crop dan tanpa upscaling).
-     * Menghendaskan path relatif di disk public; mengembalikan null untuk SVG/unknown/gagal.
+     * Menghendaskan path relatif di disk private; mengembalikan null untuk SVG/unknown/gagal.
      */
     private function generateThumbnail(string $relativePath): ?string
     {
-        $disk = Storage::disk('public');
+        $disk = Storage::disk('private');
 
         $source = $disk->path($relativePath);
 

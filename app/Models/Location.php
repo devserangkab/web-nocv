@@ -28,4 +28,13 @@ class Location extends Model
     {
         return $this->hasMany(Rack::class, 'location_id', 'location_id');
     }
+
+    /**
+     * Server yang terhubung langsung ke server room tanpa rack.
+     * Server di dalam rack tidak termasuk (rack_id terisi).
+     */
+    public function servers(): HasMany
+    {
+        return $this->hasMany(Server::class, 'location_id', 'location_id')->whereNull('rack_id');
+    }
 }

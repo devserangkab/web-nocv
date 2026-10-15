@@ -47,119 +47,193 @@
                 </div>
                 <div class="min-w-0">
                     <p class="truncate text-sm font-semibold text-content-primary">{{ config('app.name', 'Laravel') }}</p>
-                    <p class="truncate text-xs text-content-tertiary">Panel Admin</p>
+                    <p class="truncate text-xs text-content-tertiary">Inventaris Infrastruktur</p>
                 </div>
             </div>
 
             {{-- Menu --}}
-            <nav class="space-y-1 px-4 py-4">
+            <nav class="space-y-0.5 px-4 py-4">
+                {{-- Dashboard --}}
                 <a
                     href="{{ route('admin.dashboard') }}"
                     wire:navigate
-                    class="flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-content-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-content-primary data-current:bg-guide-50 data-current:text-guide-600"
+                    class="flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors duration-150 hover:bg-neutral-100 {{ request()->routeIs('admin.dashboard') ? 'bg-guide-50 text-guide-600' : 'text-content-secondary hover:text-content-primary' }}"
                 >
                     <i class="ti ti-layout-dashboard text-lg"></i>
                     Dashboard
                 </a>
-                <a
-                    href="{{ route('admin.server-rooms.index') }}"
-                    wire:navigate
-                    class="flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-content-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-content-primary data-current:bg-guide-50 data-current:text-guide-600"
-                >
-                    <i class="ti ti-building text-lg"></i>
-                    Server Room
-                </a>
 
-                {{-- Grup: Asset Fisik --}}
-                <div class="pt-5">
-                    <p class="px-3 pb-2 text-xs font-medium text-content-tertiary">Asset Fisik</p>
-                    <a
-                        href="{{ route('admin.assets.racks.index') }}"
-                        wire:navigate
-                        class="flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-content-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-content-primary data-current:bg-guide-50 data-current:text-guide-600"
+                {{-- Grup: Infrastruktur --}}
+                <div x-data="{ open: true }" class="pt-3">
+                    <button
+                        type="button"
+                        @click="open = !open"
+                        :aria-expanded="open.toString()"
+                        aria-controls="nav-infrastructure"
+                        class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-content-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-content-primary"
                     >
-                        <i class="ti ti-server-2 text-lg"></i>
-                        Rack
-                    </a>
+                        <i class="ti ti-topology-star text-lg"></i>
+                        <span class="flex-1 text-left">Infrastruktur</span>
+                        <i class="ti ti-chevron-right text-base text-content-tertiary transition-transform duration-200" :class="open && 'rotate-90'" aria-hidden="true"></i>
+                    </button>
+                    <div id="nav-infrastructure" x-show="open" x-transition:enter="transition duration-150 ease-out" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-cloak class="space-y-0.5 pt-0.5">
+                        <a
+                            href="{{ route('admin.server-rooms.index') }}"
+                            wire:navigate
+                            class="flex h-9 items-center gap-3 rounded-lg px-3 pl-10 text-[13px] font-medium transition-colors duration-150 hover:bg-neutral-100 {{ request()->routeIs('admin.server-rooms.*') ? 'bg-guide-50 text-guide-600' : 'text-content-secondary hover:text-content-primary' }}"
+                        >
+                            <i class="ti ti-building text-base"></i>
+                            Server Room
+                        </a>
+                        <a
+                            href="{{ route('admin.assets.racks.index') }}"
+                            wire:navigate
+                            class="flex h-9 items-center gap-3 rounded-lg px-3 pl-10 text-[13px] font-medium transition-colors duration-150 hover:bg-neutral-100 {{ request()->routeIs('admin.assets.racks.*') ? 'bg-guide-50 text-guide-600' : 'text-content-secondary hover:text-content-primary' }}"
+                        >
+                            <i class="ti ti-server-2 text-base"></i>
+                            Rack
+                        </a>
+                        <a
+                            href="{{ route('admin.assets.servers.index') }}"
+                            wire:navigate
+                            class="flex h-9 items-center gap-3 rounded-lg px-3 pl-10 text-[13px] font-medium transition-colors duration-150 hover:bg-neutral-100 {{ request()->routeIs('admin.assets.servers.*') ? 'bg-guide-50 text-guide-600' : 'text-content-secondary hover:text-content-primary' }}"
+                        >
+                            <i class="ti ti-server text-base"></i>
+                            Server
+                        </a>
+                        <a
+                            href="{{ route('admin.assets.virtualization.index') }}"
+                            wire:navigate
+                            class="flex h-9 items-center gap-3 rounded-lg px-3 pl-10 text-[13px] font-medium transition-colors duration-150 hover:bg-neutral-100 {{ request()->routeIs(['admin.assets.virtualization.*', 'admin.assets.proxmox.*', 'admin.assets.vms.*']) ? 'bg-guide-50 text-guide-600' : 'text-content-secondary hover:text-content-primary' }}"
+                        >
+                            <i class="ti ti-stack-2 text-base"></i>
+                            Virtualisasi
+                        </a>
+                        <a
+                            href="{{ route('admin.assets.panels.index') }}"
+                            wire:navigate
+                            class="flex h-9 items-center gap-3 rounded-lg px-3 pl-10 text-[13px] font-medium transition-colors duration-150 hover:bg-neutral-100 {{ request()->routeIs('admin.assets.panels.*') ? 'bg-guide-50 text-guide-600' : 'text-content-secondary hover:text-content-primary' }}"
+                        >
+                            <i class="ti ti-app-window text-base"></i>
+                            Panel
+                        </a>
+                        <a
+                            href="{{ route('admin.applications.index') }}"
+                            wire:navigate
+                            class="flex h-9 items-center gap-3 rounded-lg px-3 pl-10 text-[13px] font-medium transition-colors duration-150 hover:bg-neutral-100 {{ request()->routeIs('admin.applications.*') ? 'bg-guide-50 text-guide-600' : 'text-content-secondary hover:text-content-primary' }}"
+                        >
+                            <i class="ti ti-apps text-base"></i>
+                            Aplikasi
+                        </a>
+                        {{-- Topology Explorer --}}
+                        <a
+                            href="{{ route('admin.topology.index') }}"
+                            wire:navigate
+                            class="flex h-9 items-center gap-3 rounded-lg px-3 pl-10 text-[13px] font-medium transition-colors duration-150 hover:bg-neutral-100 {{ request()->routeIs('admin.topology.*') ? 'bg-guide-50 text-guide-600' : 'text-content-secondary hover:text-content-primary' }}"
+                        >
+                            <i class="ti ti-sitemap text-base"></i>
+                            Topology Explorer
+                        </a>
+                    </div>
+                </div>
+
+                {{-- Dokumentasi --}}
+                <div class="pt-3">
                     <a
-                        href="{{ route('admin.assets.servers.index') }}"
+                        href="{{ route('admin.documents.index') }}"
                         wire:navigate
-                        class="flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-content-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-content-primary data-current:bg-guide-50 data-current:text-guide-600"
+                        class="flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors duration-150 hover:bg-neutral-100 {{ request()->routeIs('admin.documents.*') ? 'bg-guide-50 text-guide-600' : 'text-content-secondary hover:text-content-primary' }}"
                     >
-                        <i class="ti ti-server text-lg"></i>
-                        Server
+                        <i class="ti ti-folder text-lg"></i>
+                        Dokumentasi
                     </a>
                 </div>
 
-                {{-- Grup: Asset Digital --}}
-                <div class="pt-5">
-                    <p class="px-3 pb-2 text-xs font-medium text-content-tertiary">Asset Digital</p>
-                    <a
-                        href="{{ route('admin.assets.proxmox.index') }}"
-                        wire:navigate
-                        class="flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-content-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-content-primary data-current:bg-guide-50 data-current:text-guide-600"
+                {{-- Grup: Aktivitas --}}
+                <div x-data="{ open: true }" class="pt-3">
+                    <button
+                        type="button"
+                        @click="open = !open"
+                        :aria-expanded="open.toString()"
+                        aria-controls="nav-activities"
+                        class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-content-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-content-primary"
                     >
-                        <i class="ti ti-stack-2 text-lg"></i>
-                        Proxmox
-                    </a>
+                        <i class="ti ti-activity text-lg"></i>
+                        <span class="flex-1 text-left">Aktivitas</span>
+                        <i class="ti ti-chevron-right text-base text-content-tertiary transition-transform duration-200" :class="open && 'rotate-90'" aria-hidden="true"></i>
+                    </button>
+                    <div id="nav-activities" x-show="open" x-transition:enter="transition duration-150 ease-out" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-cloak class="space-y-0.5 pt-0.5">
+                        <a
+                            href="{{ route('admin.activities.index') }}"
+                            wire:navigate
+                            class="flex h-9 items-center gap-3 rounded-lg px-3 pl-10 text-[13px] font-medium transition-colors duration-150 hover:bg-neutral-100 {{ request()->routeIs('admin.activities.*') ? 'bg-guide-50 text-guide-600' : 'text-content-secondary hover:text-content-primary' }}"
+                        >
+                            <i class="ti ti-list-check text-base"></i>
+                            Semua Aktivitas
+                        </a>
+                        {{-- Laporan Bulanan --}}
+                        <a
+                            href="{{ route('admin.reports.index') }}"
+                            wire:navigate
+                            class="flex h-9 items-center gap-3 rounded-lg px-3 pl-10 text-[13px] font-medium transition-colors duration-150 hover:bg-neutral-100 {{ request()->routeIs('admin.reports.*') ? 'bg-guide-50 text-guide-600' : 'text-content-secondary hover:text-content-primary' }}"
+                        >
+                            <i class="ti ti-file-report text-base"></i>
+                            Laporan Bulanan
+                        </a>
+                    </div>
+                </div>
+
+                {{-- Gallery --}}
+                <div class="pt-3">
                     <a
-                        href="{{ route('admin.assets.vms.index') }}"
+                        href="{{ route('admin.galleries.index') }}"
                         wire:navigate
-                        class="flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-content-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-content-primary data-current:bg-guide-50 data-current:text-guide-600"
+                        class="flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors duration-150 hover:bg-neutral-100 {{ request()->routeIs('admin.galleries.*') ? 'bg-guide-50 text-guide-600' : 'text-content-secondary hover:text-content-primary' }}"
                     >
-                        <i class="ti ti-box-multiple-3 text-lg"></i>
-                        Virtual Machine
-                    </a>
-                    <a
-                        href="{{ route('admin.assets.panels.index') }}"
-                        wire:navigate
-                        class="flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-content-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-content-primary data-current:bg-guide-50 data-current:text-guide-600"
-                    >
-                        <i class="ti ti-app-window text-lg"></i>
-                        Panels
+                        <i class="ti ti-photo text-lg"></i>
+                        Gallery
                     </a>
                 </div>
 
-                {{-- Grup: Application --}}
-                <div class="pt-5">
-                    <p class="px-3 pb-2 text-xs font-medium text-content-tertiary">Application</p>
-                    <a
-                        href="{{ route('admin.applications.index') }}"
-                        wire:navigate
-                        class="flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-content-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-content-primary data-current:bg-guide-50 data-current:text-guide-600"
+                {{-- Grup: Pengaturan --}}
+                <div x-data="{ open: true }" class="pt-3">
+                    <button
+                        type="button"
+                        @click="open = !open"
+                        :aria-expanded="open.toString()"
+                        aria-controls="nav-settings"
+                        class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-content-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-content-primary"
                     >
-                        <i class="ti ti-apps text-lg"></i>
-                        Applications
-                    </a>
-                </div>
-
-                {{-- Grup: Data Management --}}
-                <div class="pt-5">
-                    <p class="px-3 pb-2 text-xs font-medium text-content-tertiary">Data Management</p>
-                    <a
-                        href="{{ route('admin.users.index') }}"
-                        wire:navigate
-                        class="flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-content-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-content-primary data-current:bg-guide-50 data-current:text-guide-600"
-                    >
-                        <i class="ti ti-users text-lg"></i>
-                        Users
-                    </a>
-                    <a
-                        href="{{ route('admin.roles.index') }}"
-                        wire:navigate
-                        class="flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-content-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-content-primary data-current:bg-guide-50 data-current:text-guide-600"
-                    >
-                        <i class="ti ti-shield-check text-lg"></i>
-                        Roles
-                    </a>
-                    <a
-                        href="{{ route('admin.institutions.index') }}"
-                        wire:navigate
-                        class="flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-content-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-content-primary data-current:bg-guide-50 data-current:text-guide-600"
-                    >
-                        <i class="ti ti-building text-lg"></i>
-                        Institutions
-                    </a>
+                        <i class="ti ti-settings text-lg"></i>
+                        <span class="flex-1 text-left">Pengaturan</span>
+                        <i class="ti ti-chevron-right text-base text-content-tertiary transition-transform duration-200" :class="open && 'rotate-90'" aria-hidden="true"></i>
+                    </button>
+                    <div id="nav-settings" x-show="open" x-transition:enter="transition duration-150 ease-out" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-cloak class="space-y-0.5 pt-0.5">
+                        <a
+                            href="{{ route('admin.users.index') }}"
+                            wire:navigate
+                            class="flex h-9 items-center gap-3 rounded-lg px-3 pl-10 text-[13px] font-medium transition-colors duration-150 hover:bg-neutral-100 {{ request()->routeIs('admin.users.*') ? 'bg-guide-50 text-guide-600' : 'text-content-secondary hover:text-content-primary' }}"
+                        >
+                            <i class="ti ti-users text-base"></i>
+                            Pengguna
+                        </a>
+                        <a
+                            href="{{ route('admin.roles.index') }}"
+                            wire:navigate
+                            class="flex h-9 items-center gap-3 rounded-lg px-3 pl-10 text-[13px] font-medium transition-colors duration-150 hover:bg-neutral-100 {{ request()->routeIs('admin.roles.*') ? 'bg-guide-50 text-guide-600' : 'text-content-secondary hover:text-content-primary' }}"
+                        >
+                            <i class="ti ti-shield-check text-base"></i>
+                            Role &amp; Permission
+                        </a>
+                        <a
+                            href="{{ route('admin.institutions.index') }}"
+                            wire:navigate
+                            class="flex h-9 items-center gap-3 rounded-lg px-3 pl-10 text-[13px] font-medium transition-colors duration-150 hover:bg-neutral-100 {{ request()->routeIs('admin.institutions.*') ? 'bg-guide-50 text-guide-600' : 'text-content-secondary hover:text-content-primary' }}"
+                        >
+                            <i class="ti ti-building text-base"></i>
+                            Referensi Data
+                        </a>
+                    </div>
                 </div>
             </nav>
 
@@ -264,7 +338,7 @@
 
                         {{-- Breadcrumb --}}
                         <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-sm">
-                            <span class="text-content-tertiary">Admin</span>
+                            <a href="{{ route('admin.dashboard') }}" wire:navigate class="text-content-tertiary hover:text-content-primary">Admin</a>
                             <i class="ti ti-chevron-right text-sm text-content-tertiary" aria-hidden="true"></i>
                             <span class="font-medium text-content-primary">{{ $title ?? 'Dashboard' }}</span>
                         </nav>
@@ -288,6 +362,7 @@
                             </svg>
                         </button>
 
+                    </div>
                 </div>
             </header>
 

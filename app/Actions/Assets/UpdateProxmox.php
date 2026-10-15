@@ -2,6 +2,7 @@
 
 namespace App\Actions\Assets;
 
+use App\Actions\Activities\RecordActivity;
 use App\Models\Proxmox;
 use Illuminate\Support\Facades\Validator;
 
@@ -24,6 +25,8 @@ class UpdateProxmox
         }
 
         $proxmox->update($normalized);
+
+        app(RecordActivity::class)->audit($proxmox, 'Mengubah proxmox '.$proxmox->name.' ('.$proxmox->proxmox_id.')');
 
         return $proxmox;
     }

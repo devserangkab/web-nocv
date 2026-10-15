@@ -332,7 +332,7 @@ new class extends Component
     public function applications(): LengthAwarePaginator
     {
         return Application::query()
-            ->with(['requestedBy', 'developers'])
+            ->with(['requestedBy', 'developers', 'hostings.hostable'])
             ->when($this->statusFilter !== 'ALL', fn ($query) => $query->where('status', $this->statusFilter))
             ->when($this->typeFilter !== 'ALL', fn ($query) => $query->where('type', $this->typeFilter))
             ->when($this->search !== '', fn ($query) => $query->where(function ($query) {
@@ -420,11 +420,12 @@ new class extends Component
                     <thead>
                         <tr class="border-b border-stroke-primary bg-background-secondary text-left text-[12px] font-medium text-content-secondary">
                             <th scope="col" class="h-10 px-4 font-medium">Kode</th>
-                            <th scope="col" class="h-10 px-4 font-medium">Name</th>
+                            <th scope="col" class="h-10 px-4 font-medium">Nama</th>
                             <th scope="col" class="h-10 px-4 font-medium">Status</th>
                             <th scope="col" class="h-10 px-4 font-medium">Jenis</th>
-                            <th scope="col" class="h-10 px-4 font-medium">Requested By</th>
+                            <th scope="col" class="h-10 px-4 font-medium">OPD Pengusul</th>
                             <th scope="col" class="h-10 px-4 font-medium">Dev</th>
+                            <th scope="col" class="h-10 px-4 font-medium">Deployment</th>
                             <th scope="col" class="h-10 px-4 font-medium">Domain</th>
                             <th scope="col" class="h-10 px-4 font-medium text-right">Aksi</th>
                         </tr>
@@ -459,6 +460,18 @@ new class extends Component
                                 <td class="h-14 px-4 text-content-secondary">{{ $application->requestedBy?->abbreviation ?? '-' }}</td>
                                 <td class="h-14 px-4">
                                     <span class="ina-badge ina-badge--soft ina-badge--neutral ina-badge--sm">{{ $application->developers->count() }} dev</span>
+                                </td>
+                                <td class="h-14 max-w-[12rem] px-4 text-content-secondary">
+                                    @if ($application->hostings->isNotEmpty())
+                                        @foreach ($application->hostings as $hosting)
+                                            <span class="block truncate text-[12px]" title="{{ $hosting->hostable !== null ? ($hosting->hostable->name ?? $hosting->hostable->server_name ?? '?') : $hosting->name }}">
+                                                <i class="ti {{ match ($hosting->kind()) { 'vm' => 'ti-box-multiple-3', 'server' => 'ti-server', default => 'ti-cloud' } }} text-sm" aria-hidden="true"></i>
+                                                {{ $hosting->hostable !== null ? ($hosting->hostable->name ?? $hosting->hostable->server_name ?? '-') : $hosting->name }}
+                                            </span>
+                                        @endforeach
+                                    @else
+                                        <span class="text-content-tertiary">-</span>
+                                    @endif
                                 </td>
                                 <td class="h-14 max-w-xs truncate px-4 text-content-secondary" title="{{ $application->domain }}">{{ $application->domain ?? '-' }}</td>
                                 <td class="h-14 px-4">

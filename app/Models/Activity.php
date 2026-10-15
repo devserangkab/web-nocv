@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ActivityType;
 use App\Models\Concerns\GeneratesCode;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -26,12 +27,19 @@ class Activity extends Model
         'user_id',
         'activity',
         'description',
+        'type',
+        'category',
         'finished_at',
+    ];
+
+    protected $attributes = [
+        'type' => 'WORK',
     ];
 
     protected function casts(): array
     {
         return [
+            'type' => ActivityType::class,
             'finished_at' => 'datetime',
         ];
     }

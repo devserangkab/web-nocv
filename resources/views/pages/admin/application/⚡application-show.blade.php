@@ -30,7 +30,8 @@ new class extends Component
     {
         return Document::query()
             ->with(['addedBy', 'application'])
-            ->where('application_id', $this->application->application_id)
+            ->where('documentable_type', Application::class)
+            ->where('documentable_id', $this->application->id)
             ->orderBy('document_id')
             ->paginate(10, pageName: 'docs_page');
     }
@@ -356,8 +357,7 @@ new class extends Component
                                             <div class="flex items-center justify-end">
                                                 @if ($document->document !== null)
                                                     <a
-                                                        href="{{ asset('storage/'.$document->document) }}"
-                                                        download
+                                                        href="{{ route('admin.documents.download', $document->document_id) }}"
                                                         class="ina-button ina-button--secondary ina-button--sm"
                                                     >
                                                         <i class="ti ti-download text-base" aria-hidden="true"></i>

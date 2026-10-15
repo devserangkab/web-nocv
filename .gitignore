@@ -26,3 +26,11 @@ Thumbs.db
 LARAVEL_INSTALL.bat
 IDDS.md
 opencode.json
+dummy.png
+
+# Kelompok belum siap di-commit (dikerjakan terpisah)
+/database/seeders
+/database/factories
+/backup
+/tests
+/resources/views/welcome.blade.php

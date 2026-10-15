@@ -2,6 +2,7 @@
 
 namespace App\Actions\Assets;
 
+use App\Actions\Activities\RecordActivity;
 use App\Enums\ServerStatus;
 use App\Models\Rack;
 use App\Models\Server;
@@ -17,7 +18,11 @@ class CreateServer
     {
         $data = Validator::make($data, static::rules(), static::messages())->validate();
 
-        return Server::create($this->normalize($data));
+        $server = Server::create($this->normalize($data));
+
+        app(RecordActivity::class)->audit($server, 'Menambahkan server '.$server->server_name.' ('.$server->server_id.')');
+
+        return $server;
     }
 
     /**

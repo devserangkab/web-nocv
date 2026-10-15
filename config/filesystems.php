@@ -47,6 +47,16 @@ return [
             'report' => false,
         ],
 
+        // File dokumen/media privat: hanya dilayani lewat controller ber-otorisasi,
+        // tidak pernah diakses langsung dari URL storage public.
+        'private' => [
+            'driver' => 'local',
+            'root' => storage_path('app/privates'),
+            'visibility' => 'private',
+            'throw' => false,
+            'report' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

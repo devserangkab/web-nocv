@@ -189,7 +189,7 @@ new class extends Component
     public function raks(): array
     {
         $servers = Server::query()
-            ->with(['rack.location', 'location'])
+            ->with(['rack.location', 'location', 'proxmox', 'panels'])
             ->when($this->locationFilter !== '', function ($query) {
                 $query->where(function ($query) {
                     $query->whereHas('rack', fn ($r) => $r->where('location_id', $this->locationFilter))
@@ -505,9 +505,25 @@ new class extends Component
                                             {{ $server->effective()->name }}
                                         </span>
                                     @endif
+                                    @if ($server->proxmox !== null)
+                                        <span class="ina-badge ina-badge--soft ina-badge--brand ina-badge--sm" title="Menjalankan Proxmox">
+                                            <i class="ti ti-stack-2 text-sm" aria-hidden="true"></i>
+                                            Proxmox
+                                        </span>
+                                    @endif
+                                    @if ($server->panels->isNotEmpty())
+                                        <span class="ina-badge ina-badge--soft ina-badge--info ina-badge--sm" title="Panel terpasang langsung">
+                                            <i class="ti ti-app-window text-sm" aria-hidden="true"></i>
+                                            {{ $server->panels->count() }} panel
+                                        </span>
+                                    @endif
                                 </div>
     
                                 <div class="mt-5 flex items-center gap-2 border-t border-stroke-primary pt-4">
+                                    <a href="{{ route('admin.assets.servers.show', $server->server_id) }}" wire:navigate class="ina-button ina-button--primary ina-button--sm">
+                                        <i class="ti ti-eye text-base" aria-hidden="true"></i>
+                                        Detail
+                                    </a>
                                     <button type="button" wire:click="edit({{ $server->id }})" class="ina-button ina-button--secondary ina-button--sm">
                                         <i class="ti ti-pencil text-base" aria-hidden="true"></i>
                                         Ubah

@@ -2,6 +2,7 @@
 
 namespace App\Actions\Assets;
 
+use App\Actions\Activities\RecordActivity;
 use App\Models\Proxmox;
 use Illuminate\Support\Facades\Validator;
 
@@ -14,7 +15,11 @@ class CreateProxmox
     {
         $data = Validator::make($data, static::rules(null), static::messages())->validate();
 
-        return Proxmox::create($this->normalize($data));
+        $proxmox = Proxmox::create($this->normalize($data));
+
+        app(RecordActivity::class)->audit($proxmox, 'Menambahkan proxmox '.$proxmox->name.' ('.$proxmox->proxmox_id.')');
+
+        return $proxmox;
     }
 
     /**

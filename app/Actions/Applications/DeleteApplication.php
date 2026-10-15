@@ -2,6 +2,7 @@
 
 namespace App\Actions\Applications;
 
+use App\Actions\Activities\RecordActivity;
 use App\Models\Application;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -16,7 +17,11 @@ class DeleteApplication
             }
 
             // pivot developers ikut terhapus via FK cascade
-            return $application->delete();
+            $deleted = $application->delete();
+
+            app(RecordActivity::class)->audit($application, 'Menghapus application '.$application->name.' ('.$application->application_id.')');
+
+            return $deleted;
         });
     }
 }

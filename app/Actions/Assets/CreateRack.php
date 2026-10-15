@@ -2,6 +2,7 @@
 
 namespace App\Actions\Assets;
 
+use App\Actions\Activities\RecordActivity;
 use App\Models\Rack;
 use Illuminate\Support\Facades\Validator;
 
@@ -14,7 +15,11 @@ class CreateRack
     {
         $data = Validator::make($data, static::rules(), static::messages())->validate();
 
-        return Rack::create($this->normalize($data));
+        $rack = Rack::create($this->normalize($data));
+
+        app(RecordActivity::class)->audit($rack, 'Menambahkan rack '.$rack->name.' ('.$rack->rack_id.')');
+
+        return $rack;
     }
 
     /**

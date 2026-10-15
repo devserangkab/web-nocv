@@ -2,6 +2,7 @@
 
 namespace App\Actions\Assets;
 
+use App\Actions\Activities\RecordActivity;
 use App\Enums\VmsStatus;
 use App\Models\Vms;
 use Illuminate\Support\Facades\Validator;
@@ -16,7 +17,11 @@ class CreateVms
     {
         $data = Validator::make($data, static::rules(), static::messages())->validate();
 
-        return Vms::create($this->normalize($data));
+        $vms = Vms::create($this->normalize($data));
+
+        app(RecordActivity::class)->audit($vms, 'Menambahkan vm '.$vms->name.' ('.$vms->vm_id.')');
+
+        return $vms;
     }
 
     /**

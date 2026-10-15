@@ -2,6 +2,7 @@
 
 namespace App\Actions\Applications;
 
+use App\Actions\Activities\RecordActivity;
 use App\Enums\ApplicationStatus;
 use App\Enums\ApplicationType;
 use App\Enums\DeveloperType;
@@ -49,6 +50,11 @@ class StoreApplication
             'developer_id' => (int) $row['user_id'],
             'type' => DeveloperType::from($row['type']),
         ]));
+
+        app(RecordActivity::class)->audit(
+            $application,
+            ($application->wasRecentlyCreated ? 'Menambahkan' : 'Mengubah').' application '.$application->name.' ('.$application->application_id.')'
+        );
 
         return $application;
     }
