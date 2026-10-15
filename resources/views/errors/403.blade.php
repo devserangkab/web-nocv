@@ -130,7 +130,7 @@
         </main>
         <footer class="border-t border-stroke-primary bg-background-primary py-6">
             <div class="px-4 sm:px-6 text-center text-xs text-content-tertiary">
-                {{ config('app.name', 'Laravel') }} Â· {{ date('Y') }}
+                {{ config('app.name', 'Laravel') }} · {{ date('Y') }}
             </div>
         </footer>
 

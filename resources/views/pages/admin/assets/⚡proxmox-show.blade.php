@@ -134,7 +134,7 @@ new class extends Component
                             <a href="{{ route('admin.assets.servers.show', $proxmox->server->server_id) }}" wire:navigate class="block truncate text-sm font-medium text-content-primary hover:text-guide-600">
                                 {{ $proxmox->server->server_name }}
                             </a>
-                            <p class="truncate text-xs text-content-tertiary">{{ $proxmox->server->server_id }} Â· {{ $proxmox->server->brand ?? 'Tanpa brand' }}</p>
+                            <p class="truncate text-xs text-content-tertiary">{{ $proxmox->server->server_id }} · {{ $proxmox->server->brand ?? 'Tanpa brand' }}</p>
                         </div>
                     </div>
                 @else
@@ -157,7 +157,7 @@ new class extends Component
                                     <a href="{{ route('admin.assets.vms.show', $vm->vm_id) }}" wire:navigate class="block truncate text-sm font-medium text-content-primary hover:text-guide-600">
                                         {{ $vm->name }}
                                     </a>
-                                    <p class="truncate text-xs text-content-tertiary">{{ $vm->vm_id }}{{ $vm->proxmox_number !== null ? ' Â· VMID '.$vm->proxmox_number : '' }} Â· {{ $vm->os ?? 'OS tidak dicatat' }}</p>
+                                    <p class="truncate text-xs text-content-tertiary">{{ $vm->vm_id }}{{ $vm->proxmox_number !== null ? ' · VMID '.$vm->proxmox_number : '' }} · {{ $vm->os ?? 'OS tidak dicatat' }}</p>
                                 </div>
                             </li>
                         @endforeach

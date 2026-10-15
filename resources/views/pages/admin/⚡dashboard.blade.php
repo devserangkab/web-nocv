@@ -93,7 +93,7 @@ new class extends Component
 
     {{-- Ringkasan statistik — setiap kartu menuju daftar terkait --}}
     @php $stats = $this->stats(); @endphp
-    <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-6">
         @foreach ([
             ['label' => 'Server Room', 'desc' => 'Ruang penempatan server', 'value' => $stats['totals']['location'], 'route' => route('admin.server-rooms.index'), 'icon' => 'ti-building'],
             ['label' => 'Rack', 'desc' => 'Rak penempatan server', 'value' => $stats['totals']['rack'], 'route' => route('admin.assets.racks.index'), 'icon' => 'ti-server-2'],
@@ -111,16 +111,16 @@ new class extends Component
             <a
                 href="{{ $card['route'] }}"
                 wire:navigate
-                class="ina-card ina-card--stack p-5 transition-shadow duration-150 hover:shadow-md"
+                class="ina-card ina-card--stack p-4 transition-shadow duration-150 hover:shadow-md"
             >
                 <div class="flex items-center gap-3">
-                    <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-guide-50 text-guide-600">
-                        <i class="ti {{ $card['icon'] }} text-lg"></i>
+                    <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-guide-50 text-guide-600">
+                        <i class="ti {{ $card['icon'] }} text-base"></i>
                     </div>
-                    <p class="text-sm font-medium text-content-secondary">{{ $card['label'] }}</p>
+                    <p class="text-[12px] font-medium text-content-secondary">{{ $card['label'] }}</p>
                 </div>
-                <p class="mt-4 text-2xl font-semibold text-content-primary">{{ $card['value'] }}</p>
-                <p class="mt-1 text-xs text-content-tertiary">{{ $card['desc'] }}</p>
+                <p class="mt-3 text-xl font-semibold text-content-primary">{{ $card['value'] }}</p>
+                <p class="mt-0.5 text-[11px] text-content-tertiary">{{ $card['desc'] }}</p>
             </a>
         @endforeach
     </div>
@@ -210,11 +210,11 @@ new class extends Component
     {{-- Pintasan menuju modul utama --}}
     <div class="mt-8">
         <h2 class="text-base font-semibold text-content-primary">Pintasan</h2>
-        <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-6">
             @foreach ($stats['locations'] as $location)
                 <div class="ina-card ina-card--stack p-5">
                     <div class="flex items-center gap-3">
-                        <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-guide-50 text-guide-600">
+                        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-guide-50 text-guide-600">
                             <i class="ti ti-building text-lg"></i>
                         </div>
                         <div class="min-w-0">

@@ -32,11 +32,11 @@
                         @endif
                         <p class="mt-1 text-xs text-content-tertiary">
                             {{ $activity->user?->name ?? 'Sistem' }}
-                            Â· {{ $activity->created_at->format('d M Y H:i') }}
+                            · {{ $activity->created_at->format('d M Y H:i') }}
                             @if ($activity->finished_at !== null)
-                                Â· Selesai {{ $activity->finished_at->format('d M Y H:i') }}
+                                · Selesai {{ $activity->finished_at->format('d M Y H:i') }}
                             @else
-                                Â· Berjalan
+                                · Berjalan
                             @endif
                         </p>
                     </div>

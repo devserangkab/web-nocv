@@ -1,7 +1,7 @@
 <?php
 /**
- * Partial tab Proxmox â€” menyertakan tabel, modal, dan filter.
- * Property & method diambil dari komponen induk âš¡virtualization-index.
+ * Partial tab Proxmox — menyertakan tabel, modal, dan filter.
+ * Property & method diambil dari komponen induk ⚡virtualization-index.
  */
 use App\Models\Proxmox;
 ?>
@@ -258,7 +258,7 @@ use App\Models\Proxmox;
                             wire:model="proxmox_password"
                             class="ina-text-field__input"
                             autocomplete="new-password"
-                            placeholder="{{ $editingProxmoxId !== null ? 'Kosongkan bila tidak diubah' : 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢' }}"
+                            placeholder="{{ $editingProxmoxId !== null ? 'Kosongkan bila tidak diubah' : '••••••••' }}"
                         >
                     </div>
                     @error('password')

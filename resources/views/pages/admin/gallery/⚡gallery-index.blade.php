@@ -424,7 +424,7 @@ new class extends Component
                                 @endif
                             </p>
                         @endif
-                        <p class="text-[11px] text-content-tertiary">{{ $media->addedBy?->name ?? 'Sistem' }} Â· {{ $media->created_at->format('d M Y') }}</p>
+                        <p class="text-[11px] text-content-tertiary">{{ $media->addedBy?->name ?? 'Sistem' }} · {{ $media->created_at->format('d M Y') }}</p>
                     </figcaption>
 
                     <div class="flex items-center justify-end gap-1 border-t border-stroke-primary px-2 py-1.5">
@@ -486,7 +486,7 @@ new class extends Component
             <div class="flex items-start justify-between">
                 <div>
                     <h2 class="text-lg font-semibold text-content-primary" id="media-upload-title">Tambah Media</h2>
-                    <p class="mt-1 text-sm text-content-secondary">Format gambar (jpg, png, webp, gif) atau video (mp4, webm) â€” maksimal 50 MB.</p>
+                    <p class="mt-1 text-sm text-content-secondary">Format gambar (jpg, png, webp, gif) atau video (mp4, webm) — maksimal 50 MB.</p>
                 </div>
                 <button type="button" class="text-content-tertiary hover:text-content-primary" wire:click="closeUploadModal" aria-label="Tutup">
                     <i class="ti ti-x text-lg"></i>
@@ -629,9 +629,9 @@ new class extends Component
 
                 <p class="mt-3 text-[11px] text-content-tertiary">
                     @if ($preview->mediable !== null)
-                        {{ class_basename($preview->mediable_type) }} â€” {{ $preview->mediable->name ?? '-' }} Â·
+                        {{ class_basename($preview->mediable_type) }} — {{ $preview->mediable->name ?? '-' }} ·
                     @endif
-                    {{ $preview->addedBy?->name ?? 'Sistem' }} Â· {{ $preview->created_at->format('d M Y H:i') }}
+                    {{ $preview->addedBy?->name ?? 'Sistem' }} · {{ $preview->created_at->format('d M Y H:i') }}
                 </p>
                 <a
                     href="{{ route('admin.media.show', $preview->media_id) }}"

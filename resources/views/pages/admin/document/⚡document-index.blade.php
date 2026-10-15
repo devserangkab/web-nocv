@@ -533,7 +533,7 @@ new class extends Component
             <div class="flex items-start justify-between">
                 <div>
                     <h2 class="text-lg font-semibold text-content-primary" id="doc-upload-title">Unggah Dokumen</h2>
-                    <p class="mt-1 text-sm text-content-secondary">Format didukung: pdf, doc(x), xls(x), ppt(x), md, txt, csv, dan gambar â€” maksimal 20 MB.</p>
+                    <p class="mt-1 text-sm text-content-secondary">Format didukung: pdf, doc(x), xls(x), ppt(x), md, txt, csv, dan gambar — maksimal 20 MB.</p>
                 </div>
                 <button type="button" class="text-content-tertiary hover:text-content-primary" wire:click="closeUploadModal" aria-label="Tutup">
                     <i class="ti ti-x text-lg"></i>

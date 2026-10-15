@@ -202,7 +202,7 @@ new class extends Component
                             <a href="{{ route('admin.assets.proxmox.show', $server->proxmox->proxmox_id) }}" wire:navigate class="block truncate text-sm font-medium text-content-primary hover:text-guide-600">
                                 {{ $server->proxmox->name }}
                             </a>
-                            <p class="truncate text-xs text-content-tertiary">{{ $server->proxmox->proxmox_id }} Â· {{ $server->proxmox->version ?? 'Versi tidak dicatat' }} Â· {{ $server->proxmox->vms->count() }} VM</p>
+                            <p class="truncate text-xs text-content-tertiary">{{ $server->proxmox->proxmox_id }} · {{ $server->proxmox->version ?? 'Versi tidak dicatat' }} · {{ $server->proxmox->vms->count() }} VM</p>
                         </div>
                     </div>
                 @else
@@ -226,7 +226,7 @@ new class extends Component
                                     <a href="{{ route('admin.assets.panels.show', $panel->panel_id) }}" wire:navigate class="block truncate text-sm font-medium text-content-primary hover:text-guide-600">
                                         {{ $panel->name }}
                                     </a>
-                                    <p class="truncate text-xs text-content-tertiary">{{ $panel->type->value }}{{ $panel->version !== null ? ' Â· '.$panel->version : '' }}</p>
+                                    <p class="truncate text-xs text-content-tertiary">{{ $panel->type->value }}{{ $panel->version !== null ? ' · '.$panel->version : '' }}</p>
                                 </div>
                             </li>
                         @endforeach
@@ -253,7 +253,7 @@ new class extends Component
                                     <a href="{{ route('admin.applications.show', $hosting->application->application_id) }}" wire:navigate class="block truncate text-sm font-medium text-content-primary hover:text-guide-600">
                                         {{ $hosting->application->name }}
                                     </a>
-                                    <p class="truncate text-xs text-content-tertiary">{{ $hosting->application->application_id }} Â· {{ $hosting->application->type->value }}</p>
+                                    <p class="truncate text-xs text-content-tertiary">{{ $hosting->application->application_id }} · {{ $hosting->application->type->value }}</p>
                                 </div>
                             </li>
                         @endforeach

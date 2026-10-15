@@ -118,7 +118,7 @@ new class extends Component
                                     <a href="{{ route('admin.assets.racks.show', $rack->rack_id) }}" wire:navigate class="block truncate text-sm font-medium text-content-primary hover:text-guide-600" title="{{ $rack->name }}">
                                         {{ $rack->name }}
                                     </a>
-                                    <p class="truncate text-xs text-content-tertiary">{{ $rack->rack_id }} Â· {{ $rack->servers->count() }} server</p>
+                                    <p class="truncate text-xs text-content-tertiary">{{ $rack->rack_id }} · {{ $rack->servers->count() }} server</p>
                                 </div>
                                 @if ($rack->color)
                                     <span class="h-3 w-3 shrink-0 rounded-full" style="background-color: {{ $rack->color }}"></span>
@@ -147,7 +147,7 @@ new class extends Component
                                     <a href="{{ route('admin.assets.servers.show', $server->server_id) }}" wire:navigate class="block truncate text-sm font-medium text-content-primary hover:text-guide-600" title="{{ $server->server_name }}">
                                         {{ $server->server_name }}
                                     </a>
-                                    <p class="truncate text-xs text-content-tertiary">{{ $server->server_id }} Â· {{ $server->brand ?? 'Tanpa brand' }}</p>
+                                    <p class="truncate text-xs text-content-tertiary">{{ $server->server_id }} · {{ $server->brand ?? 'Tanpa brand' }}</p>
                                 </div>
                             </li>
                         @endforeach

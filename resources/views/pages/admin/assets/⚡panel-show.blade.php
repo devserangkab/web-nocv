@@ -163,12 +163,12 @@ new class extends Component
                                     <a href="{{ route('admin.assets.vms.show', $panel->vm->vm_id) }}" wire:navigate class="block truncate text-sm font-medium text-content-primary hover:text-guide-600">
                                         {{ $panel->vm->name }}
                                     </a>
-                                    <p class="truncate text-xs text-content-tertiary">VM Â· {{ $panel->vm->vm_id }}</p>
+                                    <p class="truncate text-xs text-content-tertiary">VM · {{ $panel->vm->vm_id }}</p>
                                 @else
                                     <a href="{{ route('admin.assets.servers.show', $panel->server->server_id) }}" wire:navigate class="block truncate text-sm font-medium text-content-primary hover:text-guide-600">
                                         {{ $panel->server->server_name }}
                                     </a>
-                                    <p class="truncate text-xs text-content-tertiary">Server Â· {{ $panel->server->server_id }}</p>
+                                    <p class="truncate text-xs text-content-tertiary">Server · {{ $panel->server->server_id }}</p>
                                 @endif
                             </div>
                         </div>
@@ -190,7 +190,7 @@ new class extends Component
                 @php $host = $this->host(); @endphp
                 @if ($host !== null)
                     <div class="space-y-2">
-                        {{-- Rantai: Server â†’ (Proxmox â†’ VM) â†’ Panel --}}
+                        {{-- Rantai: Server → (Proxmox → VM) → Panel --}}
                         @if ($panel->vm !== null)
                             @if ($panel->vm->proxmox?->server !== null)
                                 <div class="flex items-center gap-2 rounded-lg border border-stroke-primary p-3">
@@ -279,7 +279,7 @@ new class extends Component
                                     <a href="{{ route('admin.applications.show', $hosting->application->application_id) }}" wire:navigate class="block truncate text-sm font-medium text-content-primary hover:text-guide-600">
                                         {{ $hosting->application->name }}
                                     </a>
-                                    <p class="truncate text-xs text-content-tertiary">{{ $hosting->application->application_id }} Â· {{ $hosting->application->type->value }}</p>
+                                    <p class="truncate text-xs text-content-tertiary">{{ $hosting->application->application_id }} · {{ $hosting->application->type->value }}</p>
                                 </div>
                             </li>
                         @endforeach

@@ -1,7 +1,7 @@
 <?php
 /**
- * Partial tab Virtual Machine â€” menyertakan tabel, modal, dan filter.
- * Property & method diambil dari komponen induk âš¡virtualization-index.
+ * Partial tab Virtual Machine — menyertakan tabel, modal, dan filter.
+ * Property & method diambil dari komponen induk ⚡virtualization-index.
  */
 use App\Enums\VmsStatus;
 use App\Models\Vms;
@@ -308,7 +308,7 @@ use App\Models\Vms;
                             wire:model="password"
                             class="ina-text-field__input"
                             autocomplete="new-password"
-                            placeholder="{{ $editingVmsId !== null ? 'Kosongkan bila tidak diubah' : 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢' }}"
+                            placeholder="{{ $editingVmsId !== null ? 'Kosongkan bila tidak diubah' : '••••••••' }}"
                         >
                     </div>
                     @error('password')

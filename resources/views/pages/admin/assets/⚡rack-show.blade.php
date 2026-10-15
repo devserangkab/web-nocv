@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 use App\Models\Activity;
 use App\Models\Document;
@@ -40,7 +40,7 @@ new class extends Component
     }
 
     /**
-     * Isi rak gabungan (Server + NAS) terurut position Ã¢â‚¬â€ kosong di akhir.
+     * Isi rak gabungan (Server + NAS) terurut position — kosong di akhir.
      */
     public function rackItems()
     {
@@ -66,7 +66,7 @@ new class extends Component
                 'name' => $n->name,
                 'brand' => $n->brand,
                 'position' => $n->position,
-                'detail' => ($n->bays !== null ? $n->bays.' bay' : '-').($n->raid_level !== null ? ' Ã‚Â· '.$n->raid_level : ''),
+                'detail' => ($n->bays !== null ? $n->bays.' bay' : '-').($n->raid_level !== null ? ' · '.$n->raid_level : ''),
                 'url' => route('admin.assets.nas.show', $n->nas_id),
             ]))
             ->sortBy(fn ($item) => $item->position ?? PHP_INT_MAX)

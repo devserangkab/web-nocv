@@ -175,7 +175,7 @@ new class extends Component
                             <p class="truncate text-xs text-content-tertiary">
                                 {{ $vm->proxmox->proxmox_id }}
                                 @if ($vm->proxmox->server !== null)
-                                    Â· di server {{ $vm->proxmox->server->server_name }}
+                                    · di server {{ $vm->proxmox->server->server_name }}
                                 @endif
                             </p>
                         </div>
@@ -201,7 +201,7 @@ new class extends Component
                                     <a href="{{ route('admin.assets.panels.show', $panel->panel_id) }}" wire:navigate class="block truncate text-sm font-medium text-content-primary hover:text-guide-600">
                                         {{ $panel->name }}
                                     </a>
-                                    <p class="truncate text-xs text-content-tertiary">{{ $panel->type->value }}{{ $panel->version !== null ? ' Â· '.$panel->version : '' }}</p>
+                                    <p class="truncate text-xs text-content-tertiary">{{ $panel->type->value }}{{ $panel->version !== null ? ' · '.$panel->version : '' }}</p>
                                 </div>
                             </li>
                         @endforeach
@@ -228,7 +228,7 @@ new class extends Component
                                     <a href="{{ route('admin.applications.show', $hosting->application->application_id) }}" wire:navigate class="block truncate text-sm font-medium text-content-primary hover:text-guide-600">
                                         {{ $hosting->application->name }}
                                     </a>
-                                    <p class="truncate text-xs text-content-tertiary">{{ $hosting->application->application_id }} Â· {{ $hosting->application->type->value }}</p>
+                                    <p class="truncate text-xs text-content-tertiary">{{ $hosting->application->application_id }} · {{ $hosting->application->type->value }}</p>
                                 </div>
                             </li>
                         @endforeach
