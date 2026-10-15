@@ -26,6 +26,8 @@ new class extends Component
 
     public string $captchaQuestion = '';
 
+    public string $captchaQuestionHtml = '';
+
     public array $captchaOptions = [];
 
     public function mount(): void
@@ -39,6 +41,7 @@ new class extends Component
 
         $this->captchaId = $challenge['id'];
         $this->captchaQuestion = $challenge['question'];
+        $this->captchaQuestionHtml = $challenge['questionHtml'];
         $this->captchaOptions = $challenge['options'];
         $this->captchaAnswer = '';
     }
@@ -216,8 +219,11 @@ new class extends Component
                     x-show="shown"
                     x-cloak
                 >
-                    <p class="text-center font-mono text-lg font-semibold tracking-wide text-content-primary">
-                        {{ $captchaQuestion }}
+                    <p
+                        class="flex flex-wrap items-center justify-center gap-1 font-[Cambria,Georgia,serif] text-xl text-content-primary"
+                        title="{{ $captchaQuestion }}"
+                    >
+                        {!! $captchaQuestionHtml !!}
                     </p>
 
                     <div class="mt-3 grid grid-cols-4 gap-2">
