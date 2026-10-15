@@ -1,5 +1,7 @@
 <?php
 
+use App\Actions\Auth\GenerateMathCaptcha;
+use App\Actions\Auth\ValidateMathCaptcha;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -17,12 +19,49 @@ new class extends Component
     #[Validate('required', message: 'Password wajib diisi.')]
     public string $password = '';
 
+    #[Validate('required', message: 'Verifikasi matematika wajib dijawab.')]
+    public string $captchaAnswer = '';
+
+    public string $captchaId = '';
+
+    public string $captchaQuestion = '';
+
+    public array $captchaOptions = [];
+
+    public function mount(): void
+    {
+        $this->refreshCaptcha();
+    }
+
+    public function refreshCaptcha(): void
+    {
+        $challenge = app(GenerateMathCaptcha::class)();
+
+        $this->captchaId = $challenge['id'];
+        $this->captchaQuestion = $challenge['question'];
+        $this->captchaOptions = $challenge['options'];
+        $this->captchaAnswer = '';
+    }
+
     public function login(): void
     {
         $this->validate();
 
+        // Captcha dicek sebelum kredensial — gagal tidak membocorkan
+        // validitas email/password. Challenge single-use, jadi selalu
+        // dibuat ulang setelah dipakai (benar maupun salah).
+        if (! app(ValidateMathCaptcha::class)($this->captchaAnswer, $this->captchaId)) {
+            $this->addError('captchaAnswer', 'Jawaban captcha salah atau sudah kedaluwarsa.');
+
+            $this->refreshCaptcha();
+
+            return;
+        }
+
         if (! Auth::attempt(['email' => $this->email, 'password' => $this->password])) {
             $this->addError('email', 'Email atau password salah.');
+
+            $this->refreshCaptcha();
 
             return;
         }
@@ -86,7 +125,7 @@ new class extends Component
         <form class="mx-auto w-full max-w-sm" wire:submit="login" x-data="{ showPassword: false }">
             <h1 class="text-2xl font-semibold text-content-primary">Masuk ke akun</h1>
             <p class="mt-2 text-sm text-content-secondary">
-                Gunakan email dan kata sandi yang terdaftar di sistem.
+                Gunakan email, kata sandi, dan verifikasi matematika yang terdaftar.
             </p>
 
             {{-- Email --}}
@@ -146,6 +185,55 @@ new class extends Component
                     </button>
                 </div>
                 @error('password')
+                    <p class="mt-1.5 text-sm text-content-negative">{{ $message }}</p>
+                @enderror
+            </div>
+
+            {{-- Verifikasi matematika --}}
+            <div
+                class="mt-5"
+                x-data="{ shown: false }"
+                x-init="$nextTick(() => { setTimeout(() => { shown = true }, 120) })"
+            >
+                <div class="flex items-center justify-between">
+                    <label class="ina-text-field__label mb-0!">
+                        Verifikasi matematika
+                        <span class="ina-text-field__required">*</span>
+                    </label>
+                    <button
+                        type="button"
+                        wire:click="refreshCaptcha"
+                        class="flex items-center gap-1 text-xs font-medium text-guide-600 transition-colors duration-150 hover:text-guide-500"
+                        title="Soal baru"
+                    >
+                        <i class="ti ti-refresh text-sm"></i>
+                        Soal baru
+                    </button>
+                </div>
+
+                <div
+                    class="mt-2 rounded-lg border border-stroke-primary bg-background-secondary px-4 py-3 transition-all duration-300 ease-out"
+                    x-show="shown"
+                    x-cloak
+                >
+                    <p class="text-center font-mono text-lg font-semibold tracking-wide text-content-primary">
+                        {{ $captchaQuestion }}
+                    </p>
+
+                    <div class="mt-3 grid grid-cols-4 gap-2">
+                        @foreach ($captchaOptions as $option)
+                            <button
+                                type="button"
+                                wire:click="$set('captchaAnswer', '{{ $option }}')"
+                                class="rounded-lg border px-2 py-2 text-center text-sm font-medium transition-colors duration-150 {{ $captchaAnswer === (string) $option ? 'border-transparent bg-guide-500 text-white' : 'border-stroke-primary bg-background-primary text-content-primary hover:border-guide-500' }}"
+                            >
+                                {{ $option }}
+                            </button>
+                        @endforeach
+                    </div>
+                </div>
+
+                @error('captchaAnswer')
                     <p class="mt-1.5 text-sm text-content-negative">{{ $message }}</p>
                 @enderror
             </div>
