@@ -118,6 +118,14 @@
                             Panel
                         </a>
                         <a
+                            href="{{ route('admin.assets.nas.index') }}"
+                            wire:navigate
+                            class="flex h-9 items-center gap-3 rounded-lg px-3 pl-10 text-[13px] font-medium transition-colors duration-150 hover:bg-neutral-100 {{ request()->routeIs('admin.assets.nas.*') ? 'bg-guide-50 text-guide-600' : 'text-content-secondary hover:text-content-primary' }}"
+                        >
+                            <i class="ti ti-database text-base"></i>
+                            NAS
+                        </a>
+                        <a
                             href="{{ route('admin.applications.index') }}"
                             wire:navigate
                             class="flex h-9 items-center gap-3 rounded-lg px-3 pl-10 text-[13px] font-medium transition-colors duration-150 hover:bg-neutral-100 {{ request()->routeIs('admin.applications.*') ? 'bg-guide-50 text-guide-600' : 'text-content-secondary hover:text-content-primary' }}"

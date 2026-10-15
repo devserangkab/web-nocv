@@ -37,4 +37,12 @@ class Location extends Model
     {
         return $this->hasMany(Server::class, 'location_id', 'location_id')->whereNull('rack_id');
     }
+
+    /**
+     * NAS yang terhubung langsung ke server room tanpa rack.
+     */
+    public function nas(): HasMany
+    {
+        return $this->hasMany(Nas::class, 'location_id', 'location_id')->whereNull('rack_id');
+    }
 }

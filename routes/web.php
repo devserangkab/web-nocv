@@ -24,6 +24,8 @@ Route::middleware('auth')->group(function () {
     Route::livewire('/admin/assets/vms/detail/{vmId}', 'pages::admin.assets.vms-show')->name('admin.assets.vms.show');
     Route::livewire('/admin/assets/panels', 'pages::admin.assets.panels-index')->name('admin.assets.panels.index');
     Route::livewire('/admin/assets/panels/detail/{panelId}', 'pages::admin.assets.panel-show')->name('admin.assets.panels.show');
+    Route::livewire('/admin/assets/nas', 'pages::admin.assets.nas-index')->name('admin.assets.nas.index');
+    Route::livewire('/admin/assets/nas/detail/{nasId}', 'pages::admin.assets.nas-show')->name('admin.assets.nas.show');
 
     // Aplikasi
     Route::livewire('/admin/applications', 'pages::admin.application.application-index')->name('admin.applications.index');

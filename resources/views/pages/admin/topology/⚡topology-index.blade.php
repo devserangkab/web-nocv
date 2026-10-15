@@ -23,6 +23,7 @@ new class extends Component
         'location' => true,
         'rack' => true,
         'server' => true,
+        'nas' => true,
         'proxmox' => true,
         'vms' => true,
         'panel' => true,
@@ -62,10 +63,12 @@ new class extends Component
                 'racks.servers.proxmox.vms.hostings.application',
                 'racks.servers.panels',
                 'racks.servers.hostings.application',
+                'racks.nas',
                 'servers.proxmox.vms.panels',
                 'servers.proxmox.vms.hostings.application',
                 'servers.panels',
                 'servers.hostings.application',
+                'nas',
             ])
             ->orderBy('location_id')
             ->get();
@@ -125,9 +128,13 @@ new class extends Component
             $children[] = $this->rackNode($rack);
         }
 
-        // Server tanpa rack langsung di server room
+        // Server & NAS tanpa rack langsung di server room
         foreach ($location->servers as $server) {
             $children[] = $this->serverNode($server, false);
+        }
+
+        foreach ($location->nas as $nas) {
+            $children[] = $this->nasNode($nas);
         }
 
         return [
@@ -150,7 +157,23 @@ new class extends Component
             'icon' => 'ti-server-2',
             'color' => 'neutral',
             'url' => route('admin.assets.racks.show', $rack->rack_id),
-            'children' => $rack->servers->map(fn (Server $server) => $this->serverNode($server, true))->all(),
+            'children' => array_merge(
+                $rack->servers->map(fn (Server $server) => $this->serverNode($server, true))->all(),
+                $rack->nas->map(fn (\App\Models\Nas $nas) => $this->nasNode($nas))->all(),
+            ),
+        ];
+    }
+
+    private function nasNode(\App\Models\Nas $nas): array
+    {
+        return [
+            'type' => 'nas',
+            'label' => $nas->name,
+            'code' => $nas->nas_id,
+            'icon' => 'ti-database',
+            'color' => 'info',
+            'url' => route('admin.assets.nas.show', $nas->nas_id),
+            'children' => [],
         ];
     }
 
@@ -362,8 +385,9 @@ new class extends Component
         <div class="flex flex-wrap items-center gap-2">
             @foreach ([
                 'location' => ['build', 'Server Room', 'ti-building'],
-                'rack' => ['purple', 'Rack', 'ti-server-2'],
+                'rack' => ['rack', 'Rack', 'ti-server-2'],
                 'server' => ['server', 'Server', 'ti-server'],
+                'nas' => ['nas', 'NAS', 'ti-database'],
                 'proxmox' => ['proxmox', 'Proxmox', 'ti-stack-2'],
                 'vms' => ['vms', 'Virtual Machine', 'ti-box-multiple-3'],
                 'panel' => ['panel', 'Panel', 'ti-app-window'],

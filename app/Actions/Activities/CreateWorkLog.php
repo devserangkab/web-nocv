@@ -6,6 +6,7 @@ use App\Enums\ActivityCategory;
 use App\Enums\ActivityType;
 use App\Models\Application;
 use App\Models\Location;
+use App\Models\Nas;
 use App\Models\Panel;
 use App\Models\Proxmox;
 use App\Models\Rack;
@@ -49,6 +50,7 @@ class CreateWorkLog
             Proxmox::class,
             Vms::class,
             Panel::class,
+            Nas::class,
         ];
     }
 

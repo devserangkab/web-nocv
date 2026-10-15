@@ -7,6 +7,7 @@ use App\Enums\DocumentCategory;
 use App\Models\Application;
 use App\Models\Document;
 use App\Models\Location;
+use App\Models\Nas;
 use App\Models\Panel;
 use App\Models\Proxmox;
 use App\Models\Server;
@@ -71,6 +72,7 @@ class StoreDocument
             Proxmox::class,
             Vms::class,
             Panel::class,
+            Nas::class,
         ];
     }
 

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use App\Actions\Activities\CreateWorkLog;
 use App\Enums\ActivityType;
@@ -243,6 +243,10 @@ new class extends Component
                 'label' => 'Virtual Machine',
             ],
             [
+                'value' => \App\Models\Nas::class,
+                'label' => 'NAS',
+            ],
+            [
                 'value' => Panel::class,
                 'label' => 'Panel',
             ],
@@ -291,6 +295,10 @@ new class extends Component
                 'options' => $options(Vms::class, 'vm_id', 'name', Vms::query()->orderBy('vm_id')->get()),
             ],
             [
+                'label' => 'NAS',
+                'options' => $options(\App\Models\Nas::class, 'nas_id', 'name', \App\Models\Nas::query()->orderBy('nas_id')->get()),
+            ],
+            [
                 'label' => 'Panel',
                 'options' => $options(Panel::class, 'panel_id', 'name', Panel::query()->orderBy('panel_id')->get()),
             ],
@@ -317,7 +325,7 @@ new class extends Component
                         // Pencarian nama entitas di semua jenis subject
                         $morph
                             ->orWhereHasMorph('subject', Application::class, fn ($app) => $app->where('name', 'like', "%{$this->search}%"))
-                            ->orWhereHasMorph('subject', [Location::class, Rack::class, Proxmox::class, Vms::class, Panel::class], fn ($asset) => $asset->where('name', 'like', "%{$this->search}%"))
+                            ->orWhereHasMorph('subject', [Location::class, Rack::class, Proxmox::class, Vms::class, \App\Models\Nas::class, Panel::class], fn ($asset) => $asset->where('name', 'like', "%{$this->search}%"))
                             ->orWhereHasMorph('subject', Server::class, fn ($server) => $server->where('server_name', 'like', "%{$this->search}%"));
                     });
             }))
@@ -344,6 +352,7 @@ new class extends Component
             Server::class => route('admin.assets.servers.show', $subject->server_id),
             Proxmox::class => route('admin.assets.proxmox.show', $subject->proxmox_id),
             Vms::class => route('admin.assets.vms.show', $subject->vm_id),
+            \App\Models\Nas::class => route('admin.assets.nas.show', $subject->nas_id),
             Panel::class => route('admin.assets.panels.show', $subject->panel_id),
             default => null,
         };

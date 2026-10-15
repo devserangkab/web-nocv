@@ -44,4 +44,12 @@ class Rack extends Model
     {
         return $this->hasMany(Server::class, 'rack_id', 'rack_id');
     }
+
+    /**
+     * NAS yang ditempatkan di rack ini.
+     */
+    public function nas(): HasMany
+    {
+        return $this->hasMany(Nas::class, 'rack_id', 'rack_id');
+    }
 }

@@ -18,6 +18,7 @@ $colorClasses = [
     'location' => 'bg-guide-500 text-white',
     'rack' => 'bg-background-tertiary text-content-secondary',
     'server' => 'bg-guide-50 text-guide-600',
+    'nas' => 'bg-guide-100 text-guide-600',
     'proxmox' => 'bg-warning-50 text-warning-600',
     'vms' => 'bg-background-tertiary text-content-secondary',
     'panel' => 'bg-guide-50 text-guide-600',

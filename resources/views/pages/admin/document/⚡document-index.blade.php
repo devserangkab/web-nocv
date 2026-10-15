@@ -5,6 +5,7 @@ use App\Actions\Documents\StoreDocument;
 use App\Models\Application;
 use App\Models\Document;
 use App\Models\Location;
+use App\Models\Nas;
 use App\Models\Panel;
 use App\Models\Proxmox;
 use App\Models\Rack;
@@ -117,6 +118,10 @@ new class extends Component
             [
                 'label' => 'Virtual Machine',
                 'options' => $options(Vms::class, 'vm_id', 'name', Vms::query()->orderBy('vm_id')->get(), 'Virtual Machine'),
+            ],
+            [
+                'label' => 'NAS',
+                'options' => $options(\App\Models\Nas::class, 'nas_id', 'name', \App\Models\Nas::query()->orderBy('nas_id')->get(), 'NAS'),
             ],
             [
                 'label' => 'Panel',
@@ -277,6 +282,10 @@ new class extends Component
             [
                 'value' => Vms::class,
                 'label' => 'Virtual Machine',
+            ],
+            [
+                'value' => \App\Models\Nas::class,
+                'label' => 'NAS',
             ],
             [
                 'value' => Panel::class,
@@ -526,7 +535,7 @@ new class extends Component
             <div class="flex items-start justify-between">
                 <div>
                     <h2 class="text-lg font-semibold text-content-primary" id="doc-upload-title">Unggah Dokumen</h2>
-                    <p class="mt-1 text-sm text-content-secondary">Format didukung: pdf, doc(x), xls(x), ppt(x), md, txt, csv, dan gambar — maksimal 20 MB.</p>
+                    <p class="mt-1 text-sm text-content-secondary">Format didukung: pdf, doc(x), xls(x), ppt(x), md, txt, csv, dan gambar â€” maksimal 20 MB.</p>
                 </div>
                 <button type="button" class="text-content-tertiary hover:text-content-primary" wire:click="closeUploadModal" aria-label="Tutup">
                     <i class="ti ti-x text-lg"></i>
