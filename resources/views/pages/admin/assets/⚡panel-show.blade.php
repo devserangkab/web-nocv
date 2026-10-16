@@ -92,21 +92,21 @@ new class extends Component
 
                 <div class="pt-5">
                     <dl class="space-y-2 text-sm">
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Nama</dt>
-                            <dd class="font-medium text-content-primary">{{ $panel->name }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $panel->name }}</dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Jenis</dt>
-                            <dd class="font-medium text-content-primary">{{ $panel->type->value }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $panel->type->value }}</dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Versi</dt>
-                            <dd class="font-medium text-content-primary">{{ $panel->version ?? '-' }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $panel->version ?? '-' }}</dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Username</dt>
-                            <dd class="font-medium text-content-primary">{{ $panel->username ?? '-' }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $panel->username ?? '-' }}</dd>
                         </div>
                     </dl>
                 </div>

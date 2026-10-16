@@ -92,19 +92,19 @@ new class extends Component
 
             <div class="border-stroke-primary pt-5">
                 <dl class="space-y-2 text-sm">
-                    <div class="flex items-center justify-between gap-3">
+                    <div class="flex justify-between gap-3">
                         <dt class="text-content-tertiary">Name</dt>
                         <dd class="text-right font-medium text-content-primary" title="{{ $application->name }}">{{ $application->name }}</dd>
                     </div>
-                    <div class="flex items-center justify-between gap-3">
+                    <div class="flex justify-between gap-3">
                         <dt class="text-content-tertiary">Singkatan</dt>
-                        <dd class="font-medium text-content-primary">{{ $application->abbreviation ?? '-' }}</dd>
+                        <dd class="font-medium text-content-primary text-right">{{ $application->abbreviation ?? '-' }}</dd>
                     </div>
-                    <div class="flex items-center justify-between gap-3">
+                    <div class="flex justify-between gap-3">
                         <dt class="text-content-tertiary">Jenis Application</dt>
-                        <dd class="font-medium text-content-primary">{{ $application->type->value }}</dd>
+                        <dd class="font-medium text-content-primary text-right">{{ $application->type->value }}</dd>
                     </div>
-                    <div class="flex items-center justify-between gap-3">
+                    <div class="flex justify-between gap-3">
                         <dt class="text-content-tertiary">Request</dt>
                         <dd class="text-right font-medium text-content-primary" title="{{ $application->requestedBy?->name ?? '' }}">
                             {{ $application->requestedBy !== null ? ($application->requestedBy->abbreviation.' ('.$application->requestedBy->institution_id.')') : '-' }}
@@ -123,23 +123,23 @@ new class extends Component
 
             <div class="border-stroke-primary pt-5">
                 <dl class="space-y-2 text-sm">
-                    <div class="flex items-center justify-between gap-3">
+                    <div class="flex justify-between gap-3">
                         <dt class="text-content-tertiary">Framework</dt>
-                        <dd class="font-medium text-content-primary">{{ $application->framework ?? '-' }}</dd>
+                        <dd class="font-medium text-content-primary text-right">{{ $application->framework ?? '-' }}</dd>
                     </div>
-                    <div class="flex items-center justify-between gap-3">
+                    <div class="flex justify-between gap-3">
                         <dt class="text-content-tertiary">Language</dt>
-                        <dd class="font-medium text-content-primary">{{ $application->language ?? '-' }}</dd>
+                        <dd class="font-medium text-content-primary text-right">{{ $application->language ?? '-' }}</dd>
                     </div>
-                    <div class="flex items-center justify-between gap-3">
+                    <div class="flex justify-between gap-3">
                         <dt class="text-content-tertiary">Database</dt>
-                        <dd class="font-medium text-content-primary">{{ $application->database ?? '-' }}</dd>
+                        <dd class="font-medium text-content-primary text-right">{{ $application->database ?? '-' }}</dd>
                     </div>
-                    <div class="flex items-center justify-between gap-3">
+                    <div class="flex justify-between gap-3">
                         <dt class="text-content-tertiary">Domain</dt>
                         <dd class="max-w-[60%] truncate font-medium text-content-primary" title="{{ $application->domain }}">{{ $application->domain ?? '-' }}</dd>
                     </div>
-                    <div class="flex items-center justify-between gap-3">
+                    <div class="flex justify-between gap-3">
                         <dt class="shrink-0 text-content-tertiary">Repo URL</dt>
                         <dd class="max-w-[60%] truncate font-medium">
                             @if ($application->repo_url !== null)

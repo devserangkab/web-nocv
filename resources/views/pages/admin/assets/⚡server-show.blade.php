@@ -12,6 +12,8 @@ use Livewire\Component;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\InteractsWithServerForm;
+
     #[Layout('layouts::admin')]
     #[Title('Detail Server')]
 
@@ -61,7 +63,16 @@ new class extends Component
         subtitle="Detail server beserta lokasi dan relasi terkait."
     >
         @slot('right')
-            <span class="ina-badge ina-badge--soft ina-badge--md {{ $server->status === ServerStatus::On ? 'ina-badge--positive' : 'ina-badge--neutral' }}">{{ $server->status->value }}</span>
+            @can('infrastructure.manage')
+            <button
+                type="button"
+                wire:click="edit({{ $server->id }})"
+                class="ina-button ina-button--secondary ina-button--md"
+            >
+                <i class="ti ti-pencil text-base" aria-hidden="true"></i>
+                Edit Server
+            </button>
+            @endcan
         @endslot
     </x-asset.detail-header>
 
@@ -80,21 +91,21 @@ new class extends Component
 
                 <div class="pt-5">
                     <dl class="space-y-2 text-sm">
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Nama</dt>
-                            <dd class="font-medium text-content-primary">{{ $server->server_name }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $server->server_name }}</dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Brand</dt>
                             <dd class="text-right font-medium text-content-primary">{{ $server->brand ?? '-' }}</dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">OS</dt>
-                            <dd class="font-medium text-content-primary">{{ $server->os ?? '-' }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $server->os ?? '-' }}</dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Status</dt>
-                            <dd class="font-medium text-content-primary">{{ $server->status->value }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $server->status->value }}</dd>
                         </div>
                     </dl>
                 </div>
@@ -106,7 +117,7 @@ new class extends Component
 
                 <div class="pt-5">
                     <dl class="space-y-2 text-sm">
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">CPU</dt>
                             <dd class="text-right font-medium text-content-primary">{{ $server->cpu ?? '-' }}</dd>
                         </div>
@@ -146,7 +157,7 @@ new class extends Component
 
                 <div class="pt-5">
                     <dl class="space-y-2 text-sm">
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Server Room</dt>
                             <dd class="font-medium text-right">
                                 @if ($server->effective() !== null)
@@ -156,7 +167,7 @@ new class extends Component
                                 @endif
                             </dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Rack</dt>
                             <dd class="font-medium text-right">
                                 @if ($server->rack !== null)
@@ -166,13 +177,66 @@ new class extends Component
                                 @endif
                             </dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Posisi</dt>
-                            <dd class="font-medium text-content-primary">{{ $server->position !== null ? 'U'.$server->position : '-' }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $server->position !== null ? 'U'.$server->position : '-' }}</dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Static IP</dt>
-                            <dd class="font-medium text-content-primary">{{ $server->static_ip ?? '-' }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $server->static_ip ?? '-' }}</dd>
+                        </div>
+                        <div class="flex justify-between gap-3">
+                            <dt class="text-content-tertiary">Username</dt>
+                            <dd class="text-right font-medium text-content-primary">
+                                @if (filled($server->username))
+                                    <span class="inline-flex items-center gap-1.5" x-data="{ copied: false }">
+                                        <span>{{ $server->username }}</span>
+                                        <button
+                                            type="button"
+                                            class="text-content-tertiary transition-colors duration-150 hover:text-content-primary"
+                                            @click="navigator.clipboard.writeText($refs.value.innerText.trim()); copied = true; setTimeout(() => copied = false, 1500)"
+                                            aria-label="Salin username"
+                                            title="Salin username"
+                                        >
+                                            <i class="ti text-base" :class="copied ? 'ti-check text-guide-600' : 'ti-copy'"></i>
+                                        </button>
+                                        <span x-ref="value" hidden>{{ $server->username }}</span>
+                                    </span>
+                                @else
+                                    -
+                                @endif
+                            </dd>
+                        </div>
+                        <div class="flex justify-between gap-3">
+                            <dt class="text-content-tertiary">Password</dt>
+                            <dd class="text-right font-medium text-content-primary">
+                                @if (filled($server->password))
+                                    <span class="inline-flex items-center gap-1.5" x-data="{ show: false, copied: false }">
+                                        <span x-show="!show">••••••••</span>
+                                        <span x-show="show" x-cloak>{{ $server->password }}</span>
+                                        <button
+                                            type="button"
+                                            class="text-content-tertiary transition-colors duration-150 hover:text-content-primary"
+                                            @click="show = !show"
+                                            :aria-label="show ? 'Sembunyikan password' : 'Tampilkan password'"
+                                        >
+                                            <i class="ti text-base" :class="show ? 'ti-eye-off' : 'ti-eye'"></i>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="text-content-tertiary transition-colors duration-150 hover:text-content-primary"
+                                            @click="navigator.clipboard.writeText($refs.value.innerText.trim()); copied = true; setTimeout(() => copied = false, 1500)"
+                                            aria-label="Salin password"
+                                            title="Salin password"
+                                        >
+                                            <i class="ti text-base" :class="copied ? 'ti-check text-guide-600' : 'ti-copy'"></i>
+                                        </button>
+                                        <span x-ref="value" hidden>{{ $server->password }}</span>
+                                    </span>
+                                @else
+                                    -
+                                @endif
+                            </dd>
                         </div>
                     </dl>
                 </div>
@@ -283,4 +347,6 @@ new class extends Component
             <x-asset.gallery-panel :medias="$medias" name="{{ $server->server_name }}" :add-href="route('admin.galleries.index', ['type' => Server::class, 'id' => $server->id])" />
         </div>
     @endif
+
+    @include('pages.admin.assets.partials.server-form-modal')
 </div>

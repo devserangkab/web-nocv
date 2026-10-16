@@ -97,11 +97,11 @@ new class extends Component
 
                 <div class="pt-5">
                     <dl class="space-y-2 text-sm">
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Nama</dt>
-                            <dd class="font-medium text-content-primary">{{ $rack->name }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $rack->name }}</dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Server Room</dt>
                             <dd class="text-right font-medium">
                                 @if ($rack->location !== null)
@@ -121,21 +121,21 @@ new class extends Component
 
                 <div class="pt-5">
                     <dl class="space-y-2 text-sm">
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Brand</dt>
-                            <dd class="font-medium text-content-primary">{{ $rack->brand ?? '-' }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $rack->brand ?? '-' }}</dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Kapasitas</dt>
-                            <dd class="font-medium text-content-primary">{{ $rack->units !== null ? $rack->units.' U' : '-' }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $rack->units !== null ? $rack->units.' U' : '-' }}</dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Terisi</dt>
-                            <dd class="font-medium text-content-primary">{{ $rack->servers->count() }} server</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $rack->servers->count() }} server</dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Warna</dt>
-                            <dd class="font-medium text-content-primary">
+                            <dd class="font-medium text-content-primary text-right">
                                 @if ($rack->color)
                                     {{ $rack->color }}
                                 @else

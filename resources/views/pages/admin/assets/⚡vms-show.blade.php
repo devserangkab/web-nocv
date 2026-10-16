@@ -80,15 +80,15 @@ new class extends Component
 
                 <div class="pt-5">
                     <dl class="space-y-2 text-sm">
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Nama</dt>
-                            <dd class="font-medium text-content-primary">{{ $vm->name }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $vm->name }}</dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">VMID</dt>
-                            <dd class="font-medium text-content-primary">{{ $vm->proxmox_number ?? '-' }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $vm->proxmox_number ?? '-' }}</dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Proxmox Induk</dt>
                             <dd class="font-medium text-right">
                                 @if ($vm->proxmox !== null)
@@ -98,9 +98,9 @@ new class extends Component
                                 @endif
                             </dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Status</dt>
-                            <dd class="font-medium text-content-primary">{{ $vm->status->value }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $vm->status->value }}</dd>
                         </div>
                     </dl>
                 </div>
@@ -112,21 +112,21 @@ new class extends Component
 
                 <div class="pt-5">
                     <dl class="space-y-2 text-sm">
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">OS</dt>
-                            <dd class="font-medium text-content-primary">{{ $vm->os ?? '-' }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $vm->os ?? '-' }}</dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">CPU</dt>
-                            <dd class="font-medium text-content-primary">{{ $vm->cpu !== null ? $vm->cpu.' core' : '-' }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $vm->cpu !== null ? $vm->cpu.' core' : '-' }}</dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">RAM</dt>
-                            <dd class="font-medium text-content-primary">{{ $vm->ram !== null ? number_format($vm->ram / 1024).' GB' : '-' }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $vm->ram !== null ? number_format($vm->ram / 1024).' GB' : '-' }}</dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Storage</dt>
-                            <dd class="font-medium text-content-primary">{{ $vm->storage !== null ? number_format($vm->storage / 1024).' GB' : '-' }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $vm->storage !== null ? number_format($vm->storage / 1024).' GB' : '-' }}</dd>
                         </div>
                         <div class="flex items-start justify-between gap-3">
                             <dt class="shrink-0 text-content-tertiary">Local IP</dt>

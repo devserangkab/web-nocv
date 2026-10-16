@@ -66,21 +66,21 @@ new class extends Component
 
                 <div class="pt-5">
                     <dl class="space-y-2 text-sm">
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Nama</dt>
-                            <dd class="font-medium text-content-primary">{{ $nas->name }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $nas->name }}</dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Brand</dt>
-                            <dd class="font-medium text-content-primary">{{ $nas->brand ?? '-' }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $nas->brand ?? '-' }}</dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">OS</dt>
-                            <dd class="font-medium text-content-primary">{{ $nas->os ?? '-' }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $nas->os ?? '-' }}</dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Status</dt>
-                            <dd class="font-medium text-content-primary">{{ $nas->status->value }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $nas->status->value }}</dd>
                         </div>
                     </dl>
                 </div>
@@ -92,21 +92,21 @@ new class extends Component
 
                 <div class="pt-5">
                     <dl class="space-y-2 text-sm">
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Storage</dt>
-                            <dd class="font-medium text-content-primary">{{ $nas->storage_size !== null ? number_format($nas->storage_size / 1024).' GB' : '-' }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $nas->storage_size !== null ? number_format($nas->storage_size / 1024).' GB' : '-' }}</dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Bays</dt>
-                            <dd class="font-medium text-content-primary">{{ $nas->bays !== null ? $nas->bays.' slot' : '-' }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $nas->bays !== null ? $nas->bays.' slot' : '-' }}</dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Posisi</dt>
-                            <dd class="font-medium text-content-primary">{{ $nas->position !== null ? 'U'.$nas->position : ($nas->rack !== null ? '-' : 'Tanpa rack') }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $nas->position !== null ? 'U'.$nas->position : ($nas->rack !== null ? '-' : 'Tanpa rack') }}</dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">RAID</dt>
-                            <dd class="font-medium text-content-primary">{{ $nas->raid_level ?? '-' }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $nas->raid_level ?? '-' }}</dd>
                         </div>
                     </dl>
                 </div>
@@ -118,7 +118,7 @@ new class extends Component
 
                 <div class="pt-5">
                     <dl class="space-y-2 text-sm">
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Server Room</dt>
                             <dd class="font-medium text-right">
                                 @if ($nas->effective() !== null)
@@ -128,7 +128,7 @@ new class extends Component
                                 @endif
                             </dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Rack</dt>
                             <dd class="font-medium text-right">
                                 @if ($nas->rack !== null)
@@ -138,13 +138,13 @@ new class extends Component
                                 @endif
                             </dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Static IP</dt>
-                            <dd class="font-medium text-content-primary">{{ $nas->static_ip ?? '-' }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $nas->static_ip ?? '-' }}</dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Username</dt>
-                            <dd class="font-medium text-content-primary">{{ $nas->username ?? '-' }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $nas->username ?? '-' }}</dd>
                         </div>
                     </dl>
                 </div>

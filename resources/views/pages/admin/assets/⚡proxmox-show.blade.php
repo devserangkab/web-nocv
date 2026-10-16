@@ -61,13 +61,13 @@ new class extends Component
 
                 <div class="pt-5">
                     <dl class="space-y-2 text-sm">
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Nama</dt>
-                            <dd class="font-medium text-content-primary">{{ $proxmox->name }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $proxmox->name }}</dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Versi</dt>
-                            <dd class="font-medium text-content-primary">{{ $proxmox->version ?? '-' }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $proxmox->version ?? '-' }}</dd>
                         </div>
                         <div class="flex items-start justify-between gap-3">
                             <dt class="shrink-0 text-content-tertiary">URL</dt>
@@ -79,9 +79,9 @@ new class extends Component
                                 @endif
                             </dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Username</dt>
-                            <dd class="font-medium text-content-primary">{{ $proxmox->username ?? '-' }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $proxmox->username ?? '-' }}</dd>
                         </div>
                     </dl>
                 </div>
@@ -93,7 +93,7 @@ new class extends Component
 
                 <div class="pt-5">
                     <dl class="space-y-2 text-sm">
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Server Host</dt>
                             <dd class="font-medium text-right">
                                 @if ($proxmox->server !== null)
@@ -103,9 +103,9 @@ new class extends Component
                                 @endif
                             </dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Jumlah VM</dt>
-                            <dd class="font-medium text-content-primary">{{ $proxmox->vms->count() }}</dd>
+                            <dd class="font-medium text-content-primary text-right">{{ $proxmox->vms->count() }}</dd>
                         </div>
                     </dl>
                 </div>

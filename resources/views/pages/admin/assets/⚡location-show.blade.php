@@ -62,7 +62,7 @@ new class extends Component
 
                 <div class="pt-5">
                     <dl class="space-y-2 text-sm">
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Nama</dt>
                             <dd class="text-right font-medium text-content-primary">{{ $location->name }}</dd>
                         </div>
