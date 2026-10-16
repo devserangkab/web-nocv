@@ -167,6 +167,23 @@ new class extends Component
     }
 
     /**
+     * Opsi filter jenis aktivitas (Semua / Sistem / Manual).
+     *
+     * @return array<int, array{value: string, label: string}>
+     */
+    public function typeFilterOptions(): array
+    {
+        return collect([
+            [
+                'value' => 'ALL',
+                'label' => 'Semua Jenis',
+            ],
+            ['value' => ActivityType::Audit->value, 'label' => ActivityType::Audit->label()],
+            ['value' => ActivityType::Work->value, 'label' => ActivityType::Work->label()],
+        ])->all();
+    }
+
+    /**
      * Opsi kategori untuk work log form.
      *
      * @return array<int, array{value: string, label: string}>
@@ -384,11 +401,7 @@ new class extends Component
                 <x-idds.select
                     wire-prop="typeFilter"
                     :value="$typeFilter"
-                    :options="collect([
-                        ['value' => 'ALL', 'label' => 'Semua Jenis'],
-                        ['value' => '{{ App\Enums\ActivityType::Audit->value }}', 'label' => '{{ App\Enums\ActivityType::Audit->label() }}'],
-                        ['value' => '{{ App\Enums\ActivityType::Work->value }}', 'label' => '{{ App\Enums\ActivityType::Work->label() }}'],
-                    ])->all()"
+                    :options="$this->typeFilterOptions()"
                     placeholder="Semua Jenis"
                     aria-label="Filter jenis aktivitas"
                 />
