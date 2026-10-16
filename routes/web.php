@@ -54,10 +54,13 @@ Route::middleware('auth')->group(function () {
     // Topology
     Route::livewire('/admin/topology', 'pages::admin.topology.topology-index')->name('admin.topology.index');
 
-    // Pengaturan
-    Route::livewire('/admin/users', 'pages::admin.management.user-index')->name('admin.users.index');
-    Route::livewire('/admin/roles', 'pages::admin.management.role-index')->name('admin.roles.index');
-    Route::livewire('/admin/institutions', 'pages::admin.management.institution-index')->name('admin.institutions.index');
+    // Pengaturan — hanya role yang berwenang (superadmin & user legacy)
+    Route::middleware('can:management.manage')->group(function () {
+        Route::livewire('/admin/users', 'pages::admin.management.user-index')->name('admin.users.index');
+        Route::livewire('/admin/roles', 'pages::admin.management.role-index')->name('admin.roles.index');
+        Route::livewire('/admin/institutions', 'pages::admin.management.institution-index')->name('admin.institutions.index');
+    });
+
     Route::livewire('/admin/settings', 'pages::admin.settings')->name('admin.settings.index');
 
     // Dokumentasi & Gallery

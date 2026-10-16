@@ -4,6 +4,7 @@ namespace App\Actions\Locations;
 
 use App\Actions\Activities\RecordActivity;
 use App\Models\Location;
+use App\Support\Authorize;
 use Illuminate\Support\Facades\Validator;
 
 class CreateLocation
@@ -13,6 +14,7 @@ class CreateLocation
      */
     public function __invoke(array $data): Location
     {
+        Authorize::infrastructureManage();
         $data = Validator::make($data, static::rules(), static::messages())->validate();
 
         $location = Location::create($this->normalize($data));

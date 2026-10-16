@@ -369,10 +369,12 @@ new class extends Component
                 Audit log operasi aplikasi dan work log pekerjaan teknis, terpusat dalam satu daftar.
             </p>
         </div>
+        @can('activities.create')
         <button type="button" wire:click="$set('showWorkLogModal', true)" class="ina-button ina-button--primary ina-button--md">
             <i class="ti ti-clipboard-text text-lg" aria-hidden="true"></i>
             Catat Work Log
         </button>
+        @endcan
     </div>
 
     {{-- Filter baris 1: jenis & kategori; baris 2: pelaksana & entitas; search & tanggal --}}

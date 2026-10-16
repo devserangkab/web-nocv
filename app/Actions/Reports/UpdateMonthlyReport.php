@@ -5,6 +5,7 @@ namespace App\Actions\Reports;
 use App\Models\Activity;
 use App\Models\MonthlyReport;
 use App\Models\MonthlyReportItem;
+use App\Support\Authorize;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -18,6 +19,8 @@ class UpdateMonthlyReport
      */
     public function __invoke(MonthlyReport $report, array $data): MonthlyReport
     {
+        Authorize::monthlyReportOwn($report);
+
         return DB::transaction(function () use ($report, $data): MonthlyReport {
             $data = Validator::make($data, static::rules(), static::messages())->validate();
 

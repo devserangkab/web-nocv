@@ -4,6 +4,7 @@ namespace App\Actions\Assets;
 
 use App\Actions\Activities\RecordActivity;
 use App\Models\Panel;
+use App\Support\Authorize;
 use Illuminate\Support\Facades\Validator;
 
 class UpdatePanel
@@ -13,6 +14,7 @@ class UpdatePanel
      */
     public function __invoke(Panel $panel, array $data): Panel
     {
+        Authorize::infrastructureManage();
         $data = Validator::make($data, CreatePanel::rules(), CreatePanel::messages())->validate();
 
         $normalized = CreatePanel::normalize($data);

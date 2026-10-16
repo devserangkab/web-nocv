@@ -3,6 +3,7 @@
 namespace App\Actions\Management;
 
 use App\Models\User;
+use App\Support\Authorize;
 use Illuminate\Support\Facades\Validator;
 
 class UpdateUser
@@ -12,6 +13,7 @@ class UpdateUser
      */
     public function __invoke(User $user, array $data): User
     {
+        Authorize::managementManage();
         $data = Validator::make($data, CreateUser::rules($user->id), CreateUser::messages())->validate();
 
         $payload = [

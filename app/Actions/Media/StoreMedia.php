@@ -5,6 +5,7 @@ namespace App\Actions\Media;
 use App\Actions\Activities\RecordActivity;
 use App\Enums\MediaType;
 use App\Models\Media;
+use App\Support\Authorize;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -22,6 +23,8 @@ class StoreMedia
      */
     public function __invoke(Model $mediable, array $data, ?int $addedBy = null): Media
     {
+        Authorize::mediaCreate();
+
         $data['mediable_type'] = $mediable->getMorphClass();
         $data['mediable_id'] = $mediable->id;
         $data['added_by'] = $addedBy;

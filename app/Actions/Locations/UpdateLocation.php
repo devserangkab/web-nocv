@@ -4,6 +4,7 @@ namespace App\Actions\Locations;
 
 use App\Actions\Activities\RecordActivity;
 use App\Models\Location;
+use App\Support\Authorize;
 use Illuminate\Support\Facades\Validator;
 
 class UpdateLocation
@@ -13,6 +14,7 @@ class UpdateLocation
      */
     public function __invoke(Location $location, array $data): Location
     {
+        Authorize::infrastructureManage();
         $data = Validator::make($data, CreateLocation::rules(), CreateLocation::messages())->validate();
 
         $location->update(CreateLocation::normalize($data));

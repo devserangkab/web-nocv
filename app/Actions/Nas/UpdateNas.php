@@ -4,6 +4,7 @@ namespace App\Actions\Nas;
 
 use App\Actions\Activities\RecordActivity;
 use App\Models\Nas;
+use App\Support\Authorize;
 use Illuminate\Support\Facades\Validator;
 
 class UpdateNas
@@ -13,6 +14,7 @@ class UpdateNas
      */
     public function __invoke(Nas $nas, array $data): Nas
     {
+        Authorize::infrastructureManage();
         $data = Validator::make($data, CreateNas::rules(), CreateNas::messages())->validate();
 
         $normalized = CreateNas::normalize($data);

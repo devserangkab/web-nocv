@@ -6,6 +6,7 @@ use App\Actions\Activities\RecordActivity;
 use App\Enums\NasStatus;
 use App\Models\Nas;
 use App\Models\Rack;
+use App\Support\Authorize;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -16,6 +17,7 @@ class CreateNas
      */
     public function __invoke(array $data): Nas
     {
+        Authorize::infrastructureManage();
         $data = Validator::make($data, static::rules(), static::messages())->validate();
 
         $nas = Nas::create($this->normalize($data));

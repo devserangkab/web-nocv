@@ -303,10 +303,12 @@ new class extends Component
             <h1 class="text-xl font-semibold text-content-primary">Dokumentasi</h1>
             <p class="mt-1 text-sm text-content-secondary">Pusat pengelolaan seluruh dokumen infrastruktur dan aplikasi.</p>
         </div>
+        @can("documents.create")
         <button type="button" wire:click="$set('showUploadModal', true)" class="ina-button ina-button--primary ina-button--md">
             <i class="ti ti-upload text-lg" aria-hidden="true"></i>
             Unggah Dokumen
         </button>
+        @endcan
     </div>
 
     {{-- Filter + search --}}
@@ -471,6 +473,7 @@ new class extends Component
                                         @else
                                             <span class="px-2">-</span>
                                         @endif
+                                        @if (auth()->user()?->can('documents.delete') || (auth()->user()?->can('documents.delete-own') && $document->added_by === auth()->id()))
                                         <button
                                             type="button"
                                             wire:click="askDelete({{ $document->id }})"
@@ -480,6 +483,7 @@ new class extends Component
                                         >
                                             <i class="ti ti-trash text-base"></i>
                                         </button>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>

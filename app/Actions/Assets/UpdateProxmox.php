@@ -4,6 +4,7 @@ namespace App\Actions\Assets;
 
 use App\Actions\Activities\RecordActivity;
 use App\Models\Proxmox;
+use App\Support\Authorize;
 use Illuminate\Support\Facades\Validator;
 
 class UpdateProxmox
@@ -13,6 +14,7 @@ class UpdateProxmox
      */
     public function __invoke(Proxmox $proxmox, array $data): Proxmox
     {
+        Authorize::infrastructureManage();
         $data = Validator::make($data, CreateProxmox::rules($proxmox->id), CreateProxmox::messages())->validate();
 
         $normalized = CreateProxmox::normalize($data);

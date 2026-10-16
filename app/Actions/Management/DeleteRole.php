@@ -3,6 +3,7 @@
 namespace App\Actions\Management;
 
 use App\Models\User;
+use App\Support\Authorize;
 use Illuminate\Validation\ValidationException;
 use Spatie\Permission\Models\Role;
 
@@ -13,6 +14,7 @@ class DeleteRole
      */
     public function __invoke(Role $role): bool
     {
+        Authorize::managementManage();
         if ($role->name === 'superadmin') {
             throw ValidationException::withMessages([
                 'deletingId' => 'Role superadmin tidak bisa dihapus.',

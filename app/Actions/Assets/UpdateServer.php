@@ -4,6 +4,7 @@ namespace App\Actions\Assets;
 
 use App\Actions\Activities\RecordActivity;
 use App\Models\Server;
+use App\Support\Authorize;
 use Illuminate\Support\Facades\Validator;
 
 class UpdateServer
@@ -13,6 +14,7 @@ class UpdateServer
      */
     public function __invoke(Server $server, array $data): Server
     {
+        Authorize::infrastructureManage();
         $data = Validator::make($data, CreateServer::rules(), CreateServer::messages())->validate();
 
         $normalized = CreateServer::normalize($data);

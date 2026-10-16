@@ -3,6 +3,7 @@
 namespace App\Actions\Management;
 
 use App\Models\User;
+use App\Support\Authorize;
 use Illuminate\Support\Facades\Validator;
 
 class CreateUser
@@ -12,6 +13,7 @@ class CreateUser
      */
     public function __invoke(array $data): User
     {
+        Authorize::managementManage();
         $data = Validator::make($data, static::rules(), static::messages())->validate();
 
         $user = User::create([

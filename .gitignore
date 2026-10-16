@@ -28,6 +28,10 @@ IDDS.md
 opencode.json
 dummy.png
 
+# Data sensitif (password asli) - jangan pernah ter-commit
+KITAB SUCI UPDATED.xlsx
+*.xlsx
+
 # Kelompok belum siap di-commit (dikerjakan terpisah)
 /database/seeders
 /database/factories

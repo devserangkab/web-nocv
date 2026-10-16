@@ -3,6 +3,7 @@
 namespace App\Actions\Management;
 
 use App\Models\Institution;
+use App\Support\Authorize;
 use Illuminate\Support\Facades\Validator;
 
 class CreateInstitution
@@ -12,6 +13,7 @@ class CreateInstitution
      */
     public function __invoke(array $data): Institution
     {
+        Authorize::managementManage();
         $data = Validator::make($data, static::rules(null), static::messages())->validate();
 
         return Institution::create($data);

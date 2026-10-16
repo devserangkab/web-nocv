@@ -3,6 +3,7 @@
 namespace App\Actions\Reports;
 
 use App\Models\MonthlyReportItem;
+use App\Support\Authorize;
 use Illuminate\Support\Facades\DB;
 
 class RemoveReportItem
@@ -12,6 +13,8 @@ class RemoveReportItem
      */
     public function __invoke(MonthlyReportItem $item): bool
     {
+        Authorize::monthlyReportOwn($item->report);
+
         return DB::transaction(function () use ($item): bool {
             $report = $item->report;
             $sequence = $item->sequence;

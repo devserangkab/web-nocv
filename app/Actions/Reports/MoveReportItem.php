@@ -3,6 +3,7 @@
 namespace App\Actions\Reports;
 
 use App\Models\MonthlyReportItem;
+use App\Support\Authorize;
 use Illuminate\Support\Facades\DB;
 
 class MoveReportItem
@@ -12,6 +13,8 @@ class MoveReportItem
      */
     public function __invoke(MonthlyReportItem $item, string $direction): bool
     {
+        Authorize::monthlyReportOwn($item->report);
+
         return DB::transaction(function () use ($item, $direction): bool {
             $neighbor = $item->report->items()
                 ->orderBy('sequence')

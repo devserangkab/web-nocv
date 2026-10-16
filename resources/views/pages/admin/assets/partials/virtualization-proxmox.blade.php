@@ -84,6 +84,7 @@ use App\Models\Proxmox;
                                     >
                                         <i class="ti ti-eye text-base"></i>
                                     </a>
+                                    @can('infrastructure.manage')
                                     <button
                                         type="button"
                                         wire:click="editProxmox({{ $proxmox->id }})"
@@ -102,6 +103,7 @@ use App\Models\Proxmox;
                                     >
                                         <i class="ti ti-trash text-base"></i>
                                     </button>
+                                    @endcan
                                 </div>
                             </td>
                         </tr>

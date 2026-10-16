@@ -336,10 +336,12 @@ new class extends Component
             <h1 class="text-xl font-semibold text-content-primary">Gallery</h1>
             <p class="mt-1 text-sm text-content-secondary">Pusat pengelolaan foto dan bukti visual infrastruktur.</p>
         </div>
+        @can("media.create")
         <button type="button" wire:click="$set('showUploadModal', true)" class="ina-button ina-button--primary ina-button--md">
             <i class="ti ti-photo-up text-lg" aria-hidden="true"></i>
             Tambah Media
         </button>
+        @endcan
     </div>
 
     {{-- Filter + search --}}
@@ -428,6 +430,7 @@ new class extends Component
                     </figcaption>
 
                     <div class="flex items-center justify-end gap-1 border-t border-stroke-primary px-2 py-1.5">
+                        @if (auth()->user()?->can('media.delete') || (auth()->user()?->can('media.delete-own') && $media->added_by === auth()->id()))
                         <button
                             type="button"
                             wire:click="askDelete({{ $media->id }})"
@@ -437,6 +440,7 @@ new class extends Component
                         >
                             <i class="ti ti-trash text-base"></i>
                         </button>
+                        @endif
                     </div>
                 </figure>
             @endforeach

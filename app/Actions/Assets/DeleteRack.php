@@ -4,6 +4,7 @@ namespace App\Actions\Assets;
 
 use App\Actions\Activities\RecordActivity;
 use App\Models\Rack;
+use App\Support\Authorize;
 use Illuminate\Validation\ValidationException;
 
 class DeleteRack
@@ -13,6 +14,7 @@ class DeleteRack
      */
     public function __invoke(Rack $rack): bool
     {
+        Authorize::infrastructureManage();
         if ($rack->servers()->exists()) {
             throw ValidationException::withMessages([
                 'deletingId' => 'Tidak dapat dihapus karena masih ada server di dalam rack ini.',

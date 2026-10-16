@@ -4,6 +4,7 @@ namespace App\Actions\Assets;
 
 use App\Actions\Activities\RecordActivity;
 use App\Models\Rack;
+use App\Support\Authorize;
 use Illuminate\Support\Facades\Validator;
 
 class CreateRack
@@ -13,6 +14,7 @@ class CreateRack
      */
     public function __invoke(array $data): Rack
     {
+        Authorize::infrastructureManage();
         $data = Validator::make($data, static::rules(), static::messages())->validate();
 
         $rack = Rack::create($this->normalize($data));

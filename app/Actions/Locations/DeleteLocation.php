@@ -4,6 +4,7 @@ namespace App\Actions\Locations;
 
 use App\Actions\Activities\RecordActivity;
 use App\Models\Location;
+use App\Support\Authorize;
 use Illuminate\Validation\ValidationException;
 
 class DeleteLocation
@@ -13,6 +14,7 @@ class DeleteLocation
      */
     public function __invoke(Location $location): bool
     {
+        Authorize::infrastructureManage();
         if ($location->racks()->exists()) {
             throw ValidationException::withMessages([
                 'deletingId' => 'Tidak dapat dihapus karena masih ada rack di server room ini.',

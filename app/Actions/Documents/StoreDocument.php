@@ -12,6 +12,7 @@ use App\Models\Panel;
 use App\Models\Proxmox;
 use App\Models\Server;
 use App\Models\Vms;
+use App\Support\Authorize;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Validator;
@@ -27,6 +28,8 @@ class StoreDocument
      */
     public function __invoke(?Model $documentable, array $data, ?int $addedBy = null): Document
     {
+        Authorize::documentsCreate();
+
         $data = Validator::make($data, static::rules(), static::messages())->validate();
 
         // Set aplikasi lama tetap terisi agar relasi historis tidak hilang

@@ -3,6 +3,7 @@
 namespace App\Actions\Management;
 
 use App\Models\User;
+use App\Support\Authorize;
 use Illuminate\Validation\ValidationException;
 
 class DeleteUser
@@ -12,6 +13,7 @@ class DeleteUser
      */
     public function __invoke(User $user): bool
     {
+        Authorize::managementManage();
         if ($user->id === auth()->id()) {
             throw ValidationException::withMessages([
                 'deletingId' => 'Tidak bisa menghapus akun sendiri.',

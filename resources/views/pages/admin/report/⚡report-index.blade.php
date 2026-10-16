@@ -98,6 +98,12 @@ new class extends Component
         return MonthlyReport::query()
             ->with(['creator', 'items'])
             ->withCount('items')
+            // Laporan hanya milik pembuat — kecuali yang berhak melihat semua
+            // (auth()->user() null-safe untuk pemanggilan di luar request HTTP).
+            ->when(
+                ! auth()->user()?->can('monthly-reports.view-all'),
+                fn ($query) => $query->where('created_by', auth()->id())
+            )
             ->when($this->search !== '', fn ($query) => $query->where(function ($query) {
                 $query->where('title', 'like', "%{$this->search}%")
                     ->orWhere('report_id', 'like', "%{$this->search}%");
@@ -139,10 +145,12 @@ new class extends Component
             <h1 class="text-xl font-semibold text-content-primary">Laporan Bulanan</h1>
             <p class="mt-1 text-sm text-content-secondary">Kompilasi laporan aktivitas resmi: pilih uraian kerja dari audit & work log, tulis laporan lengkap, dan cetak.</p>
         </div>
+        @can('monthly-reports.create')
         <button type="button" wire:click="openCreate" class="ina-button ina-button--primary ina-button--md">
             <i class="ti ti-file-plus text-lg" aria-hidden="true"></i>
             Buat Laporan
         </button>
+        @endcan
     </div>
 
     {{-- Search --}}

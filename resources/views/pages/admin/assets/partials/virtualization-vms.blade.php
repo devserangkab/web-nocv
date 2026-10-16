@@ -94,6 +94,7 @@ use App\Models\Vms;
                                     >
                                         <i class="ti ti-eye text-base"></i>
                                     </a>
+                                    @can('infrastructure.manage')
                                     <button
                                         type="button"
                                         wire:click="editVms({{ $vm->id }})"
@@ -112,6 +113,7 @@ use App\Models\Vms;
                                     >
                                         <i class="ti ti-trash text-base"></i>
                                     </button>
+                                    @endcan
                                 </div>
                             </td>
                         </tr>

@@ -11,7 +11,7 @@
             <h2 class="text-base font-semibold text-content-primary">Gallery</h2>
             <p class="mt-0.5 text-sm text-content-secondary">Foto dan bukti visual terkait {{ $name }}.</p>
         </div>
-        @if ($addHref)
+        @if ($addHref && auth()->user()?->can('media.create'))
             <a href="{{ $addHref }}" wire:navigate class="ina-button ina-button--primary ina-button--sm">
                 <i class="ti ti-photo-up text-base" aria-hidden="true"></i>
                 Tambah

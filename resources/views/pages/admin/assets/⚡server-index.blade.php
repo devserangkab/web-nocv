@@ -337,10 +337,12 @@ new class extends Component
             <h1 class="text-xl font-semibold text-content-primary">Server</h1>
             <p class="mt-1 text-sm text-content-secondary">Daftar server pada rak data center, dikelompokkan per rak.</p>
         </div>
+        @can('infrastructure.manage')
         <button type="button" wire:click="openCreate" class="ina-button ina-button--primary ina-button--md">
             <i class="ti ti-plus text-lg" aria-hidden="true"></i>
             Tambah Server
         </button>
+        @endcan
     </div>
 
     {{-- Filter kiri + Search kanan --}}
@@ -524,14 +526,18 @@ new class extends Component
                                         <i class="ti ti-eye text-base" aria-hidden="true"></i>
                                         Detail
                                     </a>
+                                    @can("infrastructure.manage")
                                     <button type="button" wire:click="edit({{ $server->id }})" class="ina-button ina-button--secondary ina-button--sm">
                                         <i class="ti ti-pencil text-base" aria-hidden="true"></i>
                                         Ubah
                                     </button>
+                                    @endcan
+                                    @can("infrastructure.manage")
                                     <button type="button" wire:click="askDelete({{ $server->id }})" class="ina-button ina-button--secondary ina-button--sm text-negative-600! hover:bg-negative-50!">
                                         <i class="ti ti-trash text-base" aria-hidden="true"></i>
                                         Hapus
                                     </button>
+                                    @endcan
                                 </div>
                             </div>
                         @endforeach

@@ -2,6 +2,7 @@
 
 namespace App\Actions\Management;
 
+use App\Support\Authorize;
 use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Role;
 
@@ -12,6 +13,7 @@ class CreateRole
      */
     public function __invoke(array $data): Role
     {
+        Authorize::managementManage();
         $data = Validator::make($data, static::rules(null), static::messages())->validate();
 
         $role = Role::create(['name' => $data['name'], 'guard_name' => 'web']);

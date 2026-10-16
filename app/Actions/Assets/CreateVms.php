@@ -5,6 +5,7 @@ namespace App\Actions\Assets;
 use App\Actions\Activities\RecordActivity;
 use App\Enums\VmsStatus;
 use App\Models\Vms;
+use App\Support\Authorize;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -15,6 +16,7 @@ class CreateVms
      */
     public function __invoke(array $data): Vms
     {
+        Authorize::infrastructureManage();
         $data = Validator::make($data, static::rules(), static::messages())->validate();
 
         $vms = Vms::create($this->normalize($data));

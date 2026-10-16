@@ -203,46 +203,48 @@
                     </a>
                 </div>
 
-                {{-- Grup: Pengaturan --}}
-                <div x-data="{ open: true }" class="pt-3">
-                    <button
-                        type="button"
-                        @click="open = !open"
-                        :aria-expanded="open.toString()"
-                        aria-controls="nav-settings"
-                        class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-content-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-content-primary"
-                    >
-                        <i class="ti ti-settings text-lg"></i>
-                        <span class="flex-1 text-left">Pengaturan</span>
-                        <i class="ti ti-chevron-right text-base text-content-tertiary transition-transform duration-200" :class="open && 'rotate-90'" aria-hidden="true"></i>
-                    </button>
-                    <div id="nav-settings" x-show="open" x-transition:enter="transition duration-150 ease-out" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-cloak class="space-y-0.5 pt-0.5">
-                        <a
-                            href="{{ route('admin.users.index') }}"
-                            wire:navigate
-                            class="flex h-9 items-center gap-3 rounded-lg px-3 pl-10 text-[13px] font-medium transition-colors duration-150 hover:bg-neutral-100 {{ request()->routeIs('admin.users.*') ? 'bg-guide-50 text-guide-600' : 'text-content-secondary hover:text-content-primary' }}"
+                {{-- Grup: Pengaturan (User, Role, Institution) — modul manajemen --}}
+                @if (auth()->user()?->can('management.manage'))
+                    <div x-data="{ open: true }" class="pt-3">
+                        <button
+                            type="button"
+                            @click="open = !open"
+                            :aria-expanded="open.toString()"
+                            aria-controls="nav-settings"
+                            class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-content-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-content-primary"
                         >
-                            <i class="ti ti-users text-base"></i>
-                            Pengguna
-                        </a>
-                        <a
-                            href="{{ route('admin.roles.index') }}"
-                            wire:navigate
-                            class="flex h-9 items-center gap-3 rounded-lg px-3 pl-10 text-[13px] font-medium transition-colors duration-150 hover:bg-neutral-100 {{ request()->routeIs('admin.roles.*') ? 'bg-guide-50 text-guide-600' : 'text-content-secondary hover:text-content-primary' }}"
-                        >
-                            <i class="ti ti-shield-check text-base"></i>
-                            Role &amp; Permission
-                        </a>
-                        <a
-                            href="{{ route('admin.institutions.index') }}"
-                            wire:navigate
-                            class="flex h-9 items-center gap-3 rounded-lg px-3 pl-10 text-[13px] font-medium transition-colors duration-150 hover:bg-neutral-100 {{ request()->routeIs('admin.institutions.*') ? 'bg-guide-50 text-guide-600' : 'text-content-secondary hover:text-content-primary' }}"
-                        >
-                            <i class="ti ti-building text-base"></i>
-                            Referensi Data
-                        </a>
+                            <i class="ti ti-settings text-lg"></i>
+                            <span class="flex-1 text-left">Pengaturan</span>
+                            <i class="ti ti-chevron-right text-base text-content-tertiary transition-transform duration-200" :class="open && 'rotate-90'" aria-hidden="true"></i>
+                        </button>
+                        <div id="nav-settings" x-show="open" x-transition:enter="transition duration-150 ease-out" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-cloak class="space-y-0.5 pt-0.5">
+                            <a
+                                href="{{ route('admin.users.index') }}"
+                                wire:navigate
+                                class="flex h-9 items-center gap-3 rounded-lg px-3 pl-10 text-[13px] font-medium transition-colors duration-150 hover:bg-neutral-100 {{ request()->routeIs('admin.users.*') ? 'bg-guide-50 text-guide-600' : 'text-content-secondary hover:text-content-primary' }}"
+                            >
+                                <i class="ti ti-users text-base"></i>
+                                Pengguna
+                            </a>
+                            <a
+                                href="{{ route('admin.roles.index') }}"
+                                wire:navigate
+                                class="flex h-9 items-center gap-3 rounded-lg px-3 pl-10 text-[13px] font-medium transition-colors duration-150 hover:bg-neutral-100 {{ request()->routeIs('admin.roles.*') ? 'bg-guide-50 text-guide-600' : 'text-content-secondary hover:text-content-primary' }}"
+                            >
+                                <i class="ti ti-shield-check text-base"></i>
+                                Role &amp; Permission
+                            </a>
+                            <a
+                                href="{{ route('admin.institutions.index') }}"
+                                wire:navigate
+                                class="flex h-9 items-center gap-3 rounded-lg px-3 pl-10 text-[13px] font-medium transition-colors duration-150 hover:bg-neutral-100 {{ request()->routeIs('admin.institutions.*') ? 'bg-guide-50 text-guide-600' : 'text-content-secondary hover:text-content-primary' }}"
+                            >
+                                <i class="ti ti-building text-base"></i>
+                                Referensi Data
+                            </a>
+                        </div>
                     </div>
-                </div>
+                @endif
             </nav>
 
             {{-- User — klik untuk buka menu akun --}}

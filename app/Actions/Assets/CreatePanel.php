@@ -7,6 +7,7 @@ use App\Enums\PanelType;
 use App\Models\Panel;
 use App\Models\Server;
 use App\Models\Vms;
+use App\Support\Authorize;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -17,6 +18,7 @@ class CreatePanel
      */
     public function __invoke(array $data): Panel
     {
+        Authorize::infrastructureManage();
         $data = Validator::make($data, static::rules(), static::messages())->validate();
 
         $panel = Panel::create($this->normalize($data));

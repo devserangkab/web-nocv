@@ -3,6 +3,7 @@
 namespace App\Actions\Reports;
 
 use App\Models\MonthlyReport;
+use App\Support\Authorize;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -15,6 +16,8 @@ class CreateMonthlyReport
      */
     public function __invoke(array $data, ?int $userId): MonthlyReport
     {
+        Authorize::monthlyReportsCreate();
+
         return DB::transaction(function () use ($data, $userId): MonthlyReport {
             $exists = MonthlyReport::query()
                 ->where('report_month', $data['report_month'])

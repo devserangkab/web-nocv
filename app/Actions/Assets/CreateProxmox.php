@@ -4,6 +4,7 @@ namespace App\Actions\Assets;
 
 use App\Actions\Activities\RecordActivity;
 use App\Models\Proxmox;
+use App\Support\Authorize;
 use Illuminate\Support\Facades\Validator;
 
 class CreateProxmox
@@ -13,6 +14,7 @@ class CreateProxmox
      */
     public function __invoke(array $data): Proxmox
     {
+        Authorize::infrastructureManage();
         $data = Validator::make($data, static::rules(null), static::messages())->validate();
 
         $proxmox = Proxmox::create($this->normalize($data));

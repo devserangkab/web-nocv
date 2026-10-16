@@ -5,6 +5,7 @@ namespace App\Actions\Reports;
 use App\Models\Activity;
 use App\Models\MonthlyReport;
 use App\Models\MonthlyReportItem;
+use App\Support\Authorize;
 
 class AddReportItem
 {
@@ -14,6 +15,8 @@ class AddReportItem
      */
     public function __invoke(MonthlyReport $report, ?Activity $activity, ?string $uraian = null, ?int $sequence = null): ?MonthlyReportItem
     {
+        Authorize::monthlyReportOwn($report);
+
         if ($activity === null) {
             return null;
         }

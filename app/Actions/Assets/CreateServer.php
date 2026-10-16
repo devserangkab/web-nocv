@@ -6,6 +6,7 @@ use App\Actions\Activities\RecordActivity;
 use App\Enums\ServerStatus;
 use App\Models\Rack;
 use App\Models\Server;
+use App\Support\Authorize;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -16,6 +17,7 @@ class CreateServer
      */
     public function __invoke(array $data): Server
     {
+        Authorize::infrastructureManage();
         $data = Validator::make($data, static::rules(), static::messages())->validate();
 
         $server = Server::create($this->normalize($data));

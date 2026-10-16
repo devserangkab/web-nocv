@@ -7,6 +7,7 @@ use App\Enums\ApplicationStatus;
 use App\Enums\ApplicationType;
 use App\Enums\DeveloperType;
 use App\Models\Application;
+use App\Support\Authorize;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -25,6 +26,7 @@ class StoreApplication
      */
     public function __invoke(Application $application, array $data): Application
     {
+        Authorize::applicationsManage();
         $data = Validator::make($data, static::rules($application->exists ? $application->id : null), static::messages())->validate();
 
         $developerRows = collect($data['developers'] ?? []);

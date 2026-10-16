@@ -4,6 +4,7 @@ namespace App\Actions\Assets;
 
 use App\Actions\Activities\RecordActivity;
 use App\Models\Rack;
+use App\Support\Authorize;
 use Illuminate\Support\Facades\Validator;
 
 class UpdateRack
@@ -13,6 +14,7 @@ class UpdateRack
      */
     public function __invoke(Rack $rack, array $data): Rack
     {
+        Authorize::infrastructureManage();
         $data = Validator::make($data, CreateRack::rules(), CreateRack::messages())->validate();
 
         $rack->update(CreateRack::normalize($data));

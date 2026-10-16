@@ -4,6 +4,7 @@ namespace App\Actions\Assets;
 
 use App\Actions\Activities\RecordActivity;
 use App\Models\Vms;
+use App\Support\Authorize;
 use Illuminate\Support\Facades\Validator;
 
 class UpdateVms
@@ -13,6 +14,7 @@ class UpdateVms
      */
     public function __invoke(Vms $vm, array $data): Vms
     {
+        Authorize::infrastructureManage();
         $data = Validator::make($data, CreateVms::rules(), CreateVms::messages())->validate();
 
         $normalized = CreateVms::normalize($data);

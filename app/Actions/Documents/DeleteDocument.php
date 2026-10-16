@@ -4,6 +4,7 @@ namespace App\Actions\Documents;
 
 use App\Actions\Activities\RecordActivity;
 use App\Models\Document;
+use App\Support\Authorize;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -11,6 +12,8 @@ class DeleteDocument
 {
     public function __invoke(Document $document): bool
     {
+        Authorize::documentDelete($document);
+
         return DB::transaction(function () use ($document): bool {
             if (filled($document->document)) {
                 Storage::disk('private')->delete($document->document);

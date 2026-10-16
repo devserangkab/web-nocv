@@ -2,6 +2,7 @@
 
 namespace App\Actions\Reports;
 
+use App\Support\Authorize;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Validator;
 
@@ -13,6 +14,7 @@ class StoreReportAsset
      */
     public function __invoke(UploadedFile $file, ?int $userId): array
     {
+        Authorize::monthlyReportsCreate();
         $validated = Validator::make(
             ['file' => $file],
             ['file' => ['image', 'max:4096']],

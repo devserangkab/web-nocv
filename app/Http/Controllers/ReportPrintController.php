@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\MonthlyReport;
+use App\Support\Authorize;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -20,6 +21,8 @@ class ReportPrintController extends Controller
             ->with(['items', 'creator'])
             ->where('report_id', $reportId)
             ->firstOrFail();
+
+        Authorize::monthlyReportOwn($report);
 
         $items = $report->items()->orderBy('sequence')->get();
 

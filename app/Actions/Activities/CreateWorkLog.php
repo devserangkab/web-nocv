@@ -12,6 +12,7 @@ use App\Models\Proxmox;
 use App\Models\Rack;
 use App\Models\Server;
 use App\Models\Vms;
+use App\Support\Authorize;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -26,6 +27,8 @@ class CreateWorkLog
      */
     public function __invoke(?Model $subject, array $data, ?int $userId): array
     {
+        Authorize::activitiesCreate();
+
         $data = Validator::make($data, static::rules(), static::messages())->validate();
 
         $recorder = app(RecordActivity::class);

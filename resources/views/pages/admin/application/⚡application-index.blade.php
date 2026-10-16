@@ -365,10 +365,12 @@ new class extends Component
             <h1 class="text-xl font-semibold text-content-primary">Applications</h1>
             <p class="mt-1 text-sm text-content-secondary">Daftar application berikut tim developer-nya.</p>
         </div>
+        @can('applications.manage')
         <button type="button" wire:click="openCreate" class="ina-button ina-button--primary ina-button--md">
             <i class="ti ti-plus text-lg" aria-hidden="true"></i>
             Tambah Application
         </button>
+        @endcan
     </div>
 
     {{-- Filter kiri + Search kanan --}}
@@ -485,6 +487,7 @@ new class extends Component
                                         >
                                             <i class="ti ti-eye text-base"></i>
                                         </a>
+                                        @can("applications.manage")
                                         <button
                                             type="button"
                                             wire:click="edit({{ $application->id }})"
@@ -494,6 +497,8 @@ new class extends Component
                                         >
                                             <i class="ti ti-pencil text-base"></i>
                                         </button>
+                                        @endcan
+                                        @can("applications.manage")
                                         <button
                                             type="button"
                                             wire:click="askDelete({{ $application->id }})"
@@ -503,6 +508,7 @@ new class extends Component
                                         >
                                             <i class="ti ti-trash text-base"></i>
                                         </button>
+                                        @endcan
                                     </div>
                                 </td>
                             </tr>
