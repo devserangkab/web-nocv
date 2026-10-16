@@ -10,6 +10,8 @@ use Livewire\Component;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\InteractsWithPanelForm;
+
     #[Layout('layouts::admin')]
     #[Title('Detail Panel')]
 
@@ -73,7 +75,16 @@ new class extends Component
         subtitle="Detail panel beserta host dan relasi terkait."
     >
         @slot('right')
-            <span class="ina-badge ina-badge--soft ina-badge--brand ina-badge--md">{{ $panel->type->value }}</span>
+            @can('infrastructure.manage')
+            <button
+                type="button"
+                wire:click="edit({{ $panel->id }})"
+                class="ina-button ina-button--secondary ina-button--md"
+            >
+                <i class="ti ti-pencil text-base" aria-hidden="true"></i>
+                Edit Panel
+            </button>
+            @endcan
         @endslot
     </x-asset.detail-header>
 
@@ -104,10 +115,6 @@ new class extends Component
                             <dt class="text-content-tertiary">Versi</dt>
                             <dd class="font-medium text-content-primary text-right">{{ $panel->version ?? '-' }}</dd>
                         </div>
-                        <div class="flex justify-between gap-3">
-                            <dt class="text-content-tertiary">Username</dt>
-                            <dd class="font-medium text-content-primary text-right">{{ $panel->username ?? '-' }}</dd>
-                        </div>
                     </dl>
                 </div>
             </div>
@@ -135,6 +142,59 @@ new class extends Component
                                     <a href="{{ $panel->internal_address }}" target="_blank" rel="noopener noreferrer" class="text-guide-600 underline-offset-2 hover:underline">{{ $panel->internal_address }}</a>
                                 @else
                                     <span class="text-content-primary">-</span>
+                                @endif
+                            </dd>
+                        </div>
+                        <div class="flex justify-between gap-3">
+                            <dt class="text-content-tertiary">Username</dt>
+                            <dd class="text-right font-medium text-content-primary">
+                                @if (filled($panel->username))
+                                    <span class="inline-flex items-center gap-1.5" x-data="{ copied: false }">
+                                        <span>{{ $panel->username }}</span>
+                                        <button
+                                            type="button"
+                                            class="text-content-tertiary transition-colors duration-150 hover:text-content-primary"
+                                            @click="navigator.clipboard.writeText($refs.value.innerText.trim()); copied = true; setTimeout(() => copied = false, 1500)"
+                                            aria-label="Salin username"
+                                            title="Salin username"
+                                        >
+                                            <i class="ti text-base" :class="copied ? 'ti-check text-guide-600' : 'ti-copy'"></i>
+                                        </button>
+                                        <span x-ref="value" hidden>{{ $panel->username }}</span>
+                                    </span>
+                                @else
+                                    -
+                                @endif
+                            </dd>
+                        </div>
+                        <div class="flex justify-between gap-3">
+                            <dt class="text-content-tertiary">Password</dt>
+                            <dd class="text-right font-medium text-content-primary">
+                                @if (filled($panel->password))
+                                    <span class="inline-flex items-center gap-1.5" x-data="{ show: false, copied: false }">
+                                        <span x-show="!show">••••••••</span>
+                                        <span x-show="show" x-cloak>{{ $panel->password }}</span>
+                                        <button
+                                            type="button"
+                                            class="text-content-tertiary transition-colors duration-150 hover:text-content-primary"
+                                            @click="show = !show"
+                                            :aria-label="show ? 'Sembunyikan password' : 'Tampilkan password'"
+                                        >
+                                            <i class="ti text-base" :class="show ? 'ti-eye-off' : 'ti-eye'"></i>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="text-content-tertiary transition-colors duration-150 hover:text-content-primary"
+                                            @click="navigator.clipboard.writeText($refs.value.innerText.trim()); copied = true; setTimeout(() => copied = false, 1500)"
+                                            aria-label="Salin password"
+                                            title="Salin password"
+                                        >
+                                            <i class="ti text-base" :class="copied ? 'ti-check text-guide-600' : 'ti-copy'"></i>
+                                        </button>
+                                        <span x-ref="value" hidden>{{ $panel->password }}</span>
+                                    </span>
+                                @else
+                                    -
                                 @endif
                             </dd>
                         </div>
@@ -309,4 +369,6 @@ new class extends Component
             <x-asset.gallery-panel :medias="$medias" name="{{ $panel->name }}" :add-href="route('admin.galleries.index', ['type' => Panel::class, 'id' => $panel->id])" />
         </div>
     @endif
+
+    @include('pages.admin.assets.partials.panel-form-modal')
 </div>
