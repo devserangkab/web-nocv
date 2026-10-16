@@ -20,6 +20,11 @@ new class extends Component
 {
     use WithPagination;
 
+    use \App\Livewire\Concerns\InteractsWithProxmoxForm;
+
+    use \App\Livewire\Concerns\InteractsWithVmsForm;
+
+
     #[Layout('layouts::admin')]
     #[Title('Virtualisasi')]
 
@@ -28,64 +33,41 @@ new class extends Component
     // Proxmox
     public string $proxmoxSearch = '';
 
-    public bool $showProxmoxModal = false;
 
     public bool $showProxmoxDeleteModal = false;
 
-    public ?int $editingProxmoxId = null;
 
     public ?int $deletingProxmoxId = null;
 
-    public string $proxmox_name = '';
 
-    public string $proxmox_url = '';
 
-    public string $proxmox_version = '';
 
-    public string $proxmox_username = '';
 
-    public string $proxmox_password = '';
 
-    public string $assign_server_id = '';
 
     // VM
     public string $vmSearch = '';
 
     public string $proxmoxFilter = 'ALL';
 
-    public bool $showVmsModal = false;
 
     public bool $showVmsDeleteModal = false;
 
-    public ?int $editingVmsId = null;
 
     public ?int $deletingVmsId = null;
 
-    public string $proxmox_id = '';
 
-    public string $proxmox_number = '';
 
-    public string $vm_name = '';
 
-    public string $local_ip = '';
 
-    public string $public_ip = '';
 
-    public string $cpu = '';
 
-    public string $ram = '';
 
-    public string $storage = '';
 
-    public string $os = '';
 
-    public string $status = VmsStatus::Off->value;
 
-    public string $note = '';
 
-    public string $username = '';
 
-    public string $password = '';
 
     public function mount(?string $tab = null): void
     {
@@ -109,48 +91,6 @@ new class extends Component
 
     // ===== Proxmox =====
 
-    public function openProxmoxCreate(): void
-    {
-        $this->resetProxmoxForm();
-        $this->showProxmoxModal = true;
-    }
-
-    public function editProxmox(int $id): void
-    {
-        $proxmox = Proxmox::findOrFail($id);
-
-        $this->editingProxmoxId = $proxmox->id;
-        $this->proxmox_name = (string) $proxmox->name;
-        $this->proxmox_url = (string) $proxmox->url;
-        $this->proxmox_version = (string) $proxmox->version;
-        $this->proxmox_username = (string) $proxmox->username;
-        $this->proxmox_password = '';
-        $this->assign_server_id = (string) $proxmox->server_id;
-
-        $this->showProxmoxModal = true;
-    }
-
-    public function saveProxmox(): void
-    {
-        $data = [
-            'name' => $this->proxmox_name,
-            'url' => $this->proxmox_url === '' ? null : $this->proxmox_url,
-            'version' => $this->proxmox_version === '' ? null : $this->proxmox_version,
-            'assign_server_id' => $this->assign_server_id,
-            'username' => $this->proxmox_username,
-            'password' => $this->proxmox_password,
-        ];
-
-        if ($this->editingProxmoxId !== null) {
-            app(UpdateProxmox::class)(Proxmox::findOrFail($this->editingProxmoxId), $data);
-        } else {
-            app(CreateProxmox::class)($data);
-        }
-
-        $this->showProxmoxModal = false;
-        $this->resetProxmoxForm();
-    }
-
     public function askDeleteProxmox(int $id): void
     {
         $this->deletingProxmoxId = $id;
@@ -165,41 +105,6 @@ new class extends Component
 
         $this->showProxmoxDeleteModal = false;
         $this->deletingProxmoxId = null;
-    }
-
-    public function closeProxmoxModal(): void
-    {
-        $this->showProxmoxModal = false;
-        $this->resetProxmoxForm();
-    }
-
-    private function resetProxmoxForm(): void
-    {
-        $this->editingProxmoxId = null;
-        $this->resetValidation();
-        $this->proxmox_name = '';
-        $this->proxmox_url = '';
-        $this->proxmox_version = '';
-        $this->proxmox_username = '';
-        $this->proxmox_password = '';
-        $this->assign_server_id = '';
-    }
-
-    /**
-     * Opsi server untuk form: server yang sudah dipakai Proxmox lain di-disable.
-     */
-    public function serverOptions(): array
-    {
-        return Server::query()
-            ->with('proxmox')
-            ->orderBy('server_id')
-            ->get()
-            ->map(fn (Server $server) => [
-                'value' => $server->server_id,
-                'label' => "{$server->server_name} ({$server->server_id})",
-                'taken' => $server->proxmox !== null && $server->proxmox->id !== $this->editingProxmoxId,
-            ])
-            ->all();
     }
 
     public function proxmoxs(): LengthAwarePaginator
@@ -226,62 +131,6 @@ new class extends Component
 
     // ===== VM =====
 
-    public function openVmsCreate(): void
-    {
-        $this->resetVmsForm();
-        $this->showVmsModal = true;
-    }
-
-    public function editVms(int $id): void
-    {
-        $vm = Vms::findOrFail($id);
-
-        $this->editingVmsId = $vm->id;
-        $this->proxmox_id = (string) $vm->proxmox_id;
-        $this->proxmox_number = (string) $vm->proxmox_number;
-        $this->vm_name = (string) $vm->name;
-        $this->local_ip = (string) $vm->local_ip;
-        $this->public_ip = (string) $vm->public_ip;
-        $this->cpu = (string) $vm->cpu;
-        $this->ram = (string) $vm->ram;
-        $this->storage = (string) $vm->storage;
-        $this->os = (string) $vm->os;
-        $this->status = $vm->status?->value ?? VmsStatus::Off->value;
-        $this->note = (string) $vm->note;
-        $this->username = (string) $vm->username;
-        $this->password = '';
-
-        $this->showVmsModal = true;
-    }
-
-    public function saveVms(): void
-    {
-        $data = [
-            'proxmox_id' => $this->proxmox_id,
-            'proxmox_number' => $this->proxmox_number === '' ? null : (int) $this->proxmox_number,
-            'name' => $this->vm_name,
-            'local_ip' => $this->local_ip === '' ? null : $this->local_ip,
-            'public_ip' => $this->public_ip === '' ? null : $this->public_ip,
-            'cpu' => $this->cpu === '' ? null : (int) $this->cpu,
-            'ram' => $this->ram === '' ? null : (int) $this->ram,
-            'storage' => $this->storage === '' ? null : (int) $this->storage,
-            'os' => $this->os === '' ? null : $this->os,
-            'status' => $this->status,
-            'note' => $this->note === '' ? null : $this->note,
-            'username' => $this->username,
-            'password' => $this->password,
-        ];
-
-        if ($this->editingVmsId !== null) {
-            app(UpdateVms::class)(Vms::findOrFail($this->editingVmsId), $data);
-        } else {
-            app(CreateVms::class)($data);
-        }
-
-        $this->showVmsModal = false;
-        $this->resetVmsForm();
-    }
-
     public function askDeleteVms(int $id): void
     {
         $this->deletingVmsId = $id;
@@ -296,31 +145,6 @@ new class extends Component
 
         $this->showVmsDeleteModal = false;
         $this->deletingVmsId = null;
-    }
-
-    public function closeVmsModal(): void
-    {
-        $this->showVmsModal = false;
-        $this->resetVmsForm();
-    }
-
-    private function resetVmsForm(): void
-    {
-        $this->editingVmsId = null;
-        $this->resetValidation();
-        $this->proxmox_id = '';
-        $this->proxmox_number = '';
-        $this->vm_name = '';
-        $this->local_ip = '';
-        $this->public_ip = '';
-        $this->cpu = '';
-        $this->ram = '';
-        $this->storage = '';
-        $this->os = '';
-        $this->status = VmsStatus::Off->value;
-        $this->note = '';
-        $this->username = '';
-        $this->password = '';
     }
 
     /**
@@ -349,18 +173,6 @@ new class extends Component
      *
      * @return array<int, array{value: string, label: string}>
      */
-    public function proxmoxOptions(): array
-    {
-        return Proxmox::query()
-            ->orderBy('proxmox_id')
-            ->get()
-            ->map(fn (Proxmox $proxmox) => [
-                'value' => $proxmox->proxmox_id,
-                'label' => "{$proxmox->name} ({$proxmox->proxmox_id})",
-            ])
-            ->all();
-    }
-
     public function vms(): LengthAwarePaginator
     {
         return Vms::query()

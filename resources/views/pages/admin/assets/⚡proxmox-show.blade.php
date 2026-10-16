@@ -9,6 +9,8 @@ use Livewire\Component;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\InteractsWithProxmoxForm;
+
     #[Layout('layouts::admin')]
     #[Title('Detail Proxmox')]
 
@@ -44,7 +46,20 @@ new class extends Component
         :back-route="route('admin.assets.virtualization.index', ['tab' => 'proxmox'])"
         :title="$proxmox->name"
         subtitle="Detail host Proxmox beserta server host dan VM di atasnya."
-    />
+    >
+        @slot('right')
+            @can('infrastructure.manage')
+            <button
+                type="button"
+                wire:click="editProxmox({{ $proxmox->id }})"
+                class="ina-button ina-button--secondary ina-button--md"
+            >
+                <i class="ti ti-pencil text-base" aria-hidden="true"></i>
+                Edit Proxmox
+            </button>
+            @endcan
+        @endslot
+    </x-asset.detail-header>
 
     <x-asset.tab-nav
         :url="route('admin.assets.proxmox.show', ['proxmoxId' => $proxmox->proxmox_id])"
@@ -81,7 +96,56 @@ new class extends Component
                         </div>
                         <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Username</dt>
-                            <dd class="font-medium text-content-primary text-right">{{ $proxmox->username ?? '-' }}</dd>
+                            <dd class="text-right font-medium text-content-primary">
+                                @if (filled($proxmox->username))
+                                    <span class="inline-flex items-center gap-1.5" x-data="{ copied: false }">
+                                        <span>{{ $proxmox->username }}</span>
+                                        <button
+                                            type="button"
+                                            class="text-content-tertiary transition-colors duration-150 hover:text-content-primary"
+                                            @click="navigator.clipboard.writeText($refs.value.innerText.trim()); copied = true; setTimeout(() => copied = false, 1500)"
+                                            aria-label="Salin username"
+                                            title="Salin username"
+                                        >
+                                            <i class="ti text-base" :class="copied ? 'ti-check text-guide-600' : 'ti-copy'"></i>
+                                        </button>
+                                        <span x-ref="value" hidden>{{ $proxmox->username }}</span>
+                                    </span>
+                                @else
+                                    -
+                                @endif
+                            </dd>
+                        </div>
+                        <div class="flex justify-between gap-3">
+                            <dt class="text-content-tertiary">Password</dt>
+                            <dd class="text-right font-medium text-content-primary">
+                                @if (filled($proxmox->password))
+                                    <span class="inline-flex items-center gap-1.5" x-data="{ show: false, copied: false }">
+                                        <span x-show="!show">••••••••</span>
+                                        <span x-show="show" x-cloak>{{ $proxmox->password }}</span>
+                                        <button
+                                            type="button"
+                                            class="text-content-tertiary transition-colors duration-150 hover:text-content-primary"
+                                            @click="show = !show"
+                                            :aria-label="show ? 'Sembunyikan password' : 'Tampilkan password'"
+                                        >
+                                            <i class="ti text-base" :class="show ? 'ti-eye-off' : 'ti-eye'"></i>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="text-content-tertiary transition-colors duration-150 hover:text-content-primary"
+                                            @click="navigator.clipboard.writeText($refs.value.innerText.trim()); copied = true; setTimeout(() => copied = false, 1500)"
+                                            aria-label="Salin password"
+                                            title="Salin password"
+                                        >
+                                            <i class="ti text-base" :class="copied ? 'ti-check text-guide-600' : 'ti-copy'"></i>
+                                        </button>
+                                        <span x-ref="value" hidden>{{ $proxmox->password }}</span>
+                                    </span>
+                                @else
+                                    -
+                                @endif
+                            </dd>
                         </div>
                     </dl>
                 </div>
@@ -187,4 +251,6 @@ new class extends Component
             <x-asset.gallery-panel :medias="$medias" name="{{ $proxmox->name }}" :add-href="route('admin.galleries.index', ['type' => Proxmox::class, 'id' => $proxmox->id])" />
         </div>
     @endif
+
+    @include('pages.admin.assets.partials.proxmox-form-modal')
 </div>

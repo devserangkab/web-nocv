@@ -12,6 +12,8 @@ use Livewire\Component;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\InteractsWithVmsForm;
+
     #[Layout('layouts::admin')]
     #[Title('Detail Virtual Machine')]
 
@@ -61,7 +63,16 @@ new class extends Component
         subtitle="Detail virtual machine beserta relasi terkait."
     >
         @slot('right')
-            <span class="ina-badge ina-badge--soft ina-badge--md {{ $vm->status === VmsStatus::On ? 'ina-badge--positive' : ($vm->status === VmsStatus::Destroyed ? 'ina-badge--warning' : 'ina-badge--neutral') }}">{{ $vm->status->value }}</span>
+            @can('infrastructure.manage')
+            <button
+                type="button"
+                wire:click="editVms({{ $vm->id }})"
+                class="ina-button ina-button--secondary ina-button--md"
+            >
+                <i class="ti ti-pencil text-base" aria-hidden="true"></i>
+                Edit VM
+            </button>
+            @endcan
         @endslot
     </x-asset.detail-header>
 
@@ -135,6 +146,59 @@ new class extends Component
                         <div class="flex items-start justify-between gap-3">
                             <dt class="shrink-0 text-content-tertiary">Public IP</dt>
                             <dd class="text-right font-medium text-content-primary">{{ $vm->public_ip ?? '-' }}</dd>
+                        </div>
+                        <div class="flex justify-between gap-3">
+                            <dt class="text-content-tertiary">Username</dt>
+                            <dd class="text-right font-medium text-content-primary">
+                                @if (filled($vm->username))
+                                    <span class="inline-flex items-center gap-1.5" x-data="{ copied: false }">
+                                        <span>{{ $vm->username }}</span>
+                                        <button
+                                            type="button"
+                                            class="text-content-tertiary transition-colors duration-150 hover:text-content-primary"
+                                            @click="navigator.clipboard.writeText($refs.value.innerText.trim()); copied = true; setTimeout(() => copied = false, 1500)"
+                                            aria-label="Salin username"
+                                            title="Salin username"
+                                        >
+                                            <i class="ti text-base" :class="copied ? 'ti-check text-guide-600' : 'ti-copy'"></i>
+                                        </button>
+                                        <span x-ref="value" hidden>{{ $vm->username }}</span>
+                                    </span>
+                                @else
+                                    -
+                                @endif
+                            </dd>
+                        </div>
+                        <div class="flex justify-between gap-3">
+                            <dt class="text-content-tertiary">Password</dt>
+                            <dd class="text-right font-medium text-content-primary">
+                                @if (filled($vm->password))
+                                    <span class="inline-flex items-center gap-1.5" x-data="{ show: false, copied: false }">
+                                        <span x-show="!show">••••••••</span>
+                                        <span x-show="show" x-cloak>{{ $vm->password }}</span>
+                                        <button
+                                            type="button"
+                                            class="text-content-tertiary transition-colors duration-150 hover:text-content-primary"
+                                            @click="show = !show"
+                                            :aria-label="show ? 'Sembunyikan password' : 'Tampilkan password'"
+                                        >
+                                            <i class="ti text-base" :class="show ? 'ti-eye-off' : 'ti-eye'"></i>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="text-content-tertiary transition-colors duration-150 hover:text-content-primary"
+                                            @click="navigator.clipboard.writeText($refs.value.innerText.trim()); copied = true; setTimeout(() => copied = false, 1500)"
+                                            aria-label="Salin password"
+                                            title="Salin password"
+                                        >
+                                            <i class="ti text-base" :class="copied ? 'ti-check text-guide-600' : 'ti-copy'"></i>
+                                        </button>
+                                        <span x-ref="value" hidden>{{ $vm->password }}</span>
+                                    </span>
+                                @else
+                                    -
+                                @endif
+                            </dd>
                         </div>
                     </dl>
                 </div>
@@ -258,4 +322,6 @@ new class extends Component
             <x-asset.gallery-panel :medias="$medias" name="{{ $vm->name }}" :add-href="route('admin.galleries.index', ['type' => Vms::class, 'id' => $vm->id])" />
         </div>
     @endif
+
+    @include('pages.admin.assets.partials.vms-form-modal')
 </div>
