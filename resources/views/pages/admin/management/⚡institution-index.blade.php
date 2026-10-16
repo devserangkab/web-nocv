@@ -141,7 +141,7 @@ new class extends Component
                     <input
                         type="search"
                         class="ina-input-search__input"
-                        placeholder="Cari singkatan, name, atau kode..."
+                        placeholder="Cari singkatan atau name..."
                         wire:model.live.debounce.300ms="search"
                         aria-label="Cari institution"
                     >
@@ -158,7 +158,6 @@ new class extends Component
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-stroke-primary bg-background-secondary text-left text-[12px] font-medium text-content-secondary">
-                            <th scope="col" class="h-10 px-4 font-medium">Kode</th>
                             <th scope="col" class="h-10 px-4 font-medium">Singkatan</th>
                             <th scope="col" class="h-10 px-4 font-medium">Name</th>
                             <th scope="col" class="h-10 px-4 font-medium text-right">Aksi</th>
@@ -167,7 +166,6 @@ new class extends Component
                     <tbody>
                         @foreach ($institutions as $institution)
                             <tr class="border-b border-stroke-primary transition-colors duration-150 h-14 last:border-b-0 hover:bg-neutral-50">
-                                <td class="h-10 px-4 text-[13px] text-content-primary">{{ $institution->institution_id }}</td>
                                 <td class="h-10 px-4">
                                     <span class="ina-badge ina-badge--soft ina-badge--info ina-badge--sm">{{ $institution->abbreviation }}</span>
                                 </td>

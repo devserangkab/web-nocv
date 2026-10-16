@@ -43,7 +43,6 @@ new class extends Component
     <x-asset.detail-header
         :back-route="route('admin.assets.virtualization.index', ['tab' => 'proxmox'])"
         :title="$proxmox->name"
-        :code="$proxmox->proxmox_id"
         subtitle="Detail host Proxmox beserta server host dan VM di atasnya."
     />
 
@@ -62,10 +61,6 @@ new class extends Component
 
                 <div class="pt-5">
                     <dl class="space-y-2 text-sm">
-                        <div class="flex items-center justify-between gap-3">
-                            <dt class="text-content-tertiary">Kode</dt>
-                            <dd class="font-medium text-content-primary">{{ $proxmox->proxmox_id }}</dd>
-                        </div>
                         <div class="flex items-center justify-between gap-3">
                             <dt class="text-content-tertiary">Nama</dt>
                             <dd class="font-medium text-content-primary">{{ $proxmox->name }}</dd>

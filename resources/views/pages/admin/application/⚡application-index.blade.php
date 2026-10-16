@@ -421,7 +421,6 @@ new class extends Component
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-stroke-primary bg-background-secondary text-left text-[12px] font-medium text-content-secondary">
-                            <th scope="col" class="h-10 px-4 font-medium">Kode</th>
                             <th scope="col" class="h-10 px-4 font-medium">Nama</th>
                             <th scope="col" class="h-10 px-4 font-medium">Status</th>
                             <th scope="col" class="h-10 px-4 font-medium">Jenis</th>
@@ -435,7 +434,6 @@ new class extends Component
                     <tbody>
                         @foreach ($applications as $application)
                             <tr class="border-b border-stroke-primary transition-colors duration-150 h-14 last:border-b-0 hover:bg-neutral-50">
-                                <td class="h-14 px-4 text-[13px] text-content-primary">{{ $application->application_id }}</td>
                                 <td class="h-14 px-4 font-medium text-content-primary">
                                     <span class="flex items-center gap-2">
                                         @if ($application->icon !== null)

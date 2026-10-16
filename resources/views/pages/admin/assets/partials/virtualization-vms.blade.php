@@ -44,7 +44,6 @@ use App\Models\Vms;
             <table class="w-full text-sm">
                 <thead>
                     <tr class="border-b border-stroke-primary bg-background-secondary text-left text-[12px] font-medium text-content-secondary">
-                        <th scope="col" class="h-10 px-4 font-medium">Kode</th>
                         <th scope="col" class="h-10 px-4 font-medium">VMID</th>
                         <th scope="col" class="h-10 px-4 font-medium">Nama</th>
                         <th scope="col" class="h-10 px-4 font-medium">Proxmox Induk</th>
@@ -63,7 +62,6 @@ use App\Models\Vms;
                 <tbody>
                     @foreach ($vms as $vm)
                         <tr class="border-b border-stroke-primary transition-colors duration-150 h-14 last:border-b-0 hover:bg-neutral-50" wire:key="vms-{{ $vm->id }}">
-                            <td class="h-10 px-4 text-[13px] text-content-primary">{{ $vm->vm_id }}</td>
                             <td class="h-10 px-4 text-content-secondary">{{ $vm->proxmox_number ?? '-' }}</td>
                             <td class="h-10 px-4 font-medium text-content-primary">{{ $vm->name }}</td>
                             <td class="h-10 px-4 text-content-secondary">

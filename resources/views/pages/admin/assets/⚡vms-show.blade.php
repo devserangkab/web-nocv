@@ -58,7 +58,6 @@ new class extends Component
     <x-asset.detail-header
         :back-route="route('admin.assets.virtualization.index', ['tab' => 'vms'])"
         :title="$vm->name"
-        :code="$vm->vm_id"
         subtitle="Detail virtual machine beserta relasi terkait."
     >
         @slot('right')
@@ -81,10 +80,6 @@ new class extends Component
 
                 <div class="pt-5">
                     <dl class="space-y-2 text-sm">
-                        <div class="flex items-center justify-between gap-3">
-                            <dt class="text-content-tertiary">Kode</dt>
-                            <dd class="font-medium text-content-primary">{{ $vm->vm_id }}</dd>
-                        </div>
                         <div class="flex items-center justify-between gap-3">
                             <dt class="text-content-tertiary">Nama</dt>
                             <dd class="font-medium text-content-primary">{{ $vm->name }}</dd>

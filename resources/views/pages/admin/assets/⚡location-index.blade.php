@@ -188,7 +188,6 @@ new class extends Component
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-stroke-primary bg-background-secondary text-left text-[12px] font-medium text-content-secondary">
-                            <th scope="col" class="h-10 px-4 font-medium">Kode</th>
                             <th scope="col" class="h-10 px-4 font-medium">Nama</th>
                             <th scope="col" class="h-10 px-4 font-medium">Lokasi</th>
                             <th scope="col" class="h-10 px-4 font-medium text-right">Rack</th>
@@ -199,7 +198,6 @@ new class extends Component
                     <tbody>
                         @foreach ($locations as $location)
                             <tr class="border-b border-stroke-primary transition-colors duration-150 h-14 last:border-b-0 hover:bg-neutral-50" wire:key="loc-{{ $location->id }}">
-                                <td class="h-10 px-4 text-[13px] text-content-primary">{{ $location->location_id }}</td>
                                 <td class="h-10 px-4 font-medium text-content-primary">{{ $location->name }}</td>
                                 <td class="h-10 max-w-xs truncate px-4 text-content-secondary" title="{{ $location->address }}">{{ $location->address ?? '-' }}</td>
                                 <td class="h-10 px-4 text-right text-content-primary">{{ $location->racks_count }} rack</td>

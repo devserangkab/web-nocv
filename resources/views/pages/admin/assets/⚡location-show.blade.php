@@ -44,7 +44,6 @@ new class extends Component
     <x-asset.detail-header
         :back-route="route('admin.server-rooms.index')"
         :title="$location->name"
-        :code="$location->location_id"
         subtitle="Detail server room beserta rack dan server di dalamnya."
     />
 
@@ -63,10 +62,6 @@ new class extends Component
 
                 <div class="pt-5">
                     <dl class="space-y-2 text-sm">
-                        <div class="flex items-center justify-between gap-3">
-                            <dt class="text-content-tertiary">Kode</dt>
-                            <dd class="font-medium text-content-primary">{{ $location->location_id }}</dd>
-                        </div>
                         <div class="flex items-center justify-between gap-3">
                             <dt class="text-content-tertiary">Nama</dt>
                             <dd class="text-right font-medium text-content-primary">{{ $location->name }}</dd>
@@ -120,9 +115,6 @@ new class extends Component
                                     </a>
                                     <p class="truncate text-xs text-content-tertiary">{{ $rack->rack_id }} · {{ $rack->servers->count() }} server</p>
                                 </div>
-                                @if ($rack->color)
-                                    <span class="h-3 w-3 shrink-0 rounded-full" style="background-color: {{ $rack->color }}"></span>
-                                @endif
                             </li>
                         @endforeach
                     </ul>

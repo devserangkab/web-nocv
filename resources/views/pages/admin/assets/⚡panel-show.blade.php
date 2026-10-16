@@ -70,7 +70,6 @@ new class extends Component
     <x-asset.detail-header
         :back-route="route('admin.assets.panels.index')"
         :title="$panel->name"
-        :code="$panel->panel_id"
         subtitle="Detail panel beserta host dan relasi terkait."
     >
         @slot('right')
@@ -93,10 +92,6 @@ new class extends Component
 
                 <div class="pt-5">
                     <dl class="space-y-2 text-sm">
-                        <div class="flex items-center justify-between gap-3">
-                            <dt class="text-content-tertiary">Kode</dt>
-                            <dd class="font-medium text-content-primary">{{ $panel->panel_id }}</dd>
-                        </div>
                         <div class="flex items-center justify-between gap-3">
                             <dt class="text-content-tertiary">Nama</dt>
                             <dd class="font-medium text-content-primary">{{ $panel->name }}</dd>

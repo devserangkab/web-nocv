@@ -33,7 +33,7 @@ class CreateRack
             'location_id' => ['required', 'exists:locations,location_id'],
             'name' => ['required', 'max:255'],
             'brand' => ['nullable', 'max:255'],
-            'color' => ['nullable', 'max:7', 'regex:/^#([0-9A-Fa-f]{6})?$/i'],
+            'color' => ['nullable', 'string', 'max:50'],
             'units' => ['nullable', 'integer', 'min:1'],
         ];
     }
@@ -49,7 +49,7 @@ class CreateRack
             'name.required' => 'Nama rack wajib diisi.',
             'name.max' => 'Nama rack maksimal 255 karakter.',
             'brand.max' => 'Brand maksimal 255 karakter.',
-            'color.regex' => 'Warna harus berupa kode warna (contoh: #1B604E).',
+            'color.max' => 'Warna maksimal 50 karakter.',
             'units.min' => 'Units harus berupa angka (minimal 1).',
         ];
     }
@@ -64,7 +64,7 @@ class CreateRack
             'location_id' => $data['location_id'],
             'name' => $data['name'],
             'brand' => filled($data['brand'] ?? null) ? $data['brand'] : null,
-            'color' => filled($data['color'] ?? null) ? strtoupper($data['color']) : null,
+            'color' => filled($data['color'] ?? null) ? trim((string) $data['color']) : null,
             'units' => filled($data['units'] ?? null) ? (int) $data['units'] : null,
         ];
     }

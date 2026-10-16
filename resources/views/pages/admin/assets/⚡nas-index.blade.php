@@ -300,7 +300,6 @@ new class extends Component
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-stroke-primary bg-background-secondary text-left text-[12px] font-medium text-content-secondary">
-                            <th scope="col" class="h-10 px-4 font-medium">Kode</th>
                             <th scope="col" class="h-10 px-4 font-medium">Nama</th>
                             <th scope="col" class="h-10 px-4 font-medium">Brand</th>
                             <th scope="col" class="h-10 px-4 font-medium">Lokasi</th>
@@ -315,7 +314,6 @@ new class extends Component
                     <tbody>
                         @foreach ($nasList as $nas)
                             <tr class="border-b border-stroke-primary transition-colors duration-150 h-14 last:border-b-0 hover:bg-neutral-50" wire:key="nas-{{ $nas->id }}">
-                                <td class="h-14 px-4 text-[13px] text-content-primary">{{ $nas->nas_id }}</td>
                                 <td class="h-14 px-4 font-medium text-content-primary">{{ $nas->name }}</td>
                                 <td class="h-14 px-4 text-content-secondary">{{ $nas->brand ?? '-' }}</td>
                                 <td class="h-14 px-4 text-content-secondary">

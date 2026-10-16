@@ -311,7 +311,6 @@ new class extends Component
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-stroke-primary bg-background-secondary text-left text-[12px] font-medium text-content-secondary">
-                            <th scope="col" class="h-10 px-4 font-medium">Kode</th>
                             <th scope="col" class="h-10 px-4 font-medium">Nama</th>
                             <th scope="col" class="h-10 px-4 font-medium">Jenis</th>
                             <th scope="col" class="h-10 px-4 font-medium">Host</th>
@@ -326,7 +325,6 @@ new class extends Component
                         @php $appCounts = $this->applicationCounts(); @endphp
                         @foreach ($panels as $panel)
                             <tr class="border-b border-stroke-primary transition-colors duration-150 h-14 last:border-b-0 hover:bg-neutral-50" wire:key="pnl-{{ $panel->id }}">
-                                <td class="h-10 px-4 text-[13px] text-content-primary">{{ $panel->panel_id }}</td>
                                 <td class="h-10 px-4 font-medium text-content-primary">{{ $panel->name }}</td>
                                 <td class="h-10 px-4">
                                     <span class="ina-badge ina-badge--soft {{ $panel->type === PanelType::AaPanel ? 'ina-badge--info' : 'ina-badge--brand' }} ina-badge--sm">

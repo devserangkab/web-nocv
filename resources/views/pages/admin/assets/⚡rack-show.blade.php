@@ -79,7 +79,6 @@ new class extends Component
     <x-asset.detail-header
         :back-route="route('admin.assets.racks.index')"
         :title="$rack->name"
-        :code="$rack->rack_id"
         subtitle="Detail rack beserta server yang ditempatkan di dalamnya."
     />
 
@@ -98,10 +97,6 @@ new class extends Component
 
                 <div class="pt-5">
                     <dl class="space-y-2 text-sm">
-                        <div class="flex items-center justify-between gap-3">
-                            <dt class="text-content-tertiary">Kode</dt>
-                            <dd class="font-medium text-content-primary">{{ $rack->rack_id }}</dd>
-                        </div>
                         <div class="flex items-center justify-between gap-3">
                             <dt class="text-content-tertiary">Nama</dt>
                             <dd class="font-medium text-content-primary">{{ $rack->name }}</dd>
@@ -140,9 +135,8 @@ new class extends Component
                         </div>
                         <div class="flex items-center justify-between gap-3">
                             <dt class="text-content-tertiary">Warna</dt>
-                            <dd class="flex items-center gap-2 font-medium text-content-primary">
+                            <dd class="font-medium text-content-primary">
                                 @if ($rack->color)
-                                    <span class="h-3 w-3 rounded-full border border-stroke-primary" style="background-color: {{ $rack->color }}"></span>
                                     {{ $rack->color }}
                                 @else
                                     -
@@ -178,7 +172,6 @@ new class extends Component
                                 <tr class="border-b border-stroke-primary bg-background-secondary text-left text-[12px] font-medium text-content-secondary">
                                     <th scope="col" class="h-10 px-4 font-medium text-right">U</th>
                                     <th scope="col" class="h-10 px-4 font-medium">Perangkat</th>
-                                    <th scope="col" class="h-10 px-4 font-medium">Kode</th>
                                     <th scope="col" class="h-10 px-4 font-medium">Nama</th>
                                     <th scope="col" class="h-10 px-4 font-medium">Info</th>
                                 </tr>
@@ -192,7 +185,6 @@ new class extends Component
                                                 {{ $item->kind === 'server' ? 'Server' : 'NAS' }}
                                             </span>
                                         </td>
-                                        <td class="h-14 px-4 text-[13px] text-content-primary">{{ $item->code }}</td>
                                         <td class="h-14 max-w-xs truncate px-4 font-medium">
                                             <a href="{{ $item->url }}" wire:navigate class="text-content-primary hover:text-guide-600" title="{{ $item->name }}">
                                                 {{ $item->name }}

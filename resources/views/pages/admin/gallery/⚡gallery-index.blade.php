@@ -101,11 +101,11 @@ new class extends Component
      */
     public function entityOptions(): array
     {
-        $options = fn (string $class, string $codeColumn, string $nameColumn, iterable $models) => array_values(
+        $options = fn (string $class, string $nameColumn, iterable $models) => array_values(
             collect($models)
                 ->map(fn ($model) => [
                     'value' => $class.'|'.$model->id,
-                    'label' => $model->{$nameColumn}.(' ('.($model->{$codeColumn} ?? '').')'),
+                    'label' => $model->{$nameColumn},
                 ])
                 ->all()
         );
@@ -113,35 +113,35 @@ new class extends Component
         return [
             [
                 'label' => 'Application',
-                'options' => $options(Application::class, 'application_id', 'name', Application::query()->orderBy('name')->get()),
+                'options' => $options(Application::class, 'name', Application::query()->orderBy('name')->get()),
             ],
             [
                 'label' => 'Server Room',
-                'options' => $options(Location::class, 'location_id', 'name', Location::query()->orderBy('location_id')->get()),
+                'options' => $options(Location::class, 'name', Location::query()->orderBy('location_id')->get()),
             ],
             [
                 'label' => 'Rack',
-                'options' => $options(Rack::class, 'rack_id', 'name', Rack::query()->orderBy('rack_id')->get()),
+                'options' => $options(Rack::class, 'name', Rack::query()->orderBy('rack_id')->get()),
             ],
             [
                 'label' => 'Server',
-                'options' => $options(Server::class, 'server_id', 'server_name', Server::query()->orderBy('server_id')->get()),
+                'options' => $options(Server::class, 'server_name', Server::query()->orderBy('server_id')->get()),
             ],
             [
                 'label' => 'Proxmox',
-                'options' => $options(Proxmox::class, 'proxmox_id', 'name', Proxmox::query()->orderBy('proxmox_id')->get()),
+                'options' => $options(Proxmox::class, 'name', Proxmox::query()->orderBy('proxmox_id')->get()),
             ],
             [
                 'label' => 'Virtual Machine',
-                'options' => $options(Vms::class, 'vm_id', 'name', Vms::query()->orderBy('vm_id')->get()),
+                'options' => $options(Vms::class, 'name', Vms::query()->orderBy('vm_id')->get()),
             ],
             [
                 'label' => 'NAS',
-                'options' => $options(\App\Models\Nas::class, 'nas_id', 'name', \App\Models\Nas::query()->orderBy('nas_id')->get()),
+                'options' => $options(\App\Models\Nas::class, 'name', \App\Models\Nas::query()->orderBy('nas_id')->get()),
             ],
             [
                 'label' => 'Panel',
-                'options' => $options(Panel::class, 'panel_id', 'name', Panel::query()->orderBy('panel_id')->get()),
+                'options' => $options(Panel::class, 'name', Panel::query()->orderBy('panel_id')->get()),
             ],
         ];
     }

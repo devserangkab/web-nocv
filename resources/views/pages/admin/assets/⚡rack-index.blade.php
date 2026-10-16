@@ -75,7 +75,7 @@ new class extends Component
             'location_id' => $this->location_id === '' ? null : $this->location_id,
             'name' => $this->name,
             'brand' => $this->brand === '' ? null : $this->brand,
-            'color' => $this->color === '' ? null : strtoupper($this->color),
+            'color' => $this->color === '' ? null : trim($this->color),
             'units' => $this->units === '' ? null : (int) $this->units,
         ];
 
@@ -221,7 +221,6 @@ new class extends Component
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-stroke-primary bg-background-secondary text-left text-[12px] font-medium text-content-secondary">
-                            <th scope="col" class="h-10 px-4 font-medium">Kode</th>
                             <th scope="col" class="h-10 px-4 font-medium">Nama</th>
                             <th scope="col" class="h-10 px-4 font-medium">Lokasi</th>
                             <th scope="col" class="h-10 px-4 font-medium">Brand</th>
@@ -233,11 +232,6 @@ new class extends Component
                     <tbody>
                         @foreach ($racks as $rack)
                             <tr class="border-b border-stroke-primary transition-colors duration-150 h-14 last:border-b-0 hover:bg-neutral-50">
-                                <td class="h-10 px-4">
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-[13px] text-content-primary">{{ $rack->rack_id }}</span>
-                                    </div>
-                                </td>
                                 <td class="h-10 px-4 font-medium text-content-primary">{{ $rack->name }}</td>
                                 <td class="h-10 px-4 text-content-secondary">{{ $rack->location?->name ?? '-' }}</td>
                                 <td class="h-10 px-4 text-content-secondary">{{ $rack->brand ?? '-' }}</td>
@@ -400,16 +394,13 @@ new class extends Component
                             Warna
                         </label>
                         <div class="ina-text-field__wrapper ina-text-field__wrapper--size-md {{ $errors->has('color') ? 'ina-text-field__wrapper--status-error' : '' }}">
-                            @if ($color !== '')
-                                <span class="h-4 w-4 shrink-0 rounded-full border border-stroke-primary" style="background-color: {{ $color }}"></span>
-                            @endif
                             <input
                                 type="text"
                                 id="rack-color"
                                 wire:model="color"
                                 class="ina-text-field__input"
-                                placeholder="#1B604E"
-                                maxlength="7"
+                                placeholder="Hitam"
+                                maxlength="50"
                             >
                         </div>
                         @error('color')

@@ -44,7 +44,6 @@ new class extends Component
     <x-asset.detail-header
         :back-route="route('admin.assets.nas.index')"
         :title="$nas->name"
-        :code="$nas->nas_id"
         subtitle="Detail perangkat NAS beserta lokasi dan dokumen terkait."
     >
         @slot('right')
@@ -67,10 +66,6 @@ new class extends Component
 
                 <div class="pt-5">
                     <dl class="space-y-2 text-sm">
-                        <div class="flex items-center justify-between gap-3">
-                            <dt class="text-content-tertiary">Kode</dt>
-                            <dd class="font-medium text-content-primary">{{ $nas->nas_id }}</dd>
-                        </div>
                         <div class="flex items-center justify-between gap-3">
                             <dt class="text-content-tertiary">Nama</dt>
                             <dd class="font-medium text-content-primary">{{ $nas->name }}</dd>

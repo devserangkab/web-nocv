@@ -85,11 +85,11 @@ new class extends Component
      */
     public function entityOptions(): array
     {
-        $options = fn (string $class, string $codeColumn, string $nameColumn, iterable $models, string $label) => array_values(
+        $options = fn (string $class, string $nameColumn, iterable $models, string $label) => array_values(
             collect($models)
                 ->map(fn ($model) => [
                     'value' => $class.'|'.$model->id,
-                    'label' => $model->{$nameColumn}.(' ('.($model->{$codeColumn} ?? '').')'),
+                    'label' => $model->{$nameColumn},
                 ])
                 ->all()
         );
@@ -97,35 +97,35 @@ new class extends Component
         return [
             [
                 'label' => 'Application',
-                'options' => $options(Application::class, 'application_id', 'name', Application::query()->orderBy('name')->get(), 'Application'),
+                'options' => $options(Application::class, 'name', Application::query()->orderBy('name')->get(), 'Application'),
             ],
             [
                 'label' => 'Server Room',
-                'options' => $options(Location::class, 'location_id', 'name', Location::query()->orderBy('location_id')->get(), 'Server Room'),
+                'options' => $options(Location::class, 'name', Location::query()->orderBy('location_id')->get(), 'Server Room'),
             ],
             [
                 'label' => 'Rack',
-                'options' => $options(Rack::class, 'rack_id', 'name', Rack::query()->orderBy('rack_id')->get(), 'Rack'),
+                'options' => $options(Rack::class, 'name', Rack::query()->orderBy('rack_id')->get(), 'Rack'),
             ],
             [
                 'label' => 'Server',
-                'options' => $options(Server::class, 'server_id', 'server_name', Server::query()->orderBy('server_id')->get(), 'Server'),
+                'options' => $options(Server::class, 'server_name', Server::query()->orderBy('server_id')->get(), 'Server'),
             ],
             [
                 'label' => 'Proxmox',
-                'options' => $options(Proxmox::class, 'proxmox_id', 'name', Proxmox::query()->orderBy('proxmox_id')->get(), 'Proxmox'),
+                'options' => $options(Proxmox::class, 'name', Proxmox::query()->orderBy('proxmox_id')->get(), 'Proxmox'),
             ],
             [
                 'label' => 'Virtual Machine',
-                'options' => $options(Vms::class, 'vm_id', 'name', Vms::query()->orderBy('vm_id')->get(), 'Virtual Machine'),
+                'options' => $options(Vms::class, 'name', Vms::query()->orderBy('vm_id')->get(), 'Virtual Machine'),
             ],
             [
                 'label' => 'NAS',
-                'options' => $options(\App\Models\Nas::class, 'nas_id', 'name', \App\Models\Nas::query()->orderBy('nas_id')->get(), 'NAS'),
+                'options' => $options(\App\Models\Nas::class, 'name', \App\Models\Nas::query()->orderBy('nas_id')->get(), 'NAS'),
             ],
             [
                 'label' => 'Panel',
-                'options' => $options(Panel::class, 'panel_id', 'name', Panel::query()->orderBy('panel_id')->get(), 'Panel'),
+                'options' => $options(Panel::class, 'name', Panel::query()->orderBy('panel_id')->get(), 'Panel'),
             ],
         ];
     }
@@ -370,7 +370,6 @@ new class extends Component
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-stroke-primary bg-background-secondary text-left text-[12px] font-medium text-content-secondary">
-                            <th scope="col" class="h-10 px-4 font-medium">Kode</th>
                             <th scope="col" class="h-10 px-4 font-medium">Judul</th>
                             <th scope="col" class="h-10 px-4 font-medium">Kategori</th>
                             <th scope="col" class="h-10 px-4 font-medium">Entitas Terkait</th>
@@ -383,7 +382,6 @@ new class extends Component
                     <tbody>
                         @foreach ($documents as $document)
                             <tr class="border-b border-stroke-primary transition-colors duration-150 h-14 last:border-b-0 hover:bg-neutral-50" wire:key="doc-{{ $document->id }}">
-                                <td class="h-14 px-4 text-[13px] text-content-primary">{{ $document->document_id }}</td>
                                 <td class="h-14 max-w-xs truncate px-4 font-medium text-content-primary" title="{{ $document->name }}">{{ $document->name }}</td>
                                 <td class="h-14 px-4">
                                     @if ($document->category !== null)

@@ -177,7 +177,6 @@ new class extends Component
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-stroke-primary bg-background-secondary text-left text-[12px] font-medium text-content-secondary">
-                            <th scope="col" class="h-10 px-4 font-medium">Kode</th>
                             <th scope="col" class="h-10 px-4 font-medium">Periode</th>
                             <th scope="col" class="h-10 px-4 font-medium">Judul</th>
                             <th scope="col" class="h-10 px-4 font-medium text-right">Uraian Kerja</th>
@@ -189,7 +188,6 @@ new class extends Component
                     <tbody>
                         @foreach ($reports as $report)
                             <tr class="border-b border-stroke-primary transition-colors duration-150 h-14 last:border-b-0 hover:bg-neutral-50" wire:key="rpt-{{ $report->id }}">
-                                <td class="h-14 px-4 text-[13px] text-content-primary">{{ $report->report_id }}</td>
                                 <td class="h-14 px-4 font-medium text-content-primary">{{ $report->periodeText() }}</td>
                                 <td class="h-14 max-w-xs truncate px-4 text-content-secondary" title="{{ $report->title }}">{{ $report->title }}</td>
                                 <td class="h-14 px-4 text-right text-content-primary">{{ $report->items_count }} item</td>
