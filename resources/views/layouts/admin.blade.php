@@ -37,11 +37,11 @@
     <body class="min-h-screen bg-background-secondary text-content-primary antialiased" x-data="{ menuOpen: false, profileOpen: false }" @keydown.escape.window="menuOpen = false; profileOpen = false">
         {{-- Sidebar — off-canvas di mobile, permanen di >= lg --}}
         <aside
-            class="fixed inset-y-0 left-0 z-40 w-72 border-r border-stroke-primary bg-background-primary transition-transform duration-300 lg:translate-x-0"
+            class="fixed flex flex-col justify-between inset-y-0 left-0 z-40 w-72 border-r border-stroke-primary bg-background-primary transition-transform duration-300 lg:translate-x-0"
             :class="menuOpen ? 'translate-x-0' : '-translate-x-full'"
         >
             {{-- Brand --}}
-            <div class="flex h-16 items-center gap-3 border-b border-stroke-primary px-6">
+            <div class="flex shrink-0 h-16 items-center gap-3 border-b border-stroke-primary px-6">
                 <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-guide-500 text-white">
                     <i class="ti ti-sitemap text-xl"></i>
                 </div>
@@ -52,7 +52,7 @@
             </div>
 
             {{-- Menu --}}
-            <nav class="space-y-0.5 px-4 py-4">
+            <nav class="space-y-0.5 grow overflow-y-auto px-4 py-4">
                 {{-- Dashboard --}}
                 <a
                     href="{{ route('admin.dashboard') }}"
@@ -249,7 +249,7 @@
 
             {{-- User — klik untuk buka menu akun --}}
             <div
-                class="absolute inset-x-0 bottom-0 border-t border-stroke-primary p-4"
+                class="bg-background-primary border-t border-stroke-primary p-4"
                 @click.outside="profileOpen = false"
             >
                 <button
