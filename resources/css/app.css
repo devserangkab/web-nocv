@@ -42,6 +42,15 @@
 }
 
 /*
+ * Badge soft neutral di dark mode: IDDS memakai teks langkah gelap
+ * (var(--ina-neutral-800), #1f1f1f) di atas background gelap —
+ * hasilnya hitam-di-atas-hitam. Petakan teks ke token konten gelap.
+ */
+[data-theme='dark'] .ina-badge--soft.ina-badge--neutral {
+    color: var(--ina-content-primary);
+}
+
+/*
  * Brand mode "serangkab" — instansi Kabupaten Serang.
  * Warna institusi (dipilih manual): #32B4EA (biru muda, primary utama).
  * Langkah terang (25-400) tint murni dari #32B4EA — badge, chip, ring, hover
