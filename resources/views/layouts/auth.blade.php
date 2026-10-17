@@ -6,6 +6,8 @@
 
         <title>{{ $title ?? config('app.name', 'Laravel') }}</title>
 
+        @include('layouts.partials.head-meta')
+
         {{-- Anti-FOUC: terapkan tema tersimpan sebelum paint --}}
         <script>
             document.documentElement.dataset.theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';

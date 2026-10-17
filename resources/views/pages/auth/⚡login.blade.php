@@ -11,7 +11,7 @@ use Livewire\Component;
 new class extends Component
 {
     #[Layout('layouts::auth')]
-    #[Title('Masuk | appdoc')]
+    #[Title('Masuk | NOC')]
     #[Validate('required', message: 'Email wajib diisi.')]
     #[Validate('email', message: 'Format email tidak valid.')]
     public string $email = '';
