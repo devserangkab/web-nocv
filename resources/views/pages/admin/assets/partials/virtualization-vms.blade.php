@@ -77,7 +77,7 @@ use App\Models\Vms;
                             <td class="h-10 px-4 text-right text-content-primary">{{ $vm->panels_count }} panel</td>
                             <td class="h-10 px-4 text-right text-content-primary">{{ $vm->hostings_count }} app</td>
                             <td class="h-10 px-4">
-                                <span class="ina-badge ina-badge--soft ina-badge--sm {{ $vm->status === VmsStatus::On ? 'ina-badge--positive' : ($vm->status === VmsStatus::Destroyed ? 'ina-badge--warning' : 'ina-badge--neutral') }}">
+                                <span class="ina-badge ina-badge--soft ina-badge--sm {{ $vm->status === VmsStatus::On ? 'ina-badge--success' : ($vm->status === VmsStatus::Destroyed ? 'ina-badge--error' : 'ina-badge--neutral') }}">
                                     {{ $vm->status->value }}
                                 </span>
                             </td>

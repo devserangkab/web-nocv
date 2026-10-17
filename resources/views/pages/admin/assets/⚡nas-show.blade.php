@@ -47,7 +47,7 @@ new class extends Component
         subtitle="Detail perangkat NAS beserta lokasi dan dokumen terkait."
     >
         @slot('right')
-            <span class="ina-badge ina-badge--soft ina-badge--md {{ $nas->status === NasStatus::On ? 'ina-badge--positive' : 'ina-badge--neutral' }}">{{ $nas->status->value }}</span>
+            <span class="ina-badge ina-badge--soft ina-badge--md {{ $nas->status === NasStatus::On ? 'ina-badge--success' : 'ina-badge--neutral' }}">{{ $nas->status->value }}</span>
         @endslot
     </x-asset.detail-header>
 

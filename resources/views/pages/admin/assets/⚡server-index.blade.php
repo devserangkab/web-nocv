@@ -274,7 +274,7 @@ new class extends Component
                                         </p>
                                     </div>
                                     <span class="flex shrink-0 items-center gap-2">
-                                        <span class="ina-badge ina-badge--soft ina-badge--sm {{ $server->status === ServerStatus::On ? 'ina-badge--positive' : 'ina-badge--neutral' }} whitespace-nowrap">
+                                        <span class="ina-badge ina-badge--soft ina-badge--sm {{ $server->status === ServerStatus::On ? 'ina-badge--success' : 'ina-badge--neutral' }} whitespace-nowrap">
                                             {{ $server->status->value }}
                                         </span>
                                         @if ($rak['code'] !== null)

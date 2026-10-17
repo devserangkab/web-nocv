@@ -74,7 +74,7 @@ new class extends Component
         </div>
 
         <div class="flex items-center gap-2">
-            <span class="ina-badge ina-badge--soft {{ $application->status === ApplicationStatus::Production ? 'ina-badge--positive' : ($application->status === ApplicationStatus::Development ? 'ina-badge--info' : ($application->status === ApplicationStatus::Maintenance ? 'ina-badge--warning' : 'ina-badge--neutral')) }} ina-badge--md">
+            <span class="ina-badge ina-badge--soft {{ $application->status === ApplicationStatus::Production ? 'ina-badge--success' : ($application->status === ApplicationStatus::Development ? 'ina-badge--info' : ($application->status === ApplicationStatus::Maintenance ? 'ina-badge--warning' : 'ina-badge--neutral')) }} ina-badge--md">
                 {{ $application->status->value }}
             </span>
             <span class="ina-badge ina-badge--soft ina-badge--brand ina-badge--md">{{ $application->type->value }}</span>
@@ -299,7 +299,7 @@ new class extends Component
                                         <p class="truncate text-sm font-medium text-content-primary" title="{{ $activity->user?->name ?? '-' }}">{{ $activity->user?->name ?? '-' }}</p>
                                         <p class="text-xs text-content-tertiary">{{ $activity->finished_at?->format('d M Y') ?? 'Masih berjalan' }}</p>
                                     </div>
-                                    <span class="ina-badge ina-badge--soft ina-badge--sm shrink-0 {{ $activity->finished_at !== null ? 'ina-badge--positive' : 'ina-badge--warning' }}">
+                                    <span class="ina-badge ina-badge--soft ina-badge--sm shrink-0 {{ $activity->finished_at !== null ? 'ina-badge--success' : 'ina-badge--warning' }}">
                                         {{ $activity->finished_at !== null ? 'Selesai' : 'Berjalan' }}
                                     </span>
                                 </div>

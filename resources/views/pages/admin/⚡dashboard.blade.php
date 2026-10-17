@@ -111,16 +111,15 @@ new class extends Component
             <a
                 href="{{ $card['route'] }}"
                 wire:navigate
-                class="ina-card ina-card--stack p-4 transition-shadow duration-150 hover:shadow-md"
+                title="{{ $card['label'] }}"
+                class="ina-card relative ina-card--stack p-4 transition-shadow duration-150 hover:shadow-md {{ $loop->iteration === 1 ? 'ina-accent-solid' : '' }}"
             >
-                <div class="flex items-center gap-3">
-                    <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-guide-50 text-guide-600">
-                        <i class="ti {{ $card['icon'] }} text-base"></i>
-                    </div>
-                    <p class="text-[12px] font-medium text-content-secondary">{{ $card['label'] }}</p>
+                <div class="flex absolute right-2 top-2 h-10 w-10 items-center justify-center rounded-sm {{ $loop->iteration === 1 ? 'bg-white/15 text-white' : 'bg-guide-50 text-guide-600' }}">
+                    <i class="ti {{ $card['icon'] }} text-xl"></i>
                 </div>
-                <p class="mt-3 text-xl font-semibold text-content-primary">{{ $card['value'] }}</p>
-                <p class="mt-0.5 text-[11px] text-content-tertiary">{{ $card['desc'] }}</p>
+                <p class="text-sm font-medium {{ $loop->iteration === 1 ? 'text-white/80' : 'text-content-secondary' }}">{{ $card['label'] }}</p>
+                <p class="mt-3 text-2xl grow font-semibold {{ $loop->iteration === 1 ? 'text-white' : 'text-content-primary' }}">{{ $card['value'] }}</p>
+                <p class="mt-0.5 text-[11px] {{ $loop->iteration === 1 ? 'text-white/70' : 'text-content-tertiary' }}">{{ $card['desc'] }}</p>
             </a>
         @endforeach
     </div>

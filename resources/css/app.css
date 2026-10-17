@@ -43,39 +43,41 @@
 
 /*
  * Brand mode "serangkab" — instansi Kabupaten Serang.
- * Warna institusi (dipilih manual): #1B604E (primary utama) & #1C6053.
- * Skala dibangun via color-mix() dari dua warna tersebut — glossy tosca-gelap,
- * berbeda dari pemdi yang mengandalkan biru INAgov.
+ * Warna institusi (dipilih manual): #32B4EA (biru muda, primary utama).
+ * Langkah terang (25-400) tint murni dari #32B4EA — badge, chip, ring, hover
+ * tampil persis warna yang diminta.
+ * Langkah gelap (500-900) color-mix dengan black — khusus teks tautan &
+ * tombol solid agar kontras tetap terbaca.
  */
 [data-brand='serangkab'] {
-    /* Primary Colors — skala beranchor #1B604E / #1C6053 */
-    --ina-primary-25: color-mix(in srgb, #1B604E 8%, white);
-    --ina-primary-50: color-mix(in srgb, #1B604E 14%, white);
-    --ina-primary-100: color-mix(in srgb, #1B604E 24%, white);
-    --ina-primary-200: color-mix(in srgb, #1B604E 38%, white);
-    --ina-primary-300: color-mix(in srgb, #1B604E 55%, white);
-    --ina-primary-400: color-mix(in srgb, #1B604E 75%, white);
-    --ina-primary-500: #1C6053;
-    --ina-primary-600: #1B604E;
-    --ina-primary-700: color-mix(in srgb, #1B604E 75%, black);
-    --ina-primary-800: color-mix(in srgb, #1B604E 55%, black);
-    --ina-primary-900: color-mix(in srgb, #1B604E 35%, black);
-    --ina-primary-primary: #1B604E;
+    /* Primary Colors — skala beranchor #32B4EA */
+    --ina-primary-25: color-mix(in srgb, #32B4EA 8%, white);
+    --ina-primary-50: color-mix(in srgb, #32B4EA 14%, white);
+    --ina-primary-100: color-mix(in srgb, #32B4EA 24%, white);
+    --ina-primary-200: color-mix(in srgb, #32B4EA 38%, white);
+    --ina-primary-300: color-mix(in srgb, #32B4EA 55%, white);
+    --ina-primary-400: color-mix(in srgb, #32B4EA 75%, white);
+    --ina-primary-500: color-mix(in srgb, #32B4EA 82%, black);
+    --ina-primary-600: color-mix(in srgb, #32B4EA 70%, black);
+    --ina-primary-700: color-mix(in srgb, #32B4EA 55%, black);
+    --ina-primary-800: color-mix(in srgb, #32B4EA 40%, black);
+    --ina-primary-900: color-mix(in srgb, #32B4EA 25%, black);
+    --ina-primary-primary: var(--ina-primary-600);
     --ina-brand-hover: var(--ina-primary-400) !important;
     --ina-neutral-hover: var(--ina-neutral-100) !important;
 
-    /* Secondary Colors - Hijau pendamping (skala resmi paket) */
-    --ina-secondary-25: var(--ina-green-50);
-    --ina-secondary-50: var(--ina-green-50);
-    --ina-secondary-100: var(--ina-green-100);
-    --ina-secondary-200: var(--ina-green-200);
-    --ina-secondary-300: var(--ina-green-300);
-    --ina-secondary-400: var(--ina-green-400);
-    --ina-secondary-500: var(--ina-green-500);
-    --ina-secondary-600: var(--ina-green-600);
-    --ina-secondary-700: var(--ina-green-700);
-    --ina-secondary-800: var(--ina-green-800);
-    --ina-secondary-900: var(--ina-green-900);
+    /* Secondary Colors - Biru pendamping (skala resmi paket) */
+    --ina-secondary-25: var(--ina-blue-50);
+    --ina-secondary-50: var(--ina-blue-50);
+    --ina-secondary-100: var(--ina-blue-100);
+    --ina-secondary-200: var(--ina-blue-200);
+    --ina-secondary-300: var(--ina-blue-300);
+    --ina-secondary-400: var(--ina-blue-400);
+    --ina-secondary-500: var(--ina-blue-500);
+    --ina-secondary-600: var(--ina-blue-600);
+    --ina-secondary-700: var(--ina-blue-700);
+    --ina-secondary-800: var(--ina-blue-800);
+    --ina-secondary-900: var(--ina-blue-900);
 
     /* Accent */
     --ina-accent-yellow: var(--ina-lime-400);
@@ -94,7 +96,6 @@
 }
 
 [data-theme='dark'][data-brand='serangkab'] {
-    --ina-primary-primary: var(--ina-primary-400);
     --ina-primary-hover: var(--ina-primary-400);
 
     /* Guide dipetakan ke langkah terang agar link/fokus/ikon kontras di gelap */
@@ -170,6 +171,25 @@
     --ina-guide-600: color-mix(in srgb, var(--ina-primary-500) 55%, #f4f6f5);
     --ina-guide-700: var(--ina-guide-600);
 
-    /* Tombol primary di dark: tosca lebih terang agar teks putih terbaca nyaman */
-    --ina-primary-primary: color-mix(in srgb, var(--ina-primary-500) 55%, #f4f6f5);
+    /* Tombol primary di dark: #32B4EA murni terlalu menyilaukan —
+       medium gelap di atas background gelap, teks putih tetap kontras nyaman */
+    --ina-primary-primary: color-mix(in srgb, var(--ina-primary-500) 72%, var(--ina-background-secondary));
+}
+
+
+/* Accent solid dark-safe: dipakai hero card & banner berwarna brand */
+.ina-accent-solid {
+    background-color: var(--ina-primary-600) !important;
+}
+
+.ina-accent-solid:hover {
+    background-color: color-mix(in srgb, var(--ina-primary-600) 88%, black) !important;
+}
+
+[data-theme=\u0027dark\u0027] .ina-accent-solid {
+    background-color: color-mix(in srgb, var(--ina-primary-500) 72%, var(--ina-background-secondary)) !important;
+}
+
+[data-theme=\u0027dark\u0027] .ina-accent-solid:hover {
+    background-color: color-mix(in srgb, var(--ina-primary-500) 80%, var(--ina-background-secondary)) !important;
 }

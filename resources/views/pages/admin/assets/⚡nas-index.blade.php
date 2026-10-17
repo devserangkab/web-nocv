@@ -335,7 +335,7 @@ new class extends Component
                                 </td>
                                 <td class="h-14 px-4 text-content-secondary">{{ $nas->os ?? '-' }}</td>
                                 <td class="h-14 px-4">
-                                    <span class="ina-badge ina-badge--soft ina-badge--sm {{ $nas->status === NasStatus::On ? 'ina-badge--positive' : 'ina-badge--neutral' }}">{{ $nas->status->value }}</span>
+                                    <span class="ina-badge ina-badge--soft ina-badge--sm {{ $nas->status === NasStatus::On ? 'ina-badge--success' : 'ina-badge--neutral' }}">{{ $nas->status->value }}</span>
                                 </td>
                                 <td class="h-14 px-4">
                                     <div class="flex items-center justify-end gap-1">

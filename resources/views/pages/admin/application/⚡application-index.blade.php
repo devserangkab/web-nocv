@@ -448,7 +448,7 @@ new class extends Component
                                 <td class="h-14 px-4">
                                     @php
                                         $statusColor = match ($application->status) {
-                                            ApplicationStatus::Production => 'ina-badge--positive',
+                                            ApplicationStatus::Production => 'ina-badge--success',
                                             ApplicationStatus::Development => 'ina-badge--info',
                                             ApplicationStatus::Maintenance => 'ina-badge--warning',
                                             default => 'ina-badge--neutral',
