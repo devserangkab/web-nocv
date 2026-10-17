@@ -18,6 +18,8 @@ use Livewire\WithPagination;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\Notifies;
+
     use WithPagination;
 
     use \App\Livewire\Concerns\InteractsWithProxmoxForm;
@@ -103,6 +105,7 @@ new class extends Component
             app(DeleteProxmox::class)(Proxmox::findOrFail($this->deletingProxmoxId));
         }
 
+        $this->notify('Proxmox berhasil dihapus.');
         $this->showProxmoxDeleteModal = false;
         $this->deletingProxmoxId = null;
     }
@@ -143,6 +146,7 @@ new class extends Component
             app(DeleteVms::class)(Vms::findOrFail($this->deletingVmsId));
         }
 
+        $this->notify('VM berhasil dihapus.');
         $this->showVmsDeleteModal = false;
         $this->deletingVmsId = null;
     }

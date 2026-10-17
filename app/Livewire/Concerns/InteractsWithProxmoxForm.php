@@ -13,6 +13,8 @@ use App\Models\Server;
  */
 trait InteractsWithProxmoxForm
 {
+    use Notifies;
+
     public bool $showProxmoxModal = false;
 
     public ?int $editingProxmoxId = null;
@@ -63,8 +65,10 @@ trait InteractsWithProxmoxForm
 
         if ($this->editingProxmoxId !== null) {
             app(UpdateProxmox::class)(Proxmox::findOrFail($this->editingProxmoxId), $data);
+            $this->notify('Proxmox '.$this->proxmox_name.' berhasil diperbarui.');
         } else {
             app(CreateProxmox::class)($data);
+            $this->notify('Proxmox '.$this->proxmox_name.' berhasil ditambahkan.');
         }
 
         $this->showProxmoxModal = false;

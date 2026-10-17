@@ -15,6 +15,8 @@ use App\Models\Vms;
  */
 trait InteractsWithPanelForm
 {
+    use Notifies;
+
     public bool $showModal = false;
 
     public ?int $editingId = null;
@@ -75,8 +77,10 @@ trait InteractsWithPanelForm
 
         if ($this->editingId !== null) {
             app(UpdatePanel::class)(Panel::findOrFail($this->editingId), $data);
+            $this->notify('Panel '.$this->name.' berhasil diperbarui.');
         } else {
             app(CreatePanel::class)($data);
+            $this->notify('Panel '.$this->name.' berhasil ditambahkan.');
         }
 
         $this->showModal = false;

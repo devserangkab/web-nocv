@@ -15,6 +15,8 @@ use Livewire\WithPagination;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\Notifies;
+
     use WithPagination;
 
     #[Layout('layouts::admin')]
@@ -69,6 +71,7 @@ new class extends Component
             app(CreateLocation::class)($data);
         }
 
+        $this->notify('Server Room berhasil disimpan.');
         $this->showModal = false;
         $this->resetForm();
     }
@@ -93,6 +96,7 @@ new class extends Component
             return;
         }
 
+        $this->notify('Server Room berhasil dihapus.');
         $this->showDeleteModal = false;
         $this->deletingId = null;
     }

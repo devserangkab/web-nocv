@@ -16,6 +16,8 @@ use Spatie\Permission\Models\Role;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\Notifies;
+
     use WithPagination;
 
     #[Layout('layouts::admin')]
@@ -81,6 +83,7 @@ new class extends Component
             app(CreateRole::class)($data);
         }
 
+        $this->notify('Role berhasil disimpan.');
         $this->showModal = false;
         $this->resetForm();
     }
@@ -107,6 +110,7 @@ new class extends Component
             }
         }
 
+        $this->notify('Role berhasil dihapus.');
         $this->showDeleteModal = false;
         $this->deletingId = null;
     }

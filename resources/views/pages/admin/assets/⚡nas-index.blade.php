@@ -17,6 +17,8 @@ use Livewire\WithPagination;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\Notifies;
+
     use WithPagination;
 
     #[Layout('layouts::admin')]
@@ -134,6 +136,7 @@ new class extends Component
             app(CreateNas::class)($data);
         }
 
+        $this->notify('NAS berhasil disimpan.');
         $this->showModal = false;
         $this->resetForm();
     }
@@ -150,6 +153,7 @@ new class extends Component
             app(DeleteNas::class)(Nas::findOrFail($this->deletingId));
         }
 
+        $this->notify('NAS berhasil dihapus.');
         $this->showDeleteModal = false;
         $this->deletingId = null;
     }

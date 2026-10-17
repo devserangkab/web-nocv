@@ -15,6 +15,8 @@ use Livewire\Component;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\Notifies;
+
     use \App\Livewire\Concerns\InteractsWithServerForm;
 
     #[Layout('layouts::admin')]
@@ -52,6 +54,7 @@ new class extends Component
             app(DeleteServer::class)(Server::findOrFail($this->deletingId));
         }
 
+        $this->notify('Server berhasil dihapus.');
         $this->showDeleteModal = false;
         $this->deletingId = null;
     }

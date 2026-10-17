@@ -14,6 +14,8 @@ use Spatie\Permission\Models\Role;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\Notifies;
+
     use WithPagination;
 
     #[Layout('layouts::admin')]
@@ -87,6 +89,7 @@ new class extends Component
             app(CreateUser::class)($data);
         }
 
+        $this->notify('User berhasil disimpan.');
         $this->showModal = false;
         $this->resetForm();
     }
@@ -113,6 +116,7 @@ new class extends Component
             }
         }
 
+        $this->notify('User berhasil dihapus.');
         $this->showDeleteModal = false;
         $this->deletingId = null;
     }

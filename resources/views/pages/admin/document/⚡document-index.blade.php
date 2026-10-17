@@ -21,6 +21,8 @@ use Livewire\WithPagination;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\Notifies;
+
     use WithFileUploads;
     use WithPagination;
 
@@ -150,6 +152,7 @@ new class extends Component
             return;
         }
 
+        $this->notify('Dokumen berhasil diunggah.');
         $this->showUploadModal = false;
         $this->resetForm();
     }
@@ -181,6 +184,7 @@ new class extends Component
             app(DeleteDocument::class)(Document::findOrFail($this->deletingId));
         }
 
+        $this->notify('Dokumen berhasil dihapus.');
         $this->showDeleteModal = false;
         $this->deletingId = null;
     }

@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Storage;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\Notifies;
+
     use WithFileUploads;
 
     #[Layout('layouts::admin')]
@@ -70,6 +72,7 @@ new class extends Component
 
         // Sinkron ulang properti tampilan
         $this->fillFromUser($user->refresh());
+        $this->notify('Profil berhasil diperbarui.');
         $this->saved = true;
     }
 

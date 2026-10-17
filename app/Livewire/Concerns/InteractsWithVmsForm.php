@@ -14,6 +14,8 @@ use App\Models\Vms;
  */
 trait InteractsWithVmsForm
 {
+    use Notifies;
+
     public bool $showVmsModal = false;
 
     public ?int $editingVmsId = null;
@@ -92,8 +94,10 @@ trait InteractsWithVmsForm
 
         if ($this->editingVmsId !== null) {
             app(UpdateVms::class)(Vms::findOrFail($this->editingVmsId), $data);
+            $this->notify('VM '.$this->vm_name.' berhasil diperbarui.');
         } else {
             app(CreateVms::class)($data);
+            $this->notify('VM '.$this->vm_name.' berhasil ditambahkan.');
         }
 
         $this->showVmsModal = false;

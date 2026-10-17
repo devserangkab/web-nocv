@@ -382,6 +382,9 @@
             </main>
         </div>
 
+        {{-- Toast notification global --}}
+        <x-asset.toast />
+
         @livewireScripts
     </body>
 </html>

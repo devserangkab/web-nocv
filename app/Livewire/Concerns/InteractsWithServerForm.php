@@ -16,6 +16,8 @@ use Illuminate\Support\Collection;
  */
 trait InteractsWithServerForm
 {
+    use Notifies;
+
     public bool $showModal = false;
 
     public ?int $editingId = null;
@@ -114,8 +116,10 @@ trait InteractsWithServerForm
 
         if ($this->editingId !== null) {
             app(UpdateServer::class)(Server::findOrFail($this->editingId), $data);
+            $this->notify('Server '.$this->server_name.' berhasil diperbarui.');
         } else {
             app(CreateServer::class)($data);
+            $this->notify('Server '.$this->server_name.' berhasil ditambahkan.');
         }
 
         $this->showModal = false;

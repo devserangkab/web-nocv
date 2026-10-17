@@ -20,6 +20,8 @@ use Livewire\WithPagination;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\Notifies;
+
     use WithPagination;
 
     #[Layout('layouts::admin')]
@@ -125,6 +127,7 @@ new class extends Component
             return;
         }
 
+        $this->notify('Work log berhasil dicatat.');
         $this->showWorkLogModal = false;
         $this->resetWorkLogForm();
     }

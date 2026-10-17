@@ -13,6 +13,8 @@ use Livewire\WithPagination;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\Notifies;
+
     use WithPagination;
 
     #[Layout('layouts::admin')]
@@ -85,6 +87,7 @@ new class extends Component
             app(CreateRack::class)($data);
         }
 
+        $this->notify('Rack berhasil disimpan.');
         $this->showModal = false;
         $this->resetForm();
     }
@@ -110,6 +113,7 @@ new class extends Component
             return;
         }
 
+        $this->notify('Rack berhasil dihapus.');
         $this->showDeleteModal = false;
         $this->deletingId = null;
     }

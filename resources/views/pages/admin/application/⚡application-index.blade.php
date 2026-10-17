@@ -19,6 +19,8 @@ use Livewire\WithPagination;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\Notifies;
+
     use WithFileUploads;
     use WithPagination;
 
@@ -163,6 +165,7 @@ new class extends Component
         } else {
             app(StoreApplication::class)(new Application, $data);
         }
+        $this->notify('Application berhasil disimpan.');
         $this->showModal = false;
         $this->resetForm();
     }
@@ -181,6 +184,7 @@ new class extends Component
             app(DeleteApplication::class)($application);
         }
 
+        $this->notify('Application berhasil dihapus.');
         $this->showDeleteModal = false;
         $this->deletingId = null;
     }

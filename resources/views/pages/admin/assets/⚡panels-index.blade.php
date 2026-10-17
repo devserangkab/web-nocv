@@ -16,6 +16,8 @@ use Livewire\WithPagination;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\Notifies;
+
     use \App\Livewire\Concerns\InteractsWithPanelForm;
 
     use WithPagination;
@@ -66,6 +68,7 @@ new class extends Component
             app(DeletePanel::class)(Panel::findOrFail($this->deletingId));
         }
 
+        $this->notify('Panel berhasil dihapus.');
         $this->showDeleteModal = false;
         $this->deletingId = null;
     }

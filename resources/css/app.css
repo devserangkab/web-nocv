@@ -193,3 +193,17 @@
 [data-theme=\u0027dark\u0027] .ina-accent-solid:hover {
     background-color: color-mix(in srgb, var(--ina-primary-500) 80%, var(--ina-background-secondary)) !important;
 }
+
+
+/* Toast notification: sukses ikut brand, error merah fungsional */
+.ina-toast-success {
+    background: color-mix(in srgb, var(--ina-primary-500) 14%, var(--ina-background-primary));
+    border-color: color-mix(in srgb, var(--ina-primary-500) 35%, var(--ina-background-primary));
+    color: var(--ina-primary-primary);
+}
+
+.ina-toast-error {
+    background: color-mix(in srgb, var(--ina-negative-600) 14%, var(--ina-background-primary));
+    border-color: color-mix(in srgb, var(--ina-negative-600) 35%, var(--ina-background-primary));
+    color: var(--ina-negative-600);
+}

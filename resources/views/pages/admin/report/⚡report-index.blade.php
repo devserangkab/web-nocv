@@ -11,6 +11,8 @@ use Livewire\WithPagination;
 
 new class extends Component
 {
+    use \App\Livewire\Concerns\Notifies;
+
     use WithPagination;
 
     #[Layout('layouts::admin')]
@@ -72,6 +74,7 @@ new class extends Component
             return;
         }
 
+        $this->notify('Laporan bulanan berhasil dibuat.');
         $this->showCreateModal = false;
 
         $this->redirectRoute('admin.reports.edit', $report->report_id, navigate: true);
@@ -89,6 +92,7 @@ new class extends Component
             app(DeleteMonthlyReport::class)(MonthlyReport::findOrFail($this->deletingId));
         }
 
+        $this->notify('Laporan bulanan berhasil dihapus.');
         $this->showDeleteModal = false;
         $this->deletingId = null;
     }
