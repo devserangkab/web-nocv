@@ -61,6 +61,12 @@ Route::middleware('auth')->group(function () {
         Route::livewire('/admin/institutions', 'pages::admin.management.institution-index')->name('admin.institutions.index');
     });
 
+    // Tool developer (superadmin, developer)
+    Route::middleware('can:devtools.manage')->group(function () {
+        Route::livewire('/admin/dev/bcrypt', 'pages::admin.dev.bcrypt-tool')
+            ->name('admin.dev.bcrypt');
+    });
+
     Route::livewire('/admin/settings', 'pages::admin.settings')->name('admin.settings.index');
 
     // Dokumentasi & Gallery

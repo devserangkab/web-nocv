@@ -245,11 +245,38 @@
                         </div>
                     </div>
                 @endif
+
+                {{-- Grup: Developer — tool internal untuk tabel, hash, dan sebagainya --}}
+                @if (auth()->user()?->can('devtools.manage'))
+                    <div x-data="{ open: true }" class="pt-3">
+                        <button
+                            type="button"
+                            @click="open = !open"
+                            :aria-expanded="open.toString()"
+                            aria-controls="nav-developer"
+                            class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-content-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-content-primary"
+                        >
+                            <i class="ti ti-tools text-lg"></i>
+                            <span class="flex-1 text-left">Developer</span>
+                            <i class="ti ti-chevron-right text-base text-content-tertiary transition-transform duration-200" :class="open && 'rotate-90'" aria-hidden="true"></i>
+                        </button>
+                        <div id="nav-developer" x-show="open" x-transition:enter="transition duration-150 ease-out" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-cloak class="space-y-0.5 pt-0.5">
+                            <a
+                                href="{{ route('admin.dev.bcrypt') }}"
+                                wire:navigate
+                                class="flex h-9 items-center gap-3 rounded-lg px-3 pl-10 text-[13px] font-medium transition-colors duration-150 hover:bg-neutral-100 {{ request()->routeIs('admin.dev.*') ? 'bg-guide-50 text-guide-600' : 'text-content-secondary hover:text-content-primary' }}"
+                            >
+                                <i class="ti ti-key text-base"></i>
+                                Bcrypt Hash
+                            </a>
+                        </div>
+                    </div>
+                @endif
             </nav>
 
             {{-- User — klik untuk buka menu akun --}}
             <div
-                class="bg-background-primary border-t border-stroke-primary p-4"
+                class="bg-background-primary relative border-t border-stroke-primary p-4"
                 @click.outside="profileOpen = false"
             >
                 <button
