@@ -224,9 +224,9 @@ class GenerateMathCaptcha
     private function sigmaSum(string $lower, string $upper): string
     {
         return '<span class="inline-flex flex-col items-center leading-none">'
-            .'<span class="text-[9px] text-content-tertiary">'.$lower.'</span>'
+            .'<span class="text-[0.6em] text-content-secondary">'.$lower.'</span>'
             .'<span class="text-2xl font-light">Σ</span>'
-            .'<span class="text-[9px] text-content-tertiary">'.$upper.'</span>'
+            .'<span class="text-[0.6em] text-content-secondary">'.$upper.'</span>'
             .'</span>';
     }
 
