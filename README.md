@@ -1,59 +1,101 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<div align="center">
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+<img src="public/favicon/android-chrome-512x512.png" alt="Logo NOC" width="96">
 
-## About Laravel
+# NOC — Network Operation Center Virtual
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+**Panel Layanan Digital Kabupaten Serang**
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+*Copyright © Dinas Komunikasi, Informatika, Statistik dan Persandian Kabupaten Serang*
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+</div>
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## Tentang Aplikasi
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+**NOC (Network Operation Center Virtual)** merupakan aplikasi panel layanan digital yang dikembangkan oleh Dinas Komunikasi, Informatika, Statistik dan Persandian Kabupaten Serang. Aplikasi ini berfungsi sebagai satu pintu untuk pengkatalogan aset teknologi informasi, pemetaan operasional jaringan, serta dokumentasi teknis dan pelaporan berkala seluruh aset infrastruktur di lingkungan instansi.
 
-## Laravel Sponsors
+Melalui aplikasi ini, pengelola dapat memantau keberadaan dan kondisi aset infrastruktur fisik maupun virtual, mencatat aktivitas operasional, menyusun laporan bulanan, serta mengelola dokumentasi teknis secara terpusat dan terstruktur.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Fitur Utama
 
-### Premium Partners
+**Aset Infrastruktur**
+- Pengelolaan ruang server (*server room*) beserta lokasi penempatan perangkat
+- Inventarisasi rak (*rack*) dengan rincian kapasitas dan penempatan
+- Pencatatan server fisik lengkap dengan spesifikasi
+- Pengelolaan virtualisasi: host Proxmox, mesin virtual (*Virtual Machine*), panel manajemen server, dan perangkat NAS
+- Peta topologi jaringan antar lokasi
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+**Aplikasi & Pengembang**
+- Katalog aplikasi yang dikelola, termasuk status produksi
+- Pencatatan pihak pengembang dan layanan hosting aplikasi
 
-## Contributing
+**Operasional & Pelaporan**
+- Catatan aktivitas (*audit log* otomatis dan *work log* manual)
+- Penyusunan laporan bulanan dengan dukungan cetak PDF
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+**Dokumentasi**
+- Repositori dokumen teknis dengan pengunduhan yang terlindungi
+- Galeri media dokumentasi (foto dan tautan media)
 
-## Code of Conduct
+**Manajemen & Administrasi**
+- Pengelolaan pengguna, peran (*role*), dan izin akses (*permission*)
+- Referensi data instansi
+- Halaman pengaturan profil akun
+- Tool developer internal (Bcrypt Hash Generator & Verifier)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Teknologi
 
-## Security Vulnerabilities
+| Komponen | Teknologi |
+|---|---|
+| *Backend framework* | Laravel 12 (PHP ≥ 8.2) |
+| Antarmuka reaktif | Livewire 4 (Volt, komponen satu berkas) |
+| Otorisasi | Spatie Laravel Permission |
+| Antarmuka pengguna | Tailwind CSS v4, IDDS Design System, Tabler Icons |
+| Editor teks kaya | Tiptap |
+| Penyajian PDF | DomPDF |
+| *Bundler* aset | Vite |
+| Basis data | MySQL |
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Persyaratan Sistem
 
-## License
+- PHP ≥ 8.2 beserta ekstensi: `pdo_mysql`, `gd`, `mbstring`, `dom`, `zip`, `fileinfo`
+- Composer ≥ 2.x
+- Node.js ≥ 20 dan npm
+- MySQL ≥ 8.0 (atau MariaDB yang setara)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Otorisasi dan Peran
+
+Aplikasi menerapkan otorisasi tingkat modul dengan format penamaan `modul.aksi` (contoh: `servers.create`, `monthly-reports.view-all`) yang dapat dikelola melalui halaman *Role & Permission*.
+
+- **Superadmin** — memiliki akses penuh terhadap seluruh modul.
+- **Developer** — peran teknis yang memegang izin modul pengembangan, termasuk `devtools.manage` untuk menuju menu *Developer Tools*.
+
+Menu *Developer* pada sidebar hanya tampil bagi pengguna yang memegang izin `devtools.manage`.
+
+## Keamanan
+
+- **Captcha matematika** pada halaman masuk dengan tantangan sekali pakai (*single-use*) yang kedaluwarsa setelah digunakan.
+- **Kebijakan wajib ganti kata sandi**: pengguna baru yang ditandai oleh administrator dipaksa ke halaman penggantian kata sandi pada login pertama; penegakan dilakukan sisi server melalui middleware sehingga tidak dapat dilewati.
+- **Regenerasi sesi** setelah autentikasi dan pergantian kata sandi (pencegahan *session fixation*).
+- **Aset media terlindungi** — dokumen dan media dilayani melalui rute privat dan tidak dapat diakses publik.
+- **Pembatasan perayapan** — berkas `robots.txt` dan meta tag `noindex` mencegah pengindeksan oleh mesin pencari.
+
+## Konvensi Pengembangan
+
+- Komponen antarmuka ditulis dalam format **Livewire Volt satu berkas** di bawah `resources/views/pages/`.
+- Seluruh penulisan data dilakukan melalui **Action class** di bawah `app/Actions/`.
+- Penataan kode PHP diperiksa menggunakan **Laravel Pint**:
+
+    ```bash
+    vendor/bin/pint --dirty
+    ```
+
+- Pesan commit mengikuti pola *conventional commits* dalam bahasa Inggris (contoh: `feat(ui): ...`, `fix(admin): ...`).
+
+## Hak Cipta dan Lisensi
+
+Aplikasi ini merupakan milik Dinas Komunikasi, Informatika, Statistik dan Persandian Kabupaten Serang.
+
+**Seluruh hak cipta dilindungi.** Dilarang menyalin, mendistribusikan, atau menggunakan bagian mana pun dari aplikasi ini tanpa izin resmi dari pemilik hak cipta.
