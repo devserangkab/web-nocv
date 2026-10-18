@@ -71,6 +71,13 @@ new class extends Component
 
         session()->regenerate();
 
+        // User yang wajib ganti password dipaksa ke halaman reset dulu.
+        if (Auth::user()?->must_change_password) {
+            $this->redirect(route('auth.change-password'));
+
+            return;
+        }
+
         $this->redirect(route('admin.dashboard'));
     }
 };

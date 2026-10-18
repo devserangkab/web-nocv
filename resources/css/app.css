@@ -10,6 +10,7 @@
     --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
         'Noto Color Emoji';
     --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --breakpoint-xs: 30rem;
 }
 
 /* Fokus / ring field: brand + soft ring (semua tema, dipandu token) */
@@ -48,6 +49,17 @@
  */
 [data-theme='dark'] .ina-badge--soft.ina-badge--neutral {
     color: var(--ina-content-primary);
+}
+
+/*
+ * Checkbox IDDS: state tercentang mengikuti brand "serangkab"
+ * (bawaan IDDS memakai content-primary gelap) — kontras aman di
+ * light & dark karena langkah gelap #32B4EA tetap di atas icon putih.
+ */
+[data-brand='serangkab'] .ina-checkbox__box--checked,
+[data-brand='serangkab'] .ina-checkbox__box--indeterminate {
+    background-color: var(--ina-primary-500);
+    border-color: var(--ina-primary-500);
 }
 
 /*

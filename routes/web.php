@@ -9,7 +9,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::livewire('/', 'pages::auth.login')->name('login');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'force.password'])->group(function () {
+    // Ganti password wajib (user baru / dipaksa admin)
+    Route::livewire('/auth/change-password', 'pages::auth.change-password')
+        ->name('auth.change-password');
+
     Route::livewire('/admin/dashboard', 'pages::admin.dashboard')->name('admin.dashboard');
 
     // Infrastruktur

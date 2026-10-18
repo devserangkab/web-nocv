@@ -19,6 +19,7 @@ class UpdateUser
         $payload = [
             'name' => $data['name'],
             'email' => $data['email'],
+            'must_change_password' => (bool) ($data['mustChangePassword'] ?? false),
         ];
 
         // Password kosong = biarkan yang lama (field ter-cast 'hashed' bila diisi).

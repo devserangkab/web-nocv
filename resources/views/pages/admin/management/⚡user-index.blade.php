@@ -41,6 +41,8 @@ new class extends Component
 
     public string $passwordConfirmation = '';
 
+    public bool $mustChangePassword = true;
+
     public string $role = '';
 
     public function updatedSearch(): void
@@ -68,6 +70,7 @@ new class extends Component
         $this->email = (string) $user->email;
         $this->password = '';
         $this->passwordConfirmation = '';
+        $this->mustChangePassword = (bool) $user->must_change_password;
         $this->role = $user->roles->first()?->name ?? '';
 
         $this->showModal = true;
@@ -80,6 +83,7 @@ new class extends Component
             'email' => $this->email,
             'password' => $this->password,
             'passwordConfirmation' => $this->passwordConfirmation,
+            'mustChangePassword' => $this->mustChangePassword,
             'role' => $this->role,
         ];
 
@@ -135,6 +139,7 @@ new class extends Component
         $this->email = '';
         $this->password = '';
         $this->passwordConfirmation = '';
+        $this->mustChangePassword = true;
         $this->role = '';
     }
 
@@ -423,6 +428,32 @@ new class extends Component
                         @enderror
                     </div>
                 </div>
+
+                <label
+                    class="ina-checkbox"
+                    x-data="{ on: {{ $mustChangePassword ? 'true' : 'false' }} }"
+                >
+                    <input
+                        type="checkbox"
+                        id="user-must-change-password"
+                        wire:model="mustChangePassword"
+                        class="ina-checkbox__input"
+                        x-on:change="on = $event.target.checked"
+                    >
+                    <span
+                        class="ina-checkbox__box"
+                        :class="on ? 'ina-checkbox__box--checked' : 'ina-checkbox__box--unchecked'"
+                        aria-hidden="true"
+                    >
+                        <i class="ti ti-check text-xs" x-show="on" x-cloak></i>
+                    </span>
+                    <span class="ina-checkbox__content">
+                        <span class="ina-checkbox__label">
+                            {{ $editingId === null ? 'Wajib ganti password saat login pertama' : 'Wajib ganti password saat login berikutnya' }}
+                        </span>
+                        <span class="text-xs text-content-tertiary">Password awal dianggap sementara — user dipaksa ke halaman ganti password sebelum masuk panel.</span>
+                    </span>
+                </label>
 
                 <div class="ina-text-field">
                     <label for="user-role" class="ina-text-field__label">

@@ -20,6 +20,7 @@ class CreateUser
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => $data['password'],
+            'must_change_password' => (bool) ($data['mustChangePassword'] ?? false),
         ]);
 
         $user->syncRoles([$data['role']]);
@@ -52,6 +53,7 @@ class CreateUser
                 ['min:8', 'same:passwordConfirmation']
             ),
             'role' => ['required', 'string', 'exists:roles,name'],
+            'mustChangePassword' => ['nullable', 'boolean'],
         ];
     }
 
