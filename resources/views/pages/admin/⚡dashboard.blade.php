@@ -93,20 +93,20 @@ new class extends Component
 
     {{-- Ringkasan statistik — setiap kartu menuju daftar terkait --}}
     @php $stats = $this->stats(); @endphp
-    <div class="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-6">
+    <div class="mt-6 grid grid-cols-1 xs:grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6">
         @foreach ([
-            ['label' => 'Server Room', 'desc' => 'Ruang penempatan server', 'value' => $stats['totals']['location'], 'route' => route('admin.server-rooms.index'), 'icon' => 'ti-building'],
-            ['label' => 'Rack', 'desc' => 'Rak penempatan server', 'value' => $stats['totals']['rack'], 'route' => route('admin.assets.racks.index'), 'icon' => 'ti-server-2'],
-            ['label' => 'Server', 'desc' => 'Server fisik terdaftar', 'value' => $stats['totals']['server'], 'route' => route('admin.assets.servers.index'), 'icon' => 'ti-server'],
-            ['label' => 'Proxmox', 'desc' => 'Host virtualisasi', 'value' => $stats['totals']['proxmox'], 'route' => route('admin.assets.virtualization.index'), 'icon' => 'ti-stack-2'],
-            ['label' => 'Virtual Machine', 'desc' => 'VM yang dikelola', 'value' => $stats['totals']['vm'], 'route' => route('admin.assets.virtualization.index'), 'icon' => 'ti-box-multiple-3'],
-            ['label' => 'Panel', 'desc' => 'Panel server management', 'value' => $stats['totals']['panel'], 'route' => route('admin.assets.panels.index'), 'icon' => 'ti-app-window'],
-            ['label' => 'NAS', 'desc' => 'Perangkat penyimpanan NAS', 'value' => $stats['totals']['nas'], 'route' => route('admin.assets.nas.index'), 'icon' => 'ti-database'],
-            ['label' => 'Aplikasi', 'desc' => 'Aplikasi yang dikelola', 'value' => $stats['totals']['application'], 'route' => route('admin.applications.index'), 'icon' => 'ti-apps'],
-            ['label' => 'Aplikasi Produksi', 'desc' => 'Berstatus Production', 'value' => $this->productionApps(), 'route' => route('admin.applications.index'), 'icon' => 'ti-rocket'],
+            ['label' => 'Server Room', 'desc' => 'Ruang server', 'value' => $stats['totals']['location'], 'route' => route('admin.server-rooms.index'), 'icon' => 'ti-building'],
+            ['label' => 'Rack', 'desc' => 'Rak server', 'value' => $stats['totals']['rack'], 'route' => route('admin.assets.racks.index'), 'icon' => 'ti-server-2'],
+            ['label' => 'Server', 'desc' => 'Server fisik', 'value' => $stats['totals']['server'], 'route' => route('admin.assets.servers.index'), 'icon' => 'ti-server'],
+            ['label' => 'Proxmox', 'desc' => 'Virtualisasi', 'value' => $stats['totals']['proxmox'], 'route' => route('admin.assets.virtualization.index'), 'icon' => 'ti-stack-2'],
+            ['label' => 'Virtual Machine', 'desc' => 'VM dikelola', 'value' => $stats['totals']['vm'], 'route' => route('admin.assets.virtualization.index'), 'icon' => 'ti-box-multiple-3'],
+            ['label' => 'Panel', 'desc' => 'Panel management', 'value' => $stats['totals']['panel'], 'route' => route('admin.assets.panels.index'), 'icon' => 'ti-app-window'],
+            ['label' => 'NAS', 'desc' => 'Perangkat penyimpanan', 'value' => $stats['totals']['nas'], 'route' => route('admin.assets.nas.index'), 'icon' => 'ti-database'],
+            ['label' => 'Aplikasi', 'desc' => 'Aplikasi dikelola', 'value' => $stats['totals']['application'], 'route' => route('admin.applications.index'), 'icon' => 'ti-apps'],
+            ['label' => 'Aplikasi', 'desc' => 'Production', 'value' => $this->productionApps(), 'route' => route('admin.applications.index'), 'icon' => 'ti-rocket'],
             ['label' => 'Dokumen', 'desc' => 'Dokumen terunggah', 'value' => $stats['totals']['document'], 'route' => route('admin.documents.index'), 'icon' => 'ti-folder'],
-            ['label' => 'Media Gallery', 'desc' => 'Foto & video dokumentasi', 'value' => $stats['totals']['media'], 'route' => route('admin.galleries.index'), 'icon' => 'ti-photo'],
-            ['label' => 'Aktivitas 7 Hari', 'desc' => 'Audit & work log minggu ini', 'value' => $stats['weeklyActivity'], 'route' => route('admin.activities.index'), 'icon' => 'ti-activity'],
+            ['label' => 'Media Gallery', 'desc' => 'Media dokumentasi', 'value' => $stats['totals']['media'], 'route' => route('admin.galleries.index'), 'icon' => 'ti-photo'],
+            ['label' => 'Aktivitas 7 Hari', 'desc' => 'Aktivitas minggu ini', 'value' => $stats['weeklyActivity'], 'route' => route('admin.activities.index'), 'icon' => 'ti-activity'],
         ] as $card)
             <a
                 href="{{ $card['route'] }}"
@@ -117,7 +117,7 @@ new class extends Component
                 <div class="flex absolute right-2 top-2 h-10 w-10 items-center justify-center rounded-sm {{ $loop->iteration === 1 ? 'bg-white/15 text-white' : 'bg-guide-50 text-guide-600' }}">
                     <i class="ti {{ $card['icon'] }} text-xl"></i>
                 </div>
-                <p class="text-sm font-medium {{ $loop->iteration === 1 ? 'text-white/80' : 'text-content-secondary' }}">{{ $card['label'] }}</p>
+                <p class="sm:text-xs max-w-[100px] font-medium {{ $loop->iteration === 1 ? 'text-white/80' : 'text-content-secondary' }}">{{ $card['label'] }}</p>
                 <p class="mt-3 text-2xl grow font-semibold {{ $loop->iteration === 1 ? 'text-white' : 'text-content-primary' }}">{{ $card['value'] }}</p>
                 <p class="mt-0.5 text-[11px] {{ $loop->iteration === 1 ? 'text-white/70' : 'text-content-tertiary' }}">{{ $card['desc'] }}</p>
             </a>
