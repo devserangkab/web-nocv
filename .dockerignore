@@ -1,0 +1,50 @@
+# VCS & editor
+.git
+.gitignore
+.gitattributes
+.github
+.vscode
+.idea
+.fleet
+.nova
+.zed
+.editorconfig
+
+# Dependency & hasil build lokal (vendor dibangun di stage Composer,
+# public/build dibangun di stage Node).
+node_modules
+vendor
+public/build
+public/hot
+
+# Environment lokal — nilai dikirim via docker-compose.yml
+.env
+.env.*
+!.env.example
+
+# Cache, log, dan file runtime
+*.log
+.phpunit.result.cache
+/.phpunit.cache
+storage/logs/*
+storage/framework/cache/data/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/app/private/*
+storage/app/privates/*
+storage/app/public/*
+storage/*.key
+
+# Berkas Docker (tidak perlu ada di dalam image)
+Dockerfile
+docker-compose.yml
+.dockerignore
+docker-compose*.yml
+
+# Data & dokumentasi lokal
+backup
+*.xlsx
+dummy.png
+NEW-PLAN.md
+README.md
+LARAVEL_INSTALL.bat
