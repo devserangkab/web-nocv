@@ -12,6 +12,7 @@ use App\Models\Proxmox;
 use App\Models\Rack;
 use App\Models\Server;
 use App\Models\Vms;
+use App\Models\Waf;
 use App\Support\Authorize;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
@@ -53,6 +54,7 @@ class CreateWorkLog
             Proxmox::class,
             Vms::class,
             Panel::class,
+            Waf::class,
             Nas::class,
         ];
     }

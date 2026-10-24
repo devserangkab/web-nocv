@@ -10,6 +10,7 @@ use App\Models\Proxmox;
 use App\Models\Rack;
 use App\Models\Server;
 use App\Models\Vms;
+use App\Models\Waf;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -52,6 +53,7 @@ new class extends Component
                 'proxmox' => Proxmox::count(),
                 'vm' => Vms::count(),
                 'panel' => Panel::count(),
+                'waf' => Waf::count(),
                 'application' => Application::count(),
                 'nas' => \App\Models\Nas::count(),
                 'document' => Document::count(),
@@ -101,6 +103,7 @@ new class extends Component
             ['label' => 'Proxmox', 'desc' => 'Virtualisasi', 'value' => $stats['totals']['proxmox'], 'route' => route('admin.assets.virtualization.index'), 'icon' => 'ti-stack-2'],
             ['label' => 'Virtual Machine', 'desc' => 'VM dikelola', 'value' => $stats['totals']['vm'], 'route' => route('admin.assets.virtualization.index'), 'icon' => 'ti-box-multiple-3'],
             ['label' => 'Panel', 'desc' => 'Panel management', 'value' => $stats['totals']['panel'], 'route' => route('admin.assets.panels.index'), 'icon' => 'ti-app-window'],
+            ['label' => 'WAF', 'desc' => 'Web Application Firewall', 'value' => $stats['totals']['waf'], 'route' => route('admin.assets.wafs.index'), 'icon' => 'ti-shield-lock'],
             ['label' => 'NAS', 'desc' => 'Perangkat penyimpanan', 'value' => $stats['totals']['nas'], 'route' => route('admin.assets.nas.index'), 'icon' => 'ti-database'],
             ['label' => 'Aplikasi', 'desc' => 'Aplikasi dikelola', 'value' => $stats['totals']['application'], 'route' => route('admin.applications.index'), 'icon' => 'ti-apps'],
             ['label' => 'Aplikasi', 'desc' => 'Production', 'value' => $this->productionApps(), 'route' => route('admin.applications.index'), 'icon' => 'ti-rocket'],

@@ -90,6 +90,11 @@ class Server extends Model
         return $this->hasMany(Panel::class, 'server_id', 'server_id');
     }
 
+    public function wafs(): HasMany
+    {
+        return $this->hasMany(Waf::class, 'server_id', 'server_id');
+    }
+
     /**
      * Aplikasi yang dihosting langsung di server ini.
      */

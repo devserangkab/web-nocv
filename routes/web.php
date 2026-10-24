@@ -28,6 +28,8 @@ Route::middleware(['auth', 'force.password'])->group(function () {
     Route::livewire('/admin/assets/vms/detail/{vmId}', 'pages::admin.assets.vms-show')->name('admin.assets.vms.show');
     Route::livewire('/admin/assets/panels', 'pages::admin.assets.panels-index')->name('admin.assets.panels.index');
     Route::livewire('/admin/assets/panels/detail/{panelId}', 'pages::admin.assets.panel-show')->name('admin.assets.panels.show');
+    Route::livewire('/admin/assets/wafs', 'pages::admin.assets.waf-index')->name('admin.assets.wafs.index');
+    Route::livewire('/admin/assets/wafs/detail/{wafId}', 'pages::admin.assets.waf-show')->name('admin.assets.wafs.show');
     Route::livewire('/admin/assets/nas', 'pages::admin.assets.nas-index')->name('admin.assets.nas.index');
     Route::livewire('/admin/assets/nas/detail/{nasId}', 'pages::admin.assets.nas-show')->name('admin.assets.nas.show');
 

@@ -75,6 +75,7 @@ class StoreDocument
             Proxmox::class,
             Vms::class,
             Panel::class,
+            Waf::class,
             Nas::class,
         ];
     }

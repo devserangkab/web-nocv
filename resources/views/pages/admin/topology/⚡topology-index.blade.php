@@ -7,6 +7,7 @@ use App\Models\Proxmox;
 use App\Models\Rack;
 use App\Models\Server;
 use App\Models\Vms;
+use App\Models\Waf;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -27,6 +28,7 @@ new class extends Component
         'proxmox' => true,
         'vms' => true,
         'panel' => true,
+        'waf' => true,
         'application' => true,
     ];
 
@@ -60,13 +62,17 @@ new class extends Component
         $locations = Location::query()
             ->with([
                 'racks.servers.proxmox.vms.panels',
+                'racks.servers.proxmox.vms.wafs',
                 'racks.servers.proxmox.vms.hostings.application',
                 'racks.servers.panels',
+                'racks.servers.wafs',
                 'racks.servers.hostings.application',
                 'racks.nas',
                 'servers.proxmox.vms.panels',
+                'servers.proxmox.vms.wafs',
                 'servers.proxmox.vms.hostings.application',
                 'servers.panels',
+                'servers.wafs',
                 'servers.hostings.application',
                 'nas',
             ])
@@ -189,6 +195,10 @@ new class extends Component
             $children[] = $this->panelNode($panel);
         }
 
+        foreach ($server->wafs as $waf) {
+            $children[] = $this->wafNode($waf);
+        }
+
         foreach ($server->hostings as $hosting) {
             if ($hosting->application !== null) {
                 $children[] = $this->applicationNode($hosting->application);
@@ -227,6 +237,10 @@ new class extends Component
             $children[] = $this->panelNode($panel);
         }
 
+        foreach ($vm->wafs as $waf) {
+            $children[] = $this->wafNode($waf);
+        }
+
         foreach ($vm->hostings as $hosting) {
             if ($hosting->application !== null) {
                 $children[] = $this->applicationNode($hosting->application);
@@ -255,6 +269,21 @@ new class extends Component
             'icon' => 'ti-app-window',
             'color' => 'neutral',
             'url' => route('admin.assets.panels.show', $panel->panel_id),
+            'children' => [],
+        ];
+    }
+
+    private function wafNode(Waf $waf): array
+    {
+        $host = $waf->vm !== null ? $waf->vm : $waf->server;
+
+        return [
+            'type' => 'waf',
+            'label' => $waf->name,
+            'code' => $waf->waf_id.($host !== null ? ' · di '.$host->name : ''),
+            'icon' => 'ti-shield-lock',
+            'color' => 'waf',
+            'url' => route('admin.assets.wafs.show', $waf->waf_id),
             'children' => [],
         ];
     }
@@ -348,7 +377,7 @@ new class extends Component
     <div class="flex flex-wrap items-center justify-between gap-4">
         <div>
             <h1 class="text-xl font-semibold text-content-primary">Topology Explorer</h1>
-            <p class="mt-1 text-sm text-content-secondary">Jelajahi rantai infrastruktur: Server Room → Rack → Server → Proxmox → VM → Panel → Application.</p>
+            <p class="mt-1 text-sm text-content-secondary">Jelajahi rantai infrastruktur: Server Room → Rack → Server → Proxmox → VM → Panel → WAF → Application.</p>
         </div>
 
         {{-- Mode --}}
@@ -391,6 +420,7 @@ new class extends Component
                 'proxmox' => ['proxmox', 'Proxmox', 'ti-stack-2'],
                 'vms' => ['vms', 'Virtual Machine', 'ti-box-multiple-3'],
                 'panel' => ['panel', 'Panel', 'ti-app-window'],
+                'waf' => ['waf', 'WAF', 'ti-shield-lock'],
                 'application' => ['apps', 'Aplikasi', 'ti-apps'],
             ] as $typeKey => [$unused, $typeLabel, $typeIcon])
                 <button

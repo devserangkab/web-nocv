@@ -24,7 +24,7 @@ new class extends Component
     public function mount(string $vmId): void
     {
         $this->vm = Vms::query()
-            ->with(['proxmox.server', 'panels'])
+            ->with(['proxmox.server', 'panels', 'wafs'])
             ->where('vm_id', $vmId)
             ->firstOrFail();
 
@@ -267,6 +267,32 @@ new class extends Component
                     </ul>
                 @else
                     <p class="py-6 text-center text-sm text-content-tertiary">Tidak ada panel di VM ini.</p>
+                @endif
+            </div>
+
+            {{-- WAF --}}
+            <div class="ina-card ina-card--stack p-6">
+                <h2 class="text-base font-semibold text-content-primary">WAF</h2>
+                <p class="mt-0.5 text-sm text-content-secondary">Web Application Firewall yang terpasang di VM ini.</p>
+
+                @if ($vm->wafs->isNotEmpty())
+                    <ul class="divide-y divide-stroke-primary">
+                        @foreach ($vm->wafs as $waf)
+                            <li class="flex items-center gap-3 py-3" wire:key="waf-{{ $waf->id }}">
+                                <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-background-tertiary text-content-secondary">
+                                    <i class="ti ti-shield-lock text-base"></i>
+                                </span>
+                                <div class="min-w-0 flex-1">
+                                    <a href="{{ route('admin.assets.wafs.show', $waf->waf_id) }}" wire:navigate class="block truncate text-sm font-medium text-content-primary hover:text-guide-600">
+                                        {{ $waf->name }}
+                                    </a>
+                                    <p class="truncate text-xs text-content-tertiary">{{ $waf->tech->value }}{{ $waf->version !== null ? ' · '.$waf->version : '' }}</p>
+                                </div>
+                            </li>
+                        @endforeach
+                    </ul>
+                @else
+                    <p class="py-6 text-center text-sm text-content-tertiary">Tidak ada WAF di VM ini.</p>
                 @endif
             </div>
 

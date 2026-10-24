@@ -22,6 +22,7 @@ $colorClasses = [
     'proxmox' => 'bg-warning-50 text-warning-600',
     'vms' => 'bg-background-tertiary text-content-secondary',
     'panel' => 'bg-guide-50 text-guide-600',
+    'waf' => 'bg-negative-50 text-negative-600',
     'application' => 'bg-guide-100 text-guide-600',
     'root' => 'bg-guide-500 text-white',
 ];

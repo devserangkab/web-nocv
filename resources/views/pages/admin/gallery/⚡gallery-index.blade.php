@@ -7,6 +7,7 @@ use App\Models\Application;
 use App\Models\Location;
 use App\Models\Media;
 use App\Models\Panel;
+use App\Models\Waf;
 use App\Models\Proxmox;
 use App\Models\Rack;
 use App\Models\Server;
@@ -93,6 +94,7 @@ new class extends Component
             Proxmox::class,
             Vms::class,
             Panel::class,
+            Waf::class,
         ];
     }
 
@@ -144,6 +146,10 @@ new class extends Component
             [
                 'label' => 'Panel',
                 'options' => $options(Panel::class, 'name', Panel::query()->orderBy('panel_id')->get()),
+            ],
+            [
+                'label' => 'WAF',
+                'options' => $options(Waf::class, 'name', Waf::query()->orderBy('waf_id')->get()),
             ],
         ];
     }
@@ -328,6 +334,10 @@ new class extends Component
                 'value' => Panel::class,
                 'label' => 'Panel',
             ],
+            [
+                'value' => Waf::class,
+                'label' => 'WAF',
+            ],
         ];
     }
 };
@@ -418,6 +428,7 @@ new class extends Component
                                     Proxmox::class => route('admin.assets.proxmox.show', $media->mediable->proxmox_id),
                                     Vms::class => route('admin.assets.vms.show', $media->mediable->vm_id),
                                     Panel::class => route('admin.assets.panels.show', $media->mediable->panel_id),
+                                    Waf::class => route('admin.assets.wafs.show', $media->mediable->waf_id),
                                     default => null,
                                 };
                             @endphp
