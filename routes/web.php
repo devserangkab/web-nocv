@@ -1,6 +1,7 @@
 <?php
 
 use App\Actions\Reports\StoreReportAsset;
+use App\Http\Controllers\ApplicationIconController;
 use App\Http\Controllers\DocumentDownloadController;
 use App\Http\Controllers\MediaShowController;
 use App\Http\Controllers\ReportAssetController;
@@ -36,6 +37,7 @@ Route::middleware(['auth', 'force.password'])->group(function () {
     // Aplikasi
     Route::livewire('/admin/applications', 'pages::admin.application.application-index')->name('admin.applications.index');
     Route::livewire('/admin/applications/detail/{applicationId}', 'pages::admin.application.application-show')->name('admin.applications.show');
+    Route::get('/admin/applications/{applicationId}/icon', ApplicationIconController::class)->name('admin.applications.icon');
 
     // Aktivitas
     Route::livewire('/admin/activities', 'pages::admin.activity.activity-index')->name('admin.activities.index');

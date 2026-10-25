@@ -16,7 +16,7 @@ class DeleteApplication
 
         return DB::transaction(function () use ($application): bool {
             if (filled($application->icon)) {
-                Storage::disk('public')->delete($application->icon);
+                Storage::disk('private')->delete($application->icon);
             }
 
             // pivot developers ikut terhapus via FK cascade

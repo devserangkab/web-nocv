@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\HostingKind;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -29,14 +30,10 @@ class Hosting extends Model
     }
 
     /**
-     * Jenis host: 'vm', 'server', atau 'external'.
+     * Jenis host internal (Vms/Server/Panel) atau null bila eksternal.
      */
-    public function kind(): string
+    public function kind(): ?HostingKind
     {
-        return match (true) {
-            $this->hostable_type === Vms::class => 'vm',
-            $this->hostable_type === Server::class => 'server',
-            default => 'external',
-        };
+        return HostingKind::fromHostable($this->hostable_type);
     }
 }

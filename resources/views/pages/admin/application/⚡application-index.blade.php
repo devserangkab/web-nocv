@@ -2,13 +2,21 @@
 
 use App\Actions\Applications\DeleteApplication;
 use App\Actions\Applications\StoreApplication;
+use App\Enums\ApplicationDatabase;
+use App\Enums\ApplicationFramework;
+use App\Enums\ApplicationLanguage;
+use App\Enums\ApplicationOwnership;
 use App\Enums\ApplicationStatus;
 use App\Enums\ApplicationType;
 use App\Enums\DeveloperType;
+use App\Enums\HostingKind;
 use App\Models\Application;
 use App\Models\Developer;
 use App\Models\Institution;
+use App\Models\Panel;
+use App\Models\Server;
 use App\Models\User;
+use App\Models\Vms;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -63,9 +71,26 @@ new class extends Component
 
     public string $framework = '';
 
+    public string $framework_version = '';
+
     public string $language = '';
 
+    public string $language_version = '';
+
     public string $database = '';
+
+    public string $database_version = '';
+
+    public string $ownership = '';
+
+    public string $vendor_name = '';
+
+    /**
+     * Baris repeater deployment di modal: [['kind' => 'vm', 'host' => 'VMS-00001', 'name' => '', 'note' => ''], ...]
+     *
+     * @var array<int, array{kind: string, host: string, name: string, note: string}>
+     */
+    public array $hostingRows = [];
 
     /**
      * Baris repeater developer di modal: [['user_id' => '1', 'type' => 'Programmer'], ...]
@@ -94,6 +119,17 @@ new class extends Component
         $this->developerRows[] = ['user_id' => '', 'type' => ''];
     }
 
+    public function addHostingRow(): void
+    {
+        $this->hostingRows[] = ['kind' => '', 'host' => '', 'name' => '', 'note' => ''];
+    }
+
+    public function removeHostingRow(int $index): void
+    {
+        unset($this->hostingRows[$index]);
+        $this->hostingRows = array_values($this->hostingRows);
+    }
+
     public function removeDeveloperRow(int $index): void
     {
         unset($this->developerRows[$index]);
@@ -114,7 +150,7 @@ new class extends Component
 
     public function edit(int $id): void
     {
-        $application = Application::with('developers')->findOrFail($id);
+        $application = Application::with(['developers', 'hostings.hostable'])->findOrFail($id);
 
         $this->editingId = $application->id;
         $this->name = (string) $application->name;
@@ -127,13 +163,31 @@ new class extends Component
         $this->repo_url = (string) $application->repo_url;
         $this->icon = null;
         $this->icon_path = (string) $application->icon;
-        $this->framework = (string) $application->framework;
-        $this->language = (string) $application->language;
-        $this->database = (string) $application->database;
+        $this->framework = (string) ($application->framework?->value ?? '');
+        $this->framework_version = (string) $application->framework_version;
+        $this->language = (string) ($application->language?->value ?? '');
+        $this->language_version = (string) $application->language_version;
+        $this->database = (string) ($application->database?->value ?? '');
+        $this->database_version = (string) $application->database_version;
+        $this->ownership = (string) ($application->ownership?->value ?? '');
+        $this->vendor_name = (string) $application->vendor_name;
         $this->developerRows = $application->developers
             ->map(fn (Developer $row) => [
                 'user_id' => (string) ($row->user->id ?? ''),
                 'type' => $row->type->value,
+            ])
+            ->all();
+        $this->hostingRows = $application->hostings
+            ->map(fn (\App\Models\Hosting $hosting) => [
+                'kind' => $hosting->kind()?->value ?? 'external',
+                'host' => match (true) {
+                    $hosting->kind() === HostingKind::Vm => (string) ($hosting->hostable?->vm_id ?? ''),
+                    $hosting->kind() === HostingKind::Server => (string) ($hosting->hostable?->server_id ?? ''),
+                    $hosting->kind() === HostingKind::Panel => (string) ($hosting->hostable?->panel_id ?? ''),
+                    default => '',
+                },
+                'name' => $hosting->kind() === null ? (string) $hosting->name : '',
+                'note' => (string) $hosting->note,
             ])
             ->all();
 
@@ -153,11 +207,17 @@ new class extends Component
             'domain' => $this->domain === '' ? null : $this->domain,
             'repo_url' => $this->repo_url === '' ? null : $this->repo_url,
             'framework' => $this->framework === '' ? null : $this->framework,
+            'framework_version' => $this->framework_version === '' ? null : $this->framework_version,
             'language' => $this->language === '' ? null : $this->language,
+            'language_version' => $this->language_version === '' ? null : $this->language_version,
             'database' => $this->database === '' ? null : $this->database,
+            'database_version' => $this->database_version === '' ? null : $this->database_version,
+            'ownership' => $this->ownership === '' ? null : $this->ownership,
+            'vendor_name' => $this->vendor_name === '' ? null : $this->vendor_name,
             'icon' => $this->icon,
             'existing_icon_path' => $this->icon_path,
             'developers' => $this->developerRows,
+            'hostings' => $this->hostingRows,
         ];
 
         if ($this->editingId !== null) {
@@ -210,9 +270,15 @@ new class extends Component
         $this->icon = null;
         $this->icon_path = '';
         $this->framework = '';
+        $this->framework_version = '';
         $this->language = '';
+        $this->language_version = '';
         $this->database = '';
+        $this->database_version = '';
+        $this->ownership = '';
+        $this->vendor_name = '';
         $this->developerRows = [];
+        $this->hostingRows = [];
     }
 
     /**
@@ -333,6 +399,110 @@ new class extends Component
             ->all();
     }
 
+    /**
+     * Opsi asal & kelola application untuk form.
+     *
+     * @return array<int, array{value: string, label: string}>
+     */
+    public function ownershipOptions(): array
+    {
+        return collect(ApplicationOwnership::cases())
+            ->map(fn (ApplicationOwnership $ownership) => [
+                'value' => $ownership->value,
+                'label' => $ownership->value,
+            ])
+            ->all();
+    }
+
+    /**
+     * Opsi framework untuk form.
+     *
+     * @return array<int, array{value: string, label: string}>
+     */
+    public function frameworkOptions(): array
+    {
+        return collect(ApplicationFramework::cases())
+            ->map(fn (ApplicationFramework $framework) => [
+                'value' => $framework->value,
+                'label' => $framework->value,
+            ])
+            ->all();
+    }
+
+    /**
+     * Opsi language untuk form.
+     *
+     * @return array<int, array{value: string, label: string}>
+     */
+    public function languageOptions(): array
+    {
+        return collect(ApplicationLanguage::cases())
+            ->map(fn (ApplicationLanguage $language) => [
+                'value' => $language->value,
+                'label' => $language->value,
+            ])
+            ->all();
+    }
+
+    /**
+     * Opsi database untuk form.
+     *
+     * @return array<int, array{value: string, label: string}>
+     */
+    public function databaseOptions(): array
+    {
+        return collect(ApplicationDatabase::cases())
+            ->map(fn (ApplicationDatabase $database) => [
+                'value' => $database->value,
+                'label' => $database->value,
+            ])
+            ->all();
+    }
+
+    /**
+     * Opsi jenis host deployment untuk repeater.
+     *
+     * @return array<int, array{value: string, label: string}>
+     */
+    public function hostingKindOptions(): array
+    {
+        return collect(HostingKind::cases())
+            ->map(fn (HostingKind $kind) => [
+                'value' => $kind->value,
+                'label' => $kind->label(),
+            ])
+            ->all();
+    }
+
+    /**
+     * Opsi instance host sesuai jenis baris deployment yang dipilih.
+     *
+     * @return array<int, array{value: string, label: string}>
+     */
+    public function hostOptionsFor(string $kind): array
+    {
+        $kind = HostingKind::tryFrom($kind);
+
+        if ($kind === null || $kind === HostingKind::External) {
+            return [];
+        }
+
+        $hostClass = $kind->hostClass();
+
+        /** @var \Illuminate\Database\Eloquent\Builder $query */
+        $query = $hostClass::query()->orderBy($kind->codeColumn());
+
+        return $query
+            ->get()
+            ->map(fn ($host) => [
+                'value' => (string) ($host->{$kind->codeColumn()} ?? ''),
+                'label' => $host instanceof Server
+                    ? "{$host->server_name} ({$host->server_id})"
+                    : "{$host->name} ({$host->{$kind->codeColumn()}})",
+            ])
+            ->all();
+    }
+
     public function applications(): LengthAwarePaginator
     {
         return Application::query()
@@ -441,11 +611,14 @@ new class extends Component
                                 <td class="h-14 px-4 font-medium text-content-primary">
                                     <span class="flex items-center gap-2">
                                         @if ($application->icon !== null)
-                                            <img src="{{ asset('storage/'.$application->icon) }}" alt="Icon {{ $application->name }}" class="h-6 w-6 shrink-0 rounded bg-background-secondary object-contain">
+                                            <img src="{{ route('admin.applications.icon', $application->application_id) }}" alt="Icon {{ $application->name }}" class="h-6 w-6 shrink-0 rounded bg-background-secondary object-contain">
                                         @endif
                                         <span class="truncate">
                                             {{ $application->name }}
                                             <span class="block text-[11px] font-normal text-content-tertiary">{{ $application->abbreviation ?? '-' }}</span>
+                                            @if ($application->ownership !== null)
+                                                <span class="ina-badge ina-badge--soft {{ $application->ownership === ApplicationOwnership::InHouse ? 'ina-badge--success' : ($application->ownership === ApplicationOwnership::OpenSource ? 'ina-badge--info' : 'ina-badge--warning') }} ina-badge--sm mt-0.5">{{ $application->ownership->value }}</span>
+                                            @endif
                                         </span>
                                     </span>
                                 </td>
@@ -469,7 +642,7 @@ new class extends Component
                                     @if ($application->hostings->isNotEmpty())
                                         @foreach ($application->hostings as $hosting)
                                             <span class="block truncate text-[12px]" title="{{ $hosting->hostable !== null ? ($hosting->hostable->name ?? $hosting->hostable->server_name ?? '?') : $hosting->name }}">
-                                                <i class="ti {{ match ($hosting->kind()) { 'vm' => 'ti-box-multiple-3', 'server' => 'ti-server', default => 'ti-cloud' } }} text-sm" aria-hidden="true"></i>
+                                                <i class="ti {{ $hosting->kind()?->icon() ?? 'ti-cloud' }} text-sm" aria-hidden="true"></i>
                                                 {{ $hosting->hostable !== null ? ($hosting->hostable->name ?? $hosting->hostable->server_name ?? '-') : $hosting->name }}
                                             </span>
                                         @endforeach
@@ -536,7 +709,7 @@ new class extends Component
 
     {{-- Modal Add/Edit (IDDS Task Modal) --}}
     <div
-        x-data="{ open: $wire.entangle('showModal') }"
+        x-data="{ open: $wire.entangle('showModal'), ownership: $wire.entangle('ownership') }"
         x-on:keydown.escape.window="if (open) open = false"
         x-cloak
     >
@@ -726,20 +899,57 @@ new class extends Component
                     </div>
                 </div>
 
+                {{-- Asal & kelola --}}
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div class="ina-text-field">
+                        <label for="application-ownership" class="ina-text-field__label">
+                            Asal &amp; Kelola
+                        </label>
+                        <x-idds.select
+                            wire-prop="ownership"
+                            :value="$ownership"
+                            :options="$this->ownershipOptions()"
+                            placeholder="Pilih asal & kelola..."
+                            aria-label="Pilih asal dan kelola application"
+                            :error="$errors->has('ownership')"
+                        />
+                        @error('ownership')
+                            <p class="mt-1.5 text-sm text-negative-500">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="ina-text-field" x-show="['Serah Terima Vendor', 'Dikelola Vendor'].includes(ownership)" x-cloak>
+                        <label for="application-vendor" class="ina-text-field__label">
+                            Nama Vendor
+                        </label>
+                        <div class="ina-text-field__wrapper ina-text-field__wrapper--size-md {{ $errors->has('vendor_name') ? 'ina-text-field__wrapper--status-error' : '' }}">
+                            <input
+                                type="text"
+                                id="application-vendor"
+                                wire:model="vendor_name"
+                                class="ina-text-field__input"
+                                placeholder="PT Teknologi Nusantara"
+                            >
+                        </div>
+                        @error('vendor_name')
+                            <p class="mt-1.5 text-sm text-negative-500">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                     <div class="ina-text-field">
                         <label for="application-framework" class="ina-text-field__label">
                             Framework
                         </label>
-                        <div class="ina-text-field__wrapper ina-text-field__wrapper--size-md {{ $errors->has('framework') ? 'ina-text-field__wrapper--status-error' : '' }}">
-                            <input
-                                type="text"
-                                id="application-framework"
-                                wire:model="framework"
-                                class="ina-text-field__input"
-                                placeholder="Laravel"
-                            >
-                        </div>
+                        <x-idds.select
+                            wire-prop="framework"
+                            :value="$framework"
+                            :options="$this->frameworkOptions()"
+                            placeholder="Pilih framework..."
+                            aria-label="Pilih framework"
+                            :error="$errors->has('framework')"
+                        />
                         @error('framework')
                             <p class="mt-1.5 text-sm text-negative-500">{{ $message }}</p>
                         @enderror
@@ -749,15 +959,14 @@ new class extends Component
                         <label for="application-language" class="ina-text-field__label">
                             Language
                         </label>
-                        <div class="ina-text-field__wrapper ina-text-field__wrapper--size-md {{ $errors->has('language') ? 'ina-text-field__wrapper--status-error' : '' }}">
-                            <input
-                                type="text"
-                                id="application-language"
-                                wire:model="language"
-                                class="ina-text-field__input"
-                                placeholder="PHP"
-                            >
-                        </div>
+                        <x-idds.select
+                            wire-prop="language"
+                            :value="$language"
+                            :options="$this->languageOptions()"
+                            placeholder="Pilih language..."
+                            aria-label="Pilih language"
+                            :error="$errors->has('language')"
+                        />
                         @error('language')
                             <p class="mt-1.5 text-sm text-negative-500">{{ $message }}</p>
                         @enderror
@@ -767,16 +976,71 @@ new class extends Component
                         <label for="application-database" class="ina-text-field__label">
                             Database
                         </label>
-                        <div class="ina-text-field__wrapper ina-text-field__wrapper--size-md {{ $errors->has('database') ? 'ina-text-field__wrapper--status-error' : '' }}">
+                        <x-idds.select
+                            wire-prop="database"
+                            :value="$database"
+                            :options="$this->databaseOptions()"
+                            placeholder="Pilih database..."
+                            aria-label="Pilih database"
+                            :error="$errors->has('database')"
+                        />
+                        @error('database')
+                            <p class="mt-1.5 text-sm text-negative-500">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    <div class="ina-text-field">
+                        <label for="application-framework-version" class="ina-text-field__label">
+                            Versi Framework
+                        </label>
+                        <div class="ina-text-field__wrapper ina-text-field__wrapper--size-md {{ $errors->has('framework_version') ? 'ina-text-field__wrapper--status-error' : '' }}">
                             <input
                                 type="text"
-                                id="application-database"
-                                wire:model="database"
+                                id="application-framework-version"
+                                wire:model="framework_version"
                                 class="ina-text-field__input"
-                                placeholder="MySQL"
+                                placeholder="11.0.2"
                             >
                         </div>
-                        @error('database')
+                        @error('framework_version')
+                            <p class="mt-1.5 text-sm text-negative-500">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="ina-text-field">
+                        <label for="application-language-version" class="ina-text-field__label">
+                            Versi Language
+                        </label>
+                        <div class="ina-text-field__wrapper ina-text-field__wrapper--size-md {{ $errors->has('language_version') ? 'ina-text-field__wrapper--status-error' : '' }}">
+                            <input
+                                type="text"
+                                id="application-language-version"
+                                wire:model="language_version"
+                                class="ina-text-field__input"
+                                placeholder="8.2"
+                            >
+                        </div>
+                        @error('language_version')
+                            <p class="mt-1.5 text-sm text-negative-500">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="ina-text-field">
+                        <label for="application-database-version" class="ina-text-field__label">
+                            Versi Database
+                        </label>
+                        <div class="ina-text-field__wrapper ina-text-field__wrapper--size-md {{ $errors->has('database_version') ? 'ina-text-field__wrapper--status-error' : '' }}">
+                            <input
+                                type="text"
+                                id="application-database-version"
+                                wire:model="database_version"
+                                class="ina-text-field__input"
+                                placeholder="8.0"
+                            >
+                        </div>
+                        @error('database_version')
                             <p class="mt-1.5 text-sm text-negative-500">{{ $message }}</p>
                         @enderror
                     </div>
@@ -799,8 +1063,79 @@ new class extends Component
                     @enderror
                 </div>
 
-                {{-- Repeater: Developers --}}
+                {{-- Repeater: Deployment (host) --}}
                 <div>
+                    <p class="text-sm font-medium text-content-primary">Deployment</p>
+                    <p class="mt-0.5 text-xs text-content-tertiary">Tempat application berjalan: server fisik, VM, panel di VM/server, atau hosting eksternal.</p>
+                    <div class="mt-2 space-y-3">
+                        @foreach ($hostingRows as $index => $row)
+                            <div class="flex flex-col gap-2 rounded-lg border border-stroke-primary p-3" wire:key="hosting-row-{{ $index }}">
+                                <div class="flex items-start gap-2">
+                                    <div class="w-48 shrink-0">
+                                        <x-idds.select
+                                            wire-prop="hostingRows.{{ $index }}.kind"
+                                            :value="$row['kind']"
+                                            :options="$this->hostingKindOptions()"
+                                            placeholder="Jenis host..."
+                                            aria-label="Pilih jenis host deployment"
+                                        />
+                                    </div>
+                                    <div class="min-w-0 flex-1" x-show="[{{ implode(', ', array_map(fn (HostingKind $k) => "'".$k->value."'", [HostingKind::Server, HostingKind::Vm, HostingKind::Panel])) }}].includes($wire.hostingRows[{{ $index }}].kind)" x-cloak>
+                                        <x-idds.select
+                                            wire-prop="hostingRows.{{ $index }}.host"
+                                            :value="$row['host']"
+                                            :options="$this->hostOptionsFor($row['kind'])"
+                                            placeholder="Pilih instance..."
+                                            aria-label="Pilih instance host"
+                                        />
+                                    </div>
+                                    <div class="min-w-0 flex-1" x-show="$wire.hostingRows[{{ $index }}].kind === '{{ HostingKind::External->value }}'" x-cloak>
+                                        <div class="ina-text-field__wrapper ina-text-field__wrapper--size-md">
+                                            <input
+                                                type="text"
+                                                wire:model="hostingRows.{{ $index }}.name"
+                                                class="ina-text-field__input"
+                                                placeholder="Nama layanan eksternal (mis. AWS S3)"
+                                            >
+                                        </div>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        wire:click="removeHostingRow({{ $index }})"
+                                        class="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-content-tertiary transition-colors duration-150 hover:bg-negative-50 hover:text-negative-600"
+                                        aria-label="Hapus baris deployment"
+                                        title="Hapus"
+                                    >
+                                        <i class="ti ti-trash text-base"></i>
+                                    </button>
+                                </div>
+                                <div class="ina-text-field__wrapper ina-text-field__wrapper--size-md">
+                                    <input
+                                        type="text"
+                                        wire:model="hostingRows.{{ $index }}.note"
+                                        class="ina-text-field__input"
+                                        placeholder="Keterangan deployment (opsional)..."
+                                    >
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <button
+                        type="button"
+                        wire:click="addHostingRow"
+                        class="ina-button ina-button--secondary ina-button--sm mt-3"
+                    >
+                        <i class="ti ti-plus text-base" aria-hidden="true"></i>
+                        Tambah Deployment
+                    </button>
+                    @error('hostings')
+                        <p class="mt-1.5 text-sm text-negative-500">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                {{-- Repeater: Developers (sembunyi untuk Dikelola Vendor & Open Source) --}}
+                <div x-show="!['Dikelola Vendor', 'Open Source'].includes(ownership)" x-cloak>
                     <p class="text-sm font-medium text-content-primary">Developers</p>
                     <div class="mt-2 space-y-3">
                         @foreach ($developerRows as $index => $row)

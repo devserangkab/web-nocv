@@ -2,6 +2,10 @@
 
 namespace App\Models;
 
+use App\Enums\ApplicationDatabase;
+use App\Enums\ApplicationFramework;
+use App\Enums\ApplicationLanguage;
+use App\Enums\ApplicationOwnership;
 use App\Enums\ApplicationStatus;
 use App\Enums\ApplicationType;
 use App\Models\Concerns\GeneratesCode;
@@ -33,9 +37,14 @@ class Application extends Model
         'repo_url',
         'icon',
         'framework',
+        'framework_version',
         'language',
+        'language_version',
         'database',
+        'database_version',
         'type',
+        'ownership',
+        'vendor_name',
     ];
 
     protected function casts(): array
@@ -43,6 +52,10 @@ class Application extends Model
         return [
             'status' => ApplicationStatus::class,
             'type' => ApplicationType::class,
+            'framework' => ApplicationFramework::class,
+            'language' => ApplicationLanguage::class,
+            'database' => ApplicationDatabase::class,
+            'ownership' => ApplicationOwnership::class,
         ];
     }
 

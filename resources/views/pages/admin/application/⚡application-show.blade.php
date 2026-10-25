@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\ApplicationStatus;
+use App\Enums\HostingKind;
 use App\Models\Activity;
 use App\Models\Application;
 use App\Models\Document;
@@ -74,6 +75,11 @@ new class extends Component
         </div>
 
         <div class="flex items-center gap-2">
+            @if ($application->ownership !== null)
+                <span class="ina-badge ina-badge--soft {{ $application->ownership === \App\Enums\ApplicationOwnership::InHouse ? 'ina-badge--success' : ($application->ownership === \App\Enums\ApplicationOwnership::OpenSource ? 'ina-badge--info' : 'ina-badge--warning') }} ina-badge--md" title="{{ $application->vendor_name !== null ? 'Vendor: '.$application->vendor_name : '' }}">
+                    {{ $application->ownership->value }}
+                </span>
+            @endif
             <span class="ina-badge ina-badge--soft {{ $application->status === ApplicationStatus::Production ? 'ina-badge--success' : ($application->status === ApplicationStatus::Development ? 'ina-badge--info' : ($application->status === ApplicationStatus::Maintenance ? 'ina-badge--warning' : 'ina-badge--neutral')) }} ina-badge--md">
                 {{ $application->status->value }}
             </span>
@@ -125,15 +131,21 @@ new class extends Component
                 <dl class="space-y-2 text-sm">
                     <div class="flex justify-between gap-3">
                         <dt class="text-content-tertiary">Framework</dt>
-                        <dd class="font-medium text-content-primary text-right">{{ $application->framework ?? '-' }}</dd>
+                        <dd class="font-medium text-content-primary text-right">
+                            {{ $application->framework !== null ? trim($application->framework->value.' '.($application->framework_version ?? '')) : '-' }}
+                        </dd>
                     </div>
                     <div class="flex justify-between gap-3">
                         <dt class="text-content-tertiary">Language</dt>
-                        <dd class="font-medium text-content-primary text-right">{{ $application->language ?? '-' }}</dd>
+                        <dd class="font-medium text-content-primary text-right">
+                            {{ $application->language !== null ? trim($application->language->value.' '.($application->language_version ?? '')) : '-' }}
+                        </dd>
                     </div>
                     <div class="flex justify-between gap-3">
                         <dt class="text-content-tertiary">Database</dt>
-                        <dd class="font-medium text-content-primary text-right">{{ $application->database ?? '-' }}</dd>
+                        <dd class="font-medium text-content-primary text-right">
+                            {{ $application->database !== null ? trim($application->database->value.' '.($application->database_version ?? '')) : '-' }}
+                        </dd>
                     </div>
                     <div class="flex justify-between gap-3">
                         <dt class="text-content-tertiary">Domain</dt>
@@ -236,21 +248,32 @@ new class extends Component
                                 @foreach ($application->hostings as $hosting)
                                     @php
                                         $host = $hosting->hostable;
-                                        $hostName = $host !== null ? $host->name : $hosting->name;
-                                        $ip = $hosting->kind() === 'vm' ? $host->local_ip
-                                            : ($hosting->kind() === 'server' ? $host->static_ip : null);
+                                        $kind = $hosting->kind();
+                                        $hostName = $host !== null
+                                            ? ($kind === HostingKind::Server ? $host->server_name : $host->name) ?? $hosting->name
+                                            : $hosting->name;
+                                        $hostUrl = $host !== null && $kind !== null ? match ($kind) {
+                                            HostingKind::Server => route('admin.assets.servers.show', $host->server_id),
+                                            HostingKind::Panel => route('admin.assets.panels.show', $host->panel_id),
+                                            HostingKind::Vm => route('admin.assets.vms.show', $host->vm_id),
+                                            default => null,
+                                        } : null;
+                                        $ip = $kind === HostingKind::Vm ? $host->local_ip
+                                            : ($kind === HostingKind::Server ? $host->static_ip : null);
                                     @endphp
                                     <tr class="border-b border-stroke-primary transition-colors duration-150 h-14 last:border-b-0 hover:bg-neutral-50">
                                         <td class="h-14 px-4">
-                                            <span class="ina-badge ina-badge--soft ina-badge--sm {{ $hosting->kind() === 'vm' ? 'ina-badge--info' : ($hosting->kind() === 'server' ? 'ina-badge--neutral' : 'ina-badge--warning') }}">
-                                                {{ match ($hosting->kind()) {
-                                                    'vm' => 'VM',
-                                                    'server' => 'Server',
-                                                    default => 'Eksternal',
-                                                } }}
+                                            <span class="ina-badge ina-badge--soft ina-badge--sm {{ $kind === HostingKind::Vm ? 'ina-badge--info' : ($kind === HostingKind::Server ? 'ina-badge--neutral' : ($kind === HostingKind::Panel ? 'ina-badge--brand' : 'ina-badge--warning')) }}">
+                                                {{ $kind?->label() ?? 'Eksternal' }}
                                             </span>
                                         </td>
-                                        <td class="h-14 max-w-xs truncate px-4 font-medium text-content-primary" title="{{ $hostName ?? '-' }}">{{ $hostName ?? '-' }}</td>
+                                        <td class="h-14 max-w-xs truncate px-4 font-medium text-content-primary">
+                                            @if ($hostUrl !== null)
+                                                <a href="{{ $hostUrl }}" wire:navigate class="block truncate text-content-primary hover:text-guide-600" title="{{ $hostName ?? '-' }}">{{ $hostName ?? '-' }}</a>
+                                            @else
+                                                <span title="{{ $hostName ?? '-' }}">{{ $hostName ?? '-' }}</span>
+                                            @endif
+                                        </td>
                                         <td class="h-14 px-4 text-content-secondary">{{ $ip ?? '-' }}</td>
                                         <td class="h-14 max-w-[160px] truncate px-4 text-content-secondary" title="{{ $host?->os ?? '' }}">{{ $host?->os ?? '-' }}</td>
                                         <td class="h-14 max-w-xs truncate px-4 text-content-secondary" title="{{ $hosting->note ?? '-' }}">{{ $hosting->note ?? '-' }}</td>
