@@ -3,6 +3,8 @@
 use App\Enums\ApplicationStatus;
 use App\Models\Activity;
 use App\Models\Application;
+use App\Models\Database;
+use App\Models\DatabaseInstance;
 use App\Models\Document;
 use App\Models\Location;
 use App\Models\Panel;
@@ -54,6 +56,8 @@ new class extends Component
                 'vm' => Vms::count(),
                 'panel' => Panel::count(),
                 'waf' => Waf::count(),
+                'database_instance' => DatabaseInstance::count(),
+                'database' => Database::count(),
                 'application' => Application::count(),
                 'nas' => \App\Models\Nas::count(),
                 'document' => Document::count(),
@@ -104,7 +108,9 @@ new class extends Component
             ['label' => 'Virtual Machine', 'desc' => 'VM dikelola', 'value' => $stats['totals']['vm'], 'route' => route('admin.assets.virtualization.index'), 'icon' => 'ti-box-multiple-3'],
             ['label' => 'Panel', 'desc' => 'Panel management', 'value' => $stats['totals']['panel'], 'route' => route('admin.assets.panels.index'), 'icon' => 'ti-app-window'],
             ['label' => 'WAF', 'desc' => 'Web Application Firewall', 'value' => $stats['totals']['waf'], 'route' => route('admin.assets.wafs.index'), 'icon' => 'ti-shield-lock'],
-            ['label' => 'NAS', 'desc' => 'Perangkat penyimpanan', 'value' => $stats['totals']['nas'], 'route' => route('admin.assets.nas.index'), 'icon' => 'ti-database'],
+            ['label' => 'Database Server', 'desc' => 'Instance database', 'value' => $stats['totals']['database_instance'], 'route' => route('admin.assets.databases.index'), 'icon' => 'ti-database'],
+            ['label' => 'Database', 'desc' => 'Basis data', 'value' => $stats['totals']['database'], 'route' => route('admin.assets.databases.index'), 'icon' => 'ti-table'],
+            ['label' => 'NAS', 'desc' => 'Perangkat penyimpanan', 'value' => $stats['totals']['nas'], 'route' => route('admin.assets.nas.index'), 'icon' => 'ti-vault'],
             ['label' => 'Aplikasi', 'desc' => 'Aplikasi dikelola', 'value' => $stats['totals']['application'], 'route' => route('admin.applications.index'), 'icon' => 'ti-apps'],
             ['label' => 'Aplikasi', 'desc' => 'Production', 'value' => $this->productionApps(), 'route' => route('admin.applications.index'), 'icon' => 'ti-rocket'],
             ['label' => 'Dokumen', 'desc' => 'Dokumen terunggah', 'value' => $stats['totals']['document'], 'route' => route('admin.documents.index'), 'icon' => 'ti-folder'],

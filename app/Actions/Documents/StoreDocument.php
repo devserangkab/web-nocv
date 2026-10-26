@@ -76,6 +76,7 @@ class StoreDocument
             Vms::class,
             Panel::class,
             Waf::class,
+            DatabaseInstance::class,
             Nas::class,
         ];
     }

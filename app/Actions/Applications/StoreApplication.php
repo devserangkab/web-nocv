@@ -3,7 +3,6 @@
 namespace App\Actions\Applications;
 
 use App\Actions\Activities\RecordActivity;
-use App\Enums\ApplicationDatabase;
 use App\Enums\ApplicationFramework;
 use App\Enums\ApplicationLanguage;
 use App\Enums\ApplicationOwnership;
@@ -12,6 +11,8 @@ use App\Enums\ApplicationType;
 use App\Enums\DeveloperType;
 use App\Enums\HostingKind;
 use App\Models\Application;
+use App\Models\Database;
+use App\Models\DatabaseUser;
 use App\Models\Panel;
 use App\Models\Server;
 use App\Models\Vms;
@@ -47,9 +48,11 @@ class StoreApplication
         $hostingRows = collect($data['hostings'] ?? [])
             ->filter(fn (array $row) => filled($row['kind']));
 
-        unset($data['developers'], $data['hostings'], $data['existing_icon_path']);
+        $databaseRows = collect($data['databases'] ?? [])
+            ->filter(fn (array $row) => filled($row['db'] ?? null));
+        unset($data['developers'], $data['hostings'], $data['databases'], $data['existing_icon_path']);
 
-        return DB::transaction(function () use ($application, $data, $developerRows, $hostingRows): Application {
+        return DB::transaction(function () use ($application, $data, $developerRows, $hostingRows, $databaseRows): Application {
             // Nilai teknologi sebelum perubahan — untuk aktivitas riwayat versi
             $before = $application->exists
                 ? [
@@ -57,16 +60,16 @@ class StoreApplication
                     'framework_version' => $application->framework_version,
                     'language' => $application->language?->value,
                     'language_version' => $application->language_version,
-                    'database' => $application->database?->value,
-                    'database_version' => $application->database_version,
                 ]
                 : [];
 
             $oldIcon = filled($data['existing_icon_path'] ?? null) ? $data['existing_icon_path'] : null;
 
             // Icon: upload baru menggantikan yang lama (disk privat)
-            if ($data['icon'] instanceof TemporaryUploadedFile) {
-                $data['icon'] = $data['icon']->store('applications', 'private');
+            $uploadedIcon = $data['icon'] ?? null;
+
+            if ($uploadedIcon instanceof TemporaryUploadedFile) {
+                $data['icon'] = $uploadedIcon->store('applications', 'private');
             } else {
                 $data['icon'] = $oldIcon;
             }
@@ -89,6 +92,13 @@ class StoreApplication
             // Sinkronisasi repeater deployment: bersihkan lama, tulis ulang sesuai baris valid
             $application->hostings()->delete();
             $hostingRows->each(fn (array $row) => $application->hostings()->create($this->hostingAttributes($row)));
+
+            // Sinkronisasi repeater database: null user = memakai kredensial root instance
+            $application->databases()->detach();
+            $databaseRows->each(fn (array $row) => $application->databases()->attach($row['db'], [
+                'db_user_id' => filled($row['db_user_id'] ?? null) ? $row['db_user_id'] : null,
+                'note' => filled($row['note'] ?? null) ? $row['note'] : null,
+            ]));
 
             // Riwayat versi: perubahan framework/language/database + versinya tercatat sebagai aktivitas
             if ($before !== []) {
@@ -159,7 +169,6 @@ class StoreApplication
         $pairs = [
             ['framework', 'framework', 'framework_version', 'Framework'],
             ['language', 'language', 'language_version', 'Language'],
-            ['database', 'database', 'database_version', 'Database'],
         ];
 
         foreach ($pairs as [$valueColumn, $valueKey, $versionKey, $label]) {
@@ -223,8 +232,6 @@ class StoreApplication
             'framework_version' => ['nullable', 'max:20'],
             'language' => ['nullable', new Enum(ApplicationLanguage::class)],
             'language_version' => ['nullable', 'max:20'],
-            'database' => ['nullable', new Enum(ApplicationDatabase::class)],
-            'database_version' => ['nullable', 'max:20'],
             'ownership' => ['nullable', new Enum(ApplicationOwnership::class)],
             'vendor_name' => ['nullable', 'max:255', 'required_if:ownership,Serah Terima Vendor,Dikelola Vendor'],
             'developers' => ['array', function (string $attribute, array $rows, $fail) {
@@ -271,6 +278,43 @@ class StoreApplication
                     $fail('Host deployment tidak boleh didaftar dua kali.');
                 }
             }],
+            'databases' => ['array', function (string $attribute, array $rows, $fail) {
+                /** @var Collection<int, array{db: string, db_user_id: string|null, note: string|null}> $filled */
+                $filled = collect($rows)->filter(fn (array $row) => filled($row['db'] ?? null));
+
+                $schemas = $filled
+                    ->map(fn (array $row) => Database::query()->with('instance')->where('db_id', $row['db'])->first());
+
+                if ($schemas->contains(fn ($database) => $database === null)) {
+                    $fail('Database tidak ditemukan.');
+
+                    return;
+                }
+
+                if ($filled->contains(function (array $row) use ($schemas) {
+                    if (blank($row['db_user_id'] ?? null)) {
+                        return false; // null = memakai kredensial root/admin instance
+                    }
+
+                    $user = DatabaseUser::where('dbu_id', $row['db_user_id'])->first();
+
+                    if ($user === null) {
+                        return true; // user tidak ditemukan
+                    }
+
+                    $schema = $schemas->first(fn ($database) => $database->db_id === $row['db']);
+
+                    return $schema->instance->dbi_id !== $user->dbi_id; // user bukan milik instance schema
+                })) {
+                    $fail('User database harus milik instance dari database yang dipilih.');
+
+                    return;
+                }
+
+                if ($filled->pluck('db')->duplicates()->isNotEmpty()) {
+                    $fail('Database tidak boleh didaftar dua kali.');
+                }
+            }],
         ];
     }
 
@@ -292,7 +336,6 @@ class StoreApplication
             'repo_url.max' => 'Repo URL maksimal 255 karakter.',
             'framework_version.max' => 'Versi framework maksimal 20 karakter.',
             'language_version.max' => 'Versi language maksimal 20 karakter.',
-            'database_version.max' => 'Versi database maksimal 20 karakter.',
             'vendor_name.required_if' => 'Nama vendor wajib diisi untuk application buatan vendor.',
             'vendor_name.max' => 'Nama vendor maksimal 255 karakter.',
         ];

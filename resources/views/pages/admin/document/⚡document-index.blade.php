@@ -8,6 +8,7 @@ use App\Models\Location;
 use App\Models\Nas;
 use App\Models\Panel;
 use App\Models\Waf;
+use App\Models\DatabaseInstance;
 use App\Models\Proxmox;
 use App\Models\Rack;
 use App\Models\Server;
@@ -134,6 +135,10 @@ new class extends Component
                 'label' => 'WAF',
                 'options' => $options(Waf::class, 'name', Waf::query()->orderBy('waf_id')->get(), 'WAF'),
             ],
+            [
+                'label' => 'Database',
+                'options' => $options(DatabaseInstance::class, 'name', DatabaseInstance::query()->orderBy('dbi_id')->get(), 'Database'),
+            ],
         ];
     }
 
@@ -243,7 +248,7 @@ new class extends Component
                         // Pencarian nama entitas di semua jenis documentable
                         $morph
                             ->orWhereHasMorph('documentable', Application::class, fn ($app) => $app->where('name', 'like', "%{$this->search}%"))
-                            ->orWhereHasMorph('documentable', [Location::class, Rack::class, Proxmox::class, Vms::class, Panel::class, Waf::class], fn ($asset) => $asset->where('name', 'like', "%{$this->search}%"))
+                            ->orWhereHasMorph('documentable', [Location::class, Rack::class, Proxmox::class, Vms::class, Panel::class, Waf::class, DatabaseInstance::class], fn ($asset) => $asset->where('name', 'like', "%{$this->search}%"))
                             ->orWhereHasMorph('documentable', Server::class, fn ($server) => $server->where('server_name', 'like', "%{$this->search}%"));
                     });
             }))
@@ -303,6 +308,10 @@ new class extends Component
             [
                 'value' => Waf::class,
                 'label' => 'WAF',
+            ],
+            [
+                'value' => DatabaseInstance::class,
+                'label' => 'Database',
             ],
         ];
     }
@@ -415,6 +424,7 @@ new class extends Component
                                                 Vms::class => route('admin.assets.vms.show', $document->documentable->vm_id),
                                                 Panel::class => route('admin.assets.panels.show', $document->documentable->panel_id),
                                                 Waf::class => route('admin.assets.wafs.show', $document->documentable->waf_id),
+                                                DatabaseInstance::class => route('admin.assets.databases.show', $document->documentable->dbi_id),
                                                 default => null,
                                             };
                                         @endphp

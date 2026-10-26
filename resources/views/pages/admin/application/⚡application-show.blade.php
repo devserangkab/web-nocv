@@ -22,7 +22,7 @@ new class extends Component
 
     public function mount(string $applicationId): void
     {
-        $this->application = Application::with(['developers.user', 'hostings.hostable'])
+        $this->application = Application::with(['developers.user', 'hostings.hostable', 'databases.instance'])
             ->where('application_id', $applicationId)
             ->firstOrFail();
     }
@@ -139,12 +139,6 @@ new class extends Component
                         <dt class="text-content-tertiary">Language</dt>
                         <dd class="font-medium text-content-primary text-right">
                             {{ $application->language !== null ? trim($application->language->value.' '.($application->language_version ?? '')) : '-' }}
-                        </dd>
-                    </div>
-                    <div class="flex justify-between gap-3">
-                        <dt class="text-content-tertiary">Database</dt>
-                        <dd class="font-medium text-content-primary text-right">
-                            {{ $application->database !== null ? trim($application->database->value.' '.($application->database_version ?? '')) : '-' }}
                         </dd>
                     </div>
                     <div class="flex justify-between gap-3">
@@ -288,6 +282,61 @@ new class extends Component
                         <div>
                             <p class="text-sm font-medium text-content-primary">Belum ada info hosting</p>
                             <p class="text-xs text-content-tertiary">Lokasi infrastruktur application ini akan tampil di sini.</p>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </div>
+
+        {{-- Card database --}}
+        <div class="ina-card ina-card--stack p-6 md:col-span-2 xl:col-span-2">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+                <div class="flex flex-col">
+                    <h2 class="text-base font-semibold text-content-primary">Database</h2>
+                    <p class="mt-0.5 text-sm text-content-secondary">Basis data yang dipakai application.</p>
+                </div>
+                <span class="ina-badge ina-badge--soft ina-badge--neutral ina-badge--sm">{{ $application->databases->count() }} db</span>
+            </div>
+
+            <div class="border-stroke-primary pt-5">
+                @if ($application->databases->isNotEmpty())
+                    <ul class="divide-y divide-stroke-primary">
+                        @foreach ($application->databases as $database)
+                            @php $instance = $database->instance; @endphp
+                            <li class="flex items-center gap-3 py-3" wire:key="appdb-{{ $database->pivot->id }}">
+                                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-guide-50 text-guide-600">
+                                    <i class="ti ti-database text-base"></i>
+                                </span>
+                                <div class="min-w-0 flex-1">
+                                    <span class="block truncate text-sm font-medium text-content-primary" title="{{ $database->name }}">
+                                        {{ $database->name }}
+                                        <span class="block truncate text-xs text-content-tertiary">
+                                            {{ $instance !== null ? trim($instance->tech->value.' '.($instance->version ?? '')).' · ' : '' }}{{ $database->db_id }}
+                                        </span>
+                                    </span>
+                                </div>
+                                <div class="shrink-0 text-right">
+                                    @if (filled($database->pivot->dbUser?->username))
+                                        <span class="block truncate text-xs font-medium text-content-primary" title="User database">{{ $database->pivot->dbUser->username }}</span>
+                                    @else
+                                        <span class="ina-badge ina-badge--soft ina-badge--warning ina-badge--sm" title="Memakai kredensial root/admin instance">kredensial instance</span>
+                                    @endif
+                                    @if (filled($database->pivot->note))
+                                        <span class="block truncate text-[11px] text-content-tertiary" title="{{ $database->pivot->note }}">{{ $database->pivot->note }}</span>
+                                    @endif
+                                    @if ($instance !== null)
+                                        <a href="{{ route('admin.assets.databases.show', $instance->dbi_id) }}" wire:navigate class="text-[11px] text-guide-600 hover:underline">Detail instance</a>
+                                    @endif
+                                </div>
+                            </li>
+                        @endforeach
+                    </ul>
+                @else
+                    <div class="flex items-center gap-3 rounded-lg border border-stroke-primary bg-background-secondary px-4 py-6">
+                        <i class="ti ti-database text-xl text-content-tertiary" aria-hidden="true"></i>
+                        <div>
+                            <p class="text-sm font-medium text-content-primary">Belum ada database</p>
+                            <p class="text-xs text-content-tertiary">Basis data yang dipakai application ini akan tampil di sini.</p>
                         </div>
                     </div>
                 @endif

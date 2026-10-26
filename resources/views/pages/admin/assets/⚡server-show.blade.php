@@ -24,7 +24,7 @@ new class extends Component
     public function mount(string $serverId): void
     {
         $this->server = Server::query()
-            ->with(['rack.location', 'location', 'proxmox.vms', 'panels', 'wafs'])
+            ->with(['rack.location', 'location', 'proxmox.vms', 'panels', 'wafs', 'databases.schemas'])
             ->where('server_id', $serverId)
             ->firstOrFail();
 
@@ -318,6 +318,32 @@ new class extends Component
                     </ul>
                 @else
                     <p class="py-6 text-center text-sm text-content-tertiary">Tidak ada WAF langsung di server ini.</p>
+                @endif
+            </div>
+
+            {{-- Database Server di server ini --}}
+            <div class="ina-card ina-card--stack p-6">
+                <h2 class="text-base font-semibold text-content-primary">Database Server</h2>
+                <p class="mt-0.5 text-sm text-content-secondary">Instance database yang ter-install langsung di server ini.</p>
+
+                @if ($server->databases->isNotEmpty())
+                    <ul class="divide-y divide-stroke-primary">
+                        @foreach ($server->databases as $instance)
+                            <li class="flex items-center gap-3 py-3" wire:key="dbi-{{ $instance->id }}">
+                                <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-background-tertiary text-content-secondary">
+                                    <i class="ti ti-database text-base"></i>
+                                </span>
+                                <div class="min-w-0 flex-1">
+                                    <a href="{{ route('admin.assets.databases.show', $instance->dbi_id) }}" wire:navigate class="block truncate text-sm font-medium text-content-primary hover:text-guide-600">
+                                        {{ $instance->name }}
+                                    </a>
+                                    <p class="truncate text-xs text-content-tertiary">{{ trim($instance->tech->value.' '.($instance->version ?? '')) }} · {{ $instance->schemas->count() }} db</p>
+                                </div>
+                            </li>
+                        @endforeach
+                    </ul>
+                @else
+                    <p class="py-6 text-center text-sm text-content-tertiary">Tidak ada instance database di server ini.</p>
                 @endif
             </div>
 

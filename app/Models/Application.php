@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\ApplicationDatabase;
 use App\Enums\ApplicationFramework;
 use App\Enums\ApplicationLanguage;
 use App\Enums\ApplicationOwnership;
@@ -12,6 +11,7 @@ use App\Models\Concerns\GeneratesCode;
 use App\Models\Concerns\OwnsMedia;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Application extends Model
@@ -40,8 +40,6 @@ class Application extends Model
         'framework_version',
         'language',
         'language_version',
-        'database',
-        'database_version',
         'type',
         'ownership',
         'vendor_name',
@@ -54,7 +52,6 @@ class Application extends Model
             'type' => ApplicationType::class,
             'framework' => ApplicationFramework::class,
             'language' => ApplicationLanguage::class,
-            'database' => ApplicationDatabase::class,
             'ownership' => ApplicationOwnership::class,
         ];
     }
@@ -72,5 +69,16 @@ class Application extends Model
     public function hostings(): HasMany
     {
         return $this->hasMany(Hosting::class, 'application_id', 'application_id');
+    }
+
+    /**
+     * Database schema yang dipakai application, dengan kredensial
+     * user DB khusus aplikasi di pivot (terenkripsi).
+     */
+    public function databases(): BelongsToMany
+    {
+        return $this->belongsToMany(Database::class, 'application_databases', 'application_id', 'db_id', 'application_id', 'db_id')
+            ->using(ApplicationDatabase::class)
+            ->withPivot('db_user_id', 'note');
     }
 }

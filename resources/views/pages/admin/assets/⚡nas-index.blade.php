@@ -262,7 +262,7 @@ new class extends Component
         </div>
         @can('infrastructure.manage')
         <button type="button" wire:click="openCreate" class="ina-button ina-button--primary ina-button--md">
-            <i class="ti ti-database text-lg" aria-hidden="true"></i>
+            <i class="ti ti-vault text-lg" aria-hidden="true"></i>
             Tambah NAS
         </button>
         @endcan

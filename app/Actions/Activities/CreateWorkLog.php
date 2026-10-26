@@ -5,6 +5,7 @@ namespace App\Actions\Activities;
 use App\Enums\ActivityCategory;
 use App\Enums\ActivityType;
 use App\Models\Application;
+use App\Models\DatabaseInstance;
 use App\Models\Location;
 use App\Models\Nas;
 use App\Models\Panel;
@@ -55,6 +56,7 @@ class CreateWorkLog
             Vms::class,
             Panel::class,
             Waf::class,
+            DatabaseInstance::class,
             Nas::class,
         ];
     }

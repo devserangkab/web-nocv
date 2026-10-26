@@ -77,6 +77,11 @@ class Vms extends Model
         return $this->hasMany(Waf::class, 'vm_id', 'vm_id');
     }
 
+    public function databases(): HasMany
+    {
+        return $this->hasMany(DatabaseInstance::class, 'vm_id', 'vm_id');
+    }
+
     /**
      * Aplikasi yang dihosting di VM ini.
      */

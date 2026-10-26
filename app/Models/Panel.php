@@ -8,6 +8,7 @@ use App\Models\Concerns\GeneratesCode;
 use App\Models\Concerns\OwnsMedia;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Panel extends Model
 {
@@ -53,5 +54,10 @@ class Panel extends Model
     public function server(): BelongsTo
     {
         return $this->belongsTo(Server::class, 'server_id', 'server_id');
+    }
+
+    public function databases(): HasMany
+    {
+        return $this->hasMany(DatabaseInstance::class, 'panel_id', 'panel_id');
     }
 }

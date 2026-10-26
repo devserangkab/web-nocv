@@ -95,6 +95,11 @@ class Server extends Model
         return $this->hasMany(Waf::class, 'server_id', 'server_id');
     }
 
+    public function databases(): HasMany
+    {
+        return $this->hasMany(DatabaseInstance::class, 'server_id', 'server_id');
+    }
+
     /**
      * Aplikasi yang dihosting langsung di server ini.
      */

@@ -8,6 +8,7 @@ use App\Models\Location;
 use App\Models\Media;
 use App\Models\Panel;
 use App\Models\Waf;
+use App\Models\DatabaseInstance;
 use App\Models\Proxmox;
 use App\Models\Rack;
 use App\Models\Server;
@@ -275,6 +276,10 @@ new class extends Component
                 'value' => Waf::class,
                 'label' => 'WAF',
             ],
+            [
+                'value' => DatabaseInstance::class,
+                'label' => 'Database',
+            ],
         ];
     }
 
@@ -331,6 +336,10 @@ new class extends Component
                 'label' => 'WAF',
                 'options' => $options(Waf::class, 'name', Waf::query()->orderBy('waf_id')->get()),
             ],
+            [
+                'label' => 'Database',
+                'options' => $options(DatabaseInstance::class, 'name', DatabaseInstance::query()->orderBy('dbi_id')->get()),
+            ],
         ];
     }
 
@@ -354,7 +363,7 @@ new class extends Component
                         // Pencarian nama entitas di semua jenis subject
                         $morph
                             ->orWhereHasMorph('subject', Application::class, fn ($app) => $app->where('name', 'like', "%{$this->search}%"))
-                            ->orWhereHasMorph('subject', [Location::class, Rack::class, Proxmox::class, Vms::class, \App\Models\Nas::class, Panel::class, Waf::class], fn ($asset) => $asset->where('name', 'like', "%{$this->search}%"))
+                            ->orWhereHasMorph('subject', [Location::class, Rack::class, Proxmox::class, Vms::class, \App\Models\Nas::class, Panel::class, Waf::class, DatabaseInstance::class], fn ($asset) => $asset->where('name', 'like', "%{$this->search}%"))
                             ->orWhereHasMorph('subject', Server::class, fn ($server) => $server->where('server_name', 'like', "%{$this->search}%"));
                     });
             }))
@@ -384,6 +393,7 @@ new class extends Component
             \App\Models\Nas::class => route('admin.assets.nas.show', $subject->nas_id),
             Panel::class => route('admin.assets.panels.show', $subject->panel_id),
             Waf::class => route('admin.assets.wafs.show', $subject->waf_id),
+            DatabaseInstance::class => route('admin.assets.databases.show', $subject->dbi_id),
             default => null,
         };
     }

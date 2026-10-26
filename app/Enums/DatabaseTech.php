@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum ApplicationDatabase: string
+enum DatabaseTech: string
 {
     case MySql = 'MySQL';
 

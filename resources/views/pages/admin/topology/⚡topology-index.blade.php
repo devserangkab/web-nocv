@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\Application;
+use App\Models\Database;
+use App\Models\DatabaseInstance;
 use App\Models\Location;
 use App\Models\Panel;
 use App\Models\Proxmox;
@@ -29,6 +31,7 @@ new class extends Component
         'vms' => true,
         'panel' => true,
         'waf' => true,
+        'dbi' => true,
         'application' => true,
     ];
 
@@ -62,16 +65,24 @@ new class extends Component
         $locations = Location::query()
             ->with([
                 'racks.servers.proxmox.vms.panels',
+                'racks.servers.proxmox.vms.panels.databases.schemas',
+                'racks.servers.proxmox.vms.databases.schemas',
                 'racks.servers.proxmox.vms.wafs',
                 'racks.servers.proxmox.vms.hostings.application',
                 'racks.servers.panels',
+                'racks.servers.panels.databases.schemas',
+                'racks.servers.databases.schemas',
                 'racks.servers.wafs',
                 'racks.servers.hostings.application',
                 'racks.nas',
                 'servers.proxmox.vms.panels',
+                'servers.proxmox.vms.panels.databases.schemas',
+                'servers.proxmox.vms.databases.schemas',
                 'servers.proxmox.vms.wafs',
                 'servers.proxmox.vms.hostings.application',
                 'servers.panels',
+                'servers.panels.databases.schemas',
+                'servers.databases.schemas',
                 'servers.wafs',
                 'servers.hostings.application',
                 'nas',
@@ -176,7 +187,7 @@ new class extends Component
             'type' => 'nas',
             'label' => $nas->name,
             'code' => $nas->nas_id,
-            'icon' => 'ti-database',
+            'icon' => 'ti-vault',
             'color' => 'info',
             'url' => route('admin.assets.nas.show', $nas->nas_id),
             'children' => [],
@@ -189,6 +200,10 @@ new class extends Component
 
         if ($server->proxmox !== null) {
             $children[] = $this->proxmoxNode($server->proxmox);
+        }
+
+        foreach ($server->databases as $instance) {
+            $children[] = $this->dbiNode($instance);
         }
 
         foreach ($server->panels as $panel) {
@@ -233,6 +248,10 @@ new class extends Component
     {
         $children = [];
 
+        foreach ($vm->databases as $instance) {
+            $children[] = $this->dbiNode($instance);
+        }
+
         foreach ($vm->panels as $panel) {
             $children[] = $this->panelNode($panel);
         }
@@ -269,6 +288,32 @@ new class extends Component
             'icon' => 'ti-app-window',
             'color' => 'neutral',
             'url' => route('admin.assets.panels.show', $panel->panel_id),
+            'children' => $panel->databases->map(fn (DatabaseInstance $instance) => $this->dbiNode($instance))->all(),
+        ];
+    }
+
+    private function dbiNode(DatabaseInstance $instance): array
+    {
+        return [
+            'type' => 'dbi',
+            'label' => $instance->name,
+            'code' => trim($instance->tech->value.' '.($instance->version ?? '')).' · '.$instance->dbi_id,
+            'icon' => 'ti-database',
+            'color' => 'info',
+            'url' => route('admin.assets.databases.show', $instance->dbi_id),
+            'children' => $instance->schemas->map(fn (Database $database) => $this->schemaNode($database))->all(),
+        ];
+    }
+
+    private function schemaNode(Database $database): array
+    {
+        return [
+            'type' => 'db_schema',
+            'label' => $database->name,
+            'code' => $database->db_id,
+            'icon' => 'ti-table',
+            'color' => 'info',
+            'url' => route('admin.assets.databases.show', $database->instance->dbi_id),
             'children' => [],
         ];
     }
@@ -377,7 +422,7 @@ new class extends Component
     <div class="flex flex-wrap items-center justify-between gap-4">
         <div>
             <h1 class="text-xl font-semibold text-content-primary">Topology Explorer</h1>
-            <p class="mt-1 text-sm text-content-secondary">Jelajahi rantai infrastruktur: Server Room → Rack → Server → Proxmox → VM → Panel → WAF → Application.</p>
+            <p class="mt-1 text-sm text-content-secondary">Jelajahi rantai infrastruktur: Server Room → Rack → Server → Proxmox → VM → Panel → Database → Application.</p>
         </div>
 
         {{-- Mode --}}
@@ -416,11 +461,12 @@ new class extends Component
                 'location' => ['build', 'Server Room', 'ti-building'],
                 'rack' => ['rack', 'Rack', 'ti-server-2'],
                 'server' => ['server', 'Server', 'ti-server'],
-                'nas' => ['nas', 'NAS', 'ti-database'],
+                'nas' => ['nas', 'NAS', 'ti-vault'],
                 'proxmox' => ['proxmox', 'Proxmox', 'ti-stack-2'],
                 'vms' => ['vms', 'Virtual Machine', 'ti-box-multiple-3'],
                 'panel' => ['panel', 'Panel', 'ti-app-window'],
                 'waf' => ['waf', 'WAF', 'ti-shield-lock'],
+                'dbi' => ['dbi', 'Database Server', 'ti-database'],
                 'application' => ['apps', 'Aplikasi', 'ti-apps'],
             ] as $typeKey => [$unused, $typeLabel, $typeIcon])
                 <button

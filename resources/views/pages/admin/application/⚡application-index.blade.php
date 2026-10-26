@@ -2,7 +2,6 @@
 
 use App\Actions\Applications\DeleteApplication;
 use App\Actions\Applications\StoreApplication;
-use App\Enums\ApplicationDatabase;
 use App\Enums\ApplicationFramework;
 use App\Enums\ApplicationLanguage;
 use App\Enums\ApplicationOwnership;
@@ -11,7 +10,10 @@ use App\Enums\ApplicationType;
 use App\Enums\DeveloperType;
 use App\Enums\HostingKind;
 use App\Models\Application;
+use App\Models\Database;
+use App\Models\DatabaseInstance;
 use App\Models\Developer;
+use App\Models\Hosting;
 use App\Models\Institution;
 use App\Models\Panel;
 use App\Models\Server;
@@ -77,10 +79,6 @@ new class extends Component
 
     public string $language_version = '';
 
-    public string $database = '';
-
-    public string $database_version = '';
-
     public string $ownership = '';
 
     public string $vendor_name = '';
@@ -91,6 +89,24 @@ new class extends Component
      * @var array<int, array{kind: string, host: string, name: string, note: string}>
      */
     public array $hostingRows = [];
+
+    /**
+     * Baris repeater database di modal: [['db' => 'DB-00001', 'db_user_id' => '', 'note' => ''], ...]
+     *
+     * @var array<int, array{db: string, db_user_id: string, note: string}>
+     */
+    public array $databaseRows = [];
+
+    public function addDatabaseRow(): void
+    {
+        $this->databaseRows[] = ['db' => '', 'db_user_id' => '', 'note' => ''];
+    }
+
+    public function removeDatabaseRow(int $index): void
+    {
+        unset($this->databaseRows[$index]);
+        $this->databaseRows = array_values($this->databaseRows);
+    }
 
     /**
      * Baris repeater developer di modal: [['user_id' => '1', 'type' => 'Programmer'], ...]
@@ -150,7 +166,7 @@ new class extends Component
 
     public function edit(int $id): void
     {
-        $application = Application::with(['developers', 'hostings.hostable'])->findOrFail($id);
+        $application = Application::with(['developers', 'hostings.hostable', 'databases.instance'])->findOrFail($id);
 
         $this->editingId = $application->id;
         $this->name = (string) $application->name;
@@ -167,8 +183,6 @@ new class extends Component
         $this->framework_version = (string) $application->framework_version;
         $this->language = (string) ($application->language?->value ?? '');
         $this->language_version = (string) $application->language_version;
-        $this->database = (string) ($application->database?->value ?? '');
-        $this->database_version = (string) $application->database_version;
         $this->ownership = (string) ($application->ownership?->value ?? '');
         $this->vendor_name = (string) $application->vendor_name;
         $this->developerRows = $application->developers
@@ -178,7 +192,7 @@ new class extends Component
             ])
             ->all();
         $this->hostingRows = $application->hostings
-            ->map(fn (\App\Models\Hosting $hosting) => [
+            ->map(fn (Hosting $hosting) => [
                 'kind' => $hosting->kind()?->value ?? 'external',
                 'host' => match (true) {
                     $hosting->kind() === HostingKind::Vm => (string) ($hosting->hostable?->vm_id ?? ''),
@@ -188,6 +202,13 @@ new class extends Component
                 },
                 'name' => $hosting->kind() === null ? (string) $hosting->name : '',
                 'note' => (string) $hosting->note,
+            ])
+            ->all();
+        $this->databaseRows = $application->databases
+            ->map(fn (Database $database) => [
+                'db' => (string) $database->db_id,
+                'db_user_id' => (string) ($database->pivot->db_user_id ?? ''),
+                'note' => (string) $database->pivot->note,
             ])
             ->all();
 
@@ -210,14 +231,13 @@ new class extends Component
             'framework_version' => $this->framework_version === '' ? null : $this->framework_version,
             'language' => $this->language === '' ? null : $this->language,
             'language_version' => $this->language_version === '' ? null : $this->language_version,
-            'database' => $this->database === '' ? null : $this->database,
-            'database_version' => $this->database_version === '' ? null : $this->database_version,
             'ownership' => $this->ownership === '' ? null : $this->ownership,
             'vendor_name' => $this->vendor_name === '' ? null : $this->vendor_name,
             'icon' => $this->icon,
             'existing_icon_path' => $this->icon_path,
             'developers' => $this->developerRows,
             'hostings' => $this->hostingRows,
+            'databases' => $this->databaseRows,
         ];
 
         if ($this->editingId !== null) {
@@ -273,12 +293,11 @@ new class extends Component
         $this->framework_version = '';
         $this->language = '';
         $this->language_version = '';
-        $this->database = '';
-        $this->database_version = '';
         $this->ownership = '';
         $this->vendor_name = '';
         $this->developerRows = [];
         $this->hostingRows = [];
+        $this->databaseRows = [];
     }
 
     /**
@@ -367,6 +386,37 @@ new class extends Component
     }
 
     /**
+     * Opsi user database untuk baris repeater sesuai schema yang dipilih:
+     * kredensial root/admin instance + user-user katalog di instance itu.
+     *
+     * @return array<int, array{value: string, label: string}>
+     */
+    public function databaseUserOptions(?string $dbId): array
+    {
+        if (blank($dbId)) {
+            return [];
+        }
+
+        $database = Database::query()->with('instance.users')->where('db_id', $dbId)->first();
+
+        if ($database === null || $database->instance === null) {
+            return [];
+        }
+
+        $rootLabel = 'Kredensial instance (root'.($database->instance->username !== null ? ': '.$database->instance->username : '').')';
+
+        return [
+            ['value' => '', 'label' => $rootLabel],
+            ...$database->instance->users
+                ->map(fn ($user) => [
+                    'value' => $user->dbu_id,
+                    'label' => "{$user->username} ({$user->dbu_id})",
+                ])
+                ->all(),
+        ];
+    }
+
+    /**
      * Opsi developer: user bеrole "developer" saja.
      *
      * @return array<int, array{value: string, label: string}>
@@ -445,16 +495,24 @@ new class extends Component
     }
 
     /**
-     * Opsi database untuk form.
+     * Opsi database schema untuk repeater: tergrup per instance (tech + versi).
      *
-     * @return array<int, array{value: string, label: string}>
+     * @return array<int, array{label: string|null, options: array<int, array{value: string, label: string}>}>
      */
     public function databaseOptions(): array
     {
-        return collect(ApplicationDatabase::cases())
-            ->map(fn (ApplicationDatabase $database) => [
-                'value' => $database->value,
-                'label' => $database->value,
+        return DatabaseInstance::query()
+            ->with('schemas')
+            ->orderBy('dbi_id')
+            ->get()
+            ->map(fn (DatabaseInstance $instance) => [
+                'label' => trim($instance->tech->value.' '.($instance->version ?? '')).' — '.$instance->name,
+                'options' => $instance->schemas
+                    ->map(fn (Database $database) => [
+                        'value' => $database->db_id,
+                        'label' => "{$database->name} ({$database->db_id})",
+                    ])
+                    ->all(),
             ])
             ->all();
     }
@@ -516,7 +574,6 @@ new class extends Component
                     ->orWhere('domain', 'like', "%{$this->search}%")
                     ->orWhere('framework', 'like', "%{$this->search}%")
                     ->orWhere('language', 'like', "%{$this->search}%")
-                    ->orWhere('database', 'like', "%{$this->search}%")
                     ->orWhereHas('requestedBy', fn ($institution) => $institution
                         ->where('abbreviation', 'like', "%{$this->search}%")
                         ->orWhere('name', 'like', "%{$this->search}%"));
@@ -937,7 +994,7 @@ new class extends Component
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div class="ina-text-field">
                         <label for="application-framework" class="ina-text-field__label">
                             Framework
@@ -971,26 +1028,9 @@ new class extends Component
                             <p class="mt-1.5 text-sm text-negative-500">{{ $message }}</p>
                         @enderror
                     </div>
-
-                    <div class="ina-text-field">
-                        <label for="application-database" class="ina-text-field__label">
-                            Database
-                        </label>
-                        <x-idds.select
-                            wire-prop="database"
-                            :value="$database"
-                            :options="$this->databaseOptions()"
-                            placeholder="Pilih database..."
-                            aria-label="Pilih database"
-                            :error="$errors->has('database')"
-                        />
-                        @error('database')
-                            <p class="mt-1.5 text-sm text-negative-500">{{ $message }}</p>
-                        @enderror
-                    </div>
                 </div>
 
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div class="ina-text-field">
                         <label for="application-framework-version" class="ina-text-field__label">
                             Versi Framework
@@ -1026,24 +1066,69 @@ new class extends Component
                             <p class="mt-1.5 text-sm text-negative-500">{{ $message }}</p>
                         @enderror
                     </div>
+                </div>
 
-                    <div class="ina-text-field">
-                        <label for="application-database-version" class="ina-text-field__label">
-                            Versi Database
-                        </label>
-                        <div class="ina-text-field__wrapper ina-text-field__wrapper--size-md {{ $errors->has('database_version') ? 'ina-text-field__wrapper--status-error' : '' }}">
-                            <input
-                                type="text"
-                                id="application-database-version"
-                                wire:model="database_version"
-                                class="ina-text-field__input"
-                                placeholder="8.0"
-                            >
-                        </div>
-                        @error('database_version')
-                            <p class="mt-1.5 text-sm text-negative-500">{{ $message }}</p>
-                        @enderror
+                {{-- Repeater: Database --}}
+                <div>
+                    <p class="text-sm font-medium text-content-primary">Database</p>
+                    <p class="mt-0.5 text-xs text-content-tertiary">Basis data yang dipakai application beserta user database-nya (tanpa memilih user = memakai kredensial root/admin instance).</p>
+                    <div class="mt-2 space-y-3">
+                        @foreach ($databaseRows as $index => $row)
+                            <div class="flex flex-col gap-2 rounded-lg border border-stroke-primary p-3" wire:key="db-row-{{ $index }}">
+                                <div class="flex items-start gap-2">
+                                    <div class="min-w-0 flex-1">
+                                        <x-idds.select
+                                            wire-prop="databaseRows.{{ $index }}.db"
+                                            :value="$row['db']"
+                                            :groups="$this->databaseOptions()"
+                                            placeholder="Pilih database..."
+                                            aria-label="Pilih database schema"
+                                        />
+                                    </div>
+                                    <button
+                                        type="button"
+                                        wire:click="removeDatabaseRow({{ $index }})"
+                                        class="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-content-tertiary transition-colors duration-150 hover:bg-negative-50 hover:text-negative-600"
+                                        aria-label="Hapus baris database"
+                                        title="Hapus"
+                                    >
+                                        <i class="ti ti-trash text-base"></i>
+                                    </button>
+                                </div>
+                                <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                                    <div class="min-w-0">
+                                        <x-idds.select
+                                            wire-prop="databaseRows.{{ $index }}.db_user_id"
+                                            :value="$row['db_user_id']"
+                                            :options="$this->databaseUserOptions($row['db'])"
+                                            placeholder="User database..."
+                                            aria-label="Pilih user database"
+                                        />
+                                    </div>
+                                    <div class="ina-text-field__wrapper ina-text-field__wrapper--size-md">
+                                        <input
+                                            type="text"
+                                            wire:model="databaseRows.{{ $index }}.note"
+                                            class="ina-text-field__input"
+                                            placeholder="Keterangan (mis. read-write, readonly)..."
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
+
+                    <button
+                        type="button"
+                        wire:click="addDatabaseRow"
+                        class="ina-button ina-button--secondary ina-button--sm mt-3"
+                    >
+                        <i class="ti ti-plus text-base" aria-hidden="true"></i>
+                        Tambah Database
+                    </button>
+                    @error('databases')
+                        <p class="mt-1.5 text-sm text-negative-500">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="ina-text-area">
