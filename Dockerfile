@@ -67,9 +67,10 @@ RUN composer install \
         --optimize-autoloader \
     && composer clear-cache
 
-# Guard: worker mode bergantung pada laravel/octane — gagalkan build bila vendor
-# tidak memuat Octane (mis. checkout server masih memakai composer.lock lama).
-RUN php -r 'exit(class_exists("Laravel\\Octane\\Octane") ? 0 : 1);' \
+# Guard: laravel/octane wajib ter-install — worker mode & stub worker bergantung
+# padanya. Pakai cek direktori vendor, bukan class_exists: pada `php -r` tanpa
+# require autoload, class_exists SELALU false (tidak ada autoloader terdaftar).
+RUN test -d vendor/laravel/octane \
     || (echo "ERROR: laravel/octane tidak ter-install — pastikan checkout server memuat composer.lock yang memuat laravel/octane." && exit 1)
 
 # --- Source code -------------------------------------------------------------
