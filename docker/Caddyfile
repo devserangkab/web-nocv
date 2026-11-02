@@ -11,11 +11,8 @@
 	}
 }
 
-# =============================================================================
-# Site utama — HTTPS dengan sertifikat Sectigo (file di-mount dari server).
-# Hanya merespons Host: noc.serangkab.go.id (sesuai APP_DOMAIN).
-# Akses via IP akan ditolak karena SNI/Host tidak match.
-# =============================================================================
+# Site utama — HTTPS (cert Sectigo di-mount dari server), hanya merespons
+# Host: APP_DOMAIN. Akses via IP ditolak karena SNI/Host tidak match.
 https://{$APP_DOMAIN}:8443 {
 	tls {$TLS_CERT} {$TLS_KEY}
 
@@ -53,15 +50,8 @@ https://{$APP_DOMAIN}:8443 {
 		php_server {
 			index frankenphp-worker.php
 			try_files {path} frankenphp-worker.php
-			# Required for the public/storage/ directory...
+			# symlink public/storage
 			resolve_root_symlink
 		}
 	}
-}
-
-# =============================================================================
-# HTTP -> HTTPS redirect (hanya untuk domain, akses via IP tidak dialihkan)
-# =============================================================================
-http://{$APP_DOMAIN}:8080 {
-	redir https://{$APP_DOMAIN}{uri} permanent
 }
