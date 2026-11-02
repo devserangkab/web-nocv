@@ -1,20 +1,14 @@
 # =============================================================================
-# Stack production — Laravel 12 (FrankenPHP worker mode) + MySQL
+# Stack production — Laravel 12 (FrankenPHP worker mode) + MariaDB
 #
-# Jalankan (1 command):
-#   docker compose up -d --build
+# Jalankan (1 command):  docker compose up -d --build
 #
-# Akses (hanya via domain, sesuai APP_DOMAIN):
-#   https://noc.serangkab.go.id    (HTTPS, cert Sectigo — port 443 host)
-#   http://noc.serangkab.go.id     (redirect otomatis ke HTTPS)
-#   Akses via IP server: ditolak (SNI/Host tidak match).
+# Akses:  https://noc.serangkab.go.id:9446   (HTTPS, cert Sectigo)
+#   Catatan: host 80/443 dipakai stack "bahagia". Akses TANPA :9446 akan
+#   mendarat di stack lain — selalu sertakan :9446 (URL tanpa port = tahap
+#   ingress kelak).
 #
-# Persiapan cert (di server, TIDAK ikut git/image):
-#   docker/certs/cert.pem  = sertifikat domain + intermediate chain Sectigo
-#   docker/certs/key.pem   = private key
-#
-# Wajib ada file .env di folder ini (dipakai container & compose):
-#   APP_KEY, DB_PASSWORD (produksi), MYSQL_ROOT_PASSWORD
+# DB (Navicat dari laptop): host=<ip-server>, port=3307, user=noc, db=tempatcod
 # =============================================================================
 
 services:
@@ -26,14 +20,14 @@ services:
     container_name: tempatcod-app
     restart: unless-stopped
     depends_on:
-      mysql:
+      mariadb:
         condition: service_healthy
     environment:
       # Aplikasi
       APP_NAME: NOC
       APP_ENV: production
       APP_DEBUG: "false"
-      APP_URL: https://noc.serangkab.go.id
+      APP_URL: https://noc.serangkab.go.id:9446
       LOG_LEVEL: error
 
       # Domain & TLS (dipakai oleh docker/Caddyfile)
@@ -46,15 +40,14 @@ services:
       OCTANE_MAX_REQUESTS: "500"
       OCTANE_WORKERS: ""   # kosong = auto (mengikuti jumlah CPU)
 
-      # Database (mengarah ke service "mysql" di bawah)
-      DB_HOST: mysql
+      # Database (mengarah ke service "mariadb" di bawah)
+      DB_HOST: mariadb
       DB_PORT: "3306"
       DB_DATABASE: tempatcod
       DB_USERNAME: noc
       DB_PASSWORD: ${DB_PASSWORD:?Tulis DB_PASSWORD produksi di .env server}
 
-      # Belum ada service queue worker — jangan sampai job menumpuk
-      # di connection "database" (default config/queue.php) tanpa worker.
+      # Belum ada service queue worker — hindari job menumpuk tanpa worker
       QUEUE_CONNECTION: sync
 
       # APP_KEY diinterpolasi dari file .env agar stabil antar restart
@@ -62,17 +55,17 @@ services:
 
       TZ: Asia/Jakarta
     ports:
-      - "443:8443"   # HTTPS utama (port standar, tanpa port di URL)
-      - "80:8080"    # HTTP -> redirect otomatis ke HTTPS
+      # Satu pintu — host 80/443 dikuasai stack "bahagia"
+      # dalam container tetap: HTTPS 8443 (TLS Sectigo)
+      - "9446:8443"
     volumes:
       - app-storage:/app/storage
-      # .env produksi (dibaca config:cache di entrypoint; env compose menang atas .env)
+      # .env produksi (dibaca config:cache di entrypoint; env compose menang)
       - ./.env:/app/.env:ro
       # Sertifikat Sectigo di-mount read-only, tidak pernah masuk image
       - ./docker/certs:/certs:ro
     healthcheck:
       # Pola terbukti bahagiafix: cek state server Octane langsung
-      # (lebih kuat dari curl TLS, tidak butuh DNS/cert di dalam container)
       test: ["CMD", "php", "artisan", "octane:status", "--server=frankenphp"]
       interval: 10s
       timeout: 5s
@@ -88,19 +81,24 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  mysql:
-    image: mysql:8.4
-    container_name: tempatcod-mysql
+  mariadb:
+    image: mariadb:11.4
+    container_name: tempatcod-mariadb
     restart: unless-stopped
+    # Expose 3307 untuk Navicat dari laptop (login pakai user 'noc', BUKAN root).
+    # Pola bahagia yang lebih aman: 127.0.0.1:3307:3306 + SSH tunnel.
+    ports:
+      - "3307:3306"
     environment:
-      MYSQL_DATABASE: tempatcod
-      MYSQL_USER: noc
-      MYSQL_PASSWORD: ${DB_PASSWORD:?Tulis DB_PASSWORD produksi di .env server}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Tulis MYSQL_ROOT_PASSWORD di .env server}
+      MARIADB_DATABASE: tempatcod
+      MARIADB_USER: noc
+      MARIADB_PASSWORD: ${DB_PASSWORD:?Tulis DB_PASSWORD produksi di .env server}
+      MARIADB_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Tulis MYSQL_ROOT_PASSWORD di .env server}
     volumes:
-      - mysql-data:/var/lib/mysql
+      - mariadb-data:/var/lib/mysql
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      # Script resmi image mariadb (pola bahagiafix)
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 5s
       timeout: 5s
       retries: 20
@@ -114,5 +112,5 @@ services:
         max-file: "3"
 
 volumes:
-  mysql-data:
+  mariadb-data:
   app-storage:
