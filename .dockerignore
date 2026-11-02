@@ -1,0 +1,44 @@
+# =============================================================================
+# Build context production — jaga image sesungguhnya minimal & bebas rahasia.
+# Pola yang terbukti: bahagiafix/.dockerignore
+# =============================================================================
+
+# --- Version control & tooling lokal ------------------------------------------
+.git
+.github
+.agents
+.opencode
+
+# --- Dependensi (di-install ulang DI DALAM image, per platform target) --------
+node_modules
+vendor
+
+# --- Runtime cache & build artifact (dibangun ulang di dalam image) ------------
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+bootstrap/cache/*
+public/build
+public/hot
+public/storage
+
+# --- Environment & secret (di-mount read-only saat runtime) --------------------
+.env
+.env.*
+
+# --- Sertifikat TLS Sectigo (di-mount read-only, TIDAK pernah ikut image) ------
+docker/certs
+
+# --- Development / lokal saja ---------------------------------------------------
+*.log
+.phpunit.result.cache
+.phpactor.json
+tests
+phpunit.xml
+boost.json
+opencode.json
+LARAVEL_INSTALL.bat
+dummy.png
+*.xlsx
+IDDS.md

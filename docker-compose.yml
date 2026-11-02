@@ -1,0 +1,118 @@
+# =============================================================================
+# Stack production — Laravel 12 (FrankenPHP worker mode) + MySQL
+#
+# Jalankan (1 command):
+#   docker compose up -d --build
+#
+# Akses (hanya via domain, sesuai APP_DOMAIN):
+#   https://noc.serangkab.go.id    (HTTPS, cert Sectigo — port 443 host)
+#   http://noc.serangkab.go.id     (redirect otomatis ke HTTPS)
+#   Akses via IP server: ditolak (SNI/Host tidak match).
+#
+# Persiapan cert (di server, TIDAK ikut git/image):
+#   docker/certs/cert.pem  = sertifikat domain + intermediate chain Sectigo
+#   docker/certs/key.pem   = private key
+#
+# Wajib ada file .env di folder ini (dipakai container & compose):
+#   APP_KEY, DB_PASSWORD (produksi), MYSQL_ROOT_PASSWORD
+# =============================================================================
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: tempatcod-app
+    container_name: tempatcod-app
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      # Aplikasi
+      APP_NAME: NOC
+      APP_ENV: production
+      APP_DEBUG: "false"
+      APP_URL: https://noc.serangkab.go.id
+      LOG_LEVEL: error
+
+      # Domain & TLS (dipakai oleh docker/Caddyfile)
+      APP_DOMAIN: noc.serangkab.go.id
+      TLS_CERT: /certs/cert.pem
+      TLS_KEY: /certs/key.pem
+
+      # Octane (FrankenPHP worker mode)
+      OCTANE_SERVER: frankenphp
+      OCTANE_MAX_REQUESTS: "500"
+      OCTANE_WORKERS: ""   # kosong = auto (mengikuti jumlah CPU)
+
+      # Database (mengarah ke service "mysql" di bawah)
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_DATABASE: tempatcod
+      DB_USERNAME: noc
+      DB_PASSWORD: ${DB_PASSWORD:?Tulis DB_PASSWORD produksi di .env server}
+
+      # Belum ada service queue worker — jangan sampai job menumpuk
+      # di connection "database" (default config/queue.php) tanpa worker.
+      QUEUE_CONNECTION: sync
+
+      # APP_KEY diinterpolasi dari file .env agar stabil antar restart
+      APP_KEY: ${APP_KEY:-}
+
+      TZ: Asia/Jakarta
+    ports:
+      - "443:8443"   # HTTPS utama (port standar, tanpa port di URL)
+      - "80:8080"    # HTTP -> redirect otomatis ke HTTPS
+    volumes:
+      - app-storage:/app/storage
+      # .env produksi (dibaca config:cache di entrypoint; env compose menang atas .env)
+      - ./.env:/app/.env:ro
+      # Sertifikat Sectigo di-mount read-only, tidak pernah masuk image
+      - ./docker/certs:/certs:ro
+    healthcheck:
+      # Pola terbukti bahagiafix: cek state server Octane langsung
+      # (lebih kuat dari curl TLS, tidak butuh DNS/cert di dalam container)
+      test: ["CMD", "php", "artisan", "octane:status", "--server=frankenphp"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  mysql:
+    image: mysql:8.4
+    container_name: tempatcod-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: tempatcod
+      MYSQL_USER: noc
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Tulis DB_PASSWORD produksi di .env server}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Tulis MYSQL_ROOT_PASSWORD di .env server}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  mysql-data:
+  app-storage:

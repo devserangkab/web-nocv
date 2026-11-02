@@ -1,0 +1,67 @@
+{
+	{$CADDY_GLOBAL_OPTIONS}
+
+	admin {$CADDY_SERVER_ADMIN_HOST}:{$CADDY_SERVER_ADMIN_PORT}
+
+	frankenphp {
+		worker {
+			file "{$APP_PUBLIC_PATH}/frankenphp-worker.php"
+			{$CADDY_SERVER_WORKER_DIRECTIVE}
+		}
+	}
+}
+
+# =============================================================================
+# Site utama — HTTPS dengan sertifikat Sectigo (file di-mount dari server).
+# Hanya merespons Host: noc.serangkab.go.id (sesuai APP_DOMAIN).
+# Akses via IP akan ditolak karena SNI/Host tidak match.
+# =============================================================================
+https://{$APP_DOMAIN}:8443 {
+	tls {$TLS_CERT} {$TLS_KEY}
+
+	log {
+		level {$CADDY_SERVER_LOG_LEVEL}
+
+		format filter {
+			wrap {$CADDY_SERVER_LOGGER}
+			fields {
+				request>uri query {
+					replace authorization REDACTED
+				}
+			}
+		}
+	}
+
+	header {
+		# Security headers
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		-X-Powered-By
+	}
+
+	# Aset Vite yang sudah di-hash tidak pernah berubah
+	@build path /build/*
+	header @build Cache-Control "public, max-age=31536000, immutable"
+
+	route {
+		root * "{$APP_PUBLIC_PATH}"
+		encode zstd br gzip
+
+		php_server {
+			index frankenphp-worker.php
+			try_files {path} frankenphp-worker.php
+			# Required for the public/storage/ directory...
+			resolve_root_symlink
+		}
+	}
+}
+
+# =============================================================================
+# HTTP -> HTTPS redirect (hanya untuk domain, akses via IP tidak dialihkan)
+# =============================================================================
+http://{$APP_DOMAIN}:8080 {
+	redir https://{$APP_DOMAIN}{uri} permanent
+}
