@@ -89,9 +89,10 @@ RUN set -eux; \
 # --- Aset frontend hasil build Vite ------------------------------------------
 COPY --from=assets /app/public/build public/build
 
-# Non-root: jangan jalankan sebagai root (port internal >1024: 8080/8443)
-USER www-data
-
+# (Opsi A — pola terbukti bahagiafix) container berjalan sebagai root:
+# binary FrankenPHP bawaan image memakai file-cap (setcap) yang pengaksesannya
+# EPERM kalau dieksekusi proses non-root di bawah no-new-privileges/cap_drop ALL.
+# Root juga memudahkan symlink public/storage dan chown storage.
 EXPOSE 8080 8443
 
 ENTRYPOINT ["/app/docker/entrypoint.sh"]

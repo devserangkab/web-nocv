@@ -71,10 +71,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 60s
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
     logging:
       driver: json-file
       options:
@@ -103,8 +99,6 @@ services:
       timeout: 5s
       retries: 20
       start_period: 30s
-    security_opt:
-      - no-new-privileges:true
     logging:
       driver: json-file
       options:
