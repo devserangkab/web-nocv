@@ -32,9 +32,15 @@ dummy.png
 KITAB SUCI UPDATED.xlsx
 *.xlsx
 
+# Sertifikat TLS (Sectigo) - jangan pernah ter-commit
+/docker/certs
+
 # Kelompok belum siap di-commit (dikerjakan terpisah)
 /database/seeders
 /database/factories
 /backup
 /tests
 /resources/views/welcome.blade.php
+**/caddy
+frankenphp
+frankenphp-worker.php
