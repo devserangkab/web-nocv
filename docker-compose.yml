@@ -25,6 +25,7 @@ services:
 
       # Domain & TLS (dipakai docker/Caddyfile; cert Sectigo di-mount dari server)
       APP_DOMAIN: kitabsuci.serangkab.go.id
+      APP_PORT: ${APP_PORT:-9446}
       TLS_CERT: /certs/cert.pem
       TLS_KEY: /certs/key.pem
 
@@ -44,7 +45,7 @@ services:
       APP_KEY: ${APP_KEY:-}
       TZ: Asia/Jakarta
     ports:
-      - "${APP_PORT:-9446}:8443"
+      - "${APP_PORT:-9446}:${APP_PORT:-9446}"
     volumes:
       - app-storage:/app/storage
       - ./.env:/app/.env:ro

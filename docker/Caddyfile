@@ -13,7 +13,7 @@
 
 # Site utama — HTTPS (cert Sectigo di-mount dari server), hanya merespons
 # Host: APP_DOMAIN. Akses via IP ditolak karena SNI/Host tidak match.
-https://{$APP_DOMAIN}:8443 {
+https://{$APP_DOMAIN}:{$APP_PORT:9446} {
 	tls {$TLS_CERT} {$TLS_KEY}
 
 	log {
