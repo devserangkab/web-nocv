@@ -1,51 +1,55 @@
-# Stack production — Laravel 12 (FrankenPHP worker) + MariaDB
+# Stack production — Laravel 12 (FrankenPHP worker).
+# Database menumpang MariaDB milik stack "bahagia" via external Docker network.
 #
-# Deploy: docker compose up -d --build
-# Akses : http://<ip-server>:${APP_PORT:-9446}   (HTTP, LAN-only, tanpa DNS)
+# Semua nilai diambil dari file .env di direktori ini (template: .env.production.example).
+# Deploy: docker compose up -d --build --remove-orphans
+# Akses : http://<ip-server>:${APP_PORT:-9446}   (HTTP, LAN-only)
 #         host 80/443 & 3306 dipakai aplikasi lain di server.
-# DB    : Navicat -> <ip-server>:${DB_PORT_HOST:-3307}, user kitabsuci, db tempatcod
+
+name: ${COMPOSE_PROJECT_NAME:-nocv}
 
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    image: tempatcod-app
-    container_name: tempatcod-app
+    image: ${COMPOSE_PROJECT_NAME:-nocv}-app
+    container_name: ${COMPOSE_PROJECT_NAME:-nocv}-app
     restart: unless-stopped
-    depends_on:
-      mariadb:
-        condition: service_healthy
     environment:
-      APP_NAME: Kitab Suci
-      APP_ENV: production
-      APP_DEBUG: "false"
+      APP_NAME: ${APP_NAME:-NOCV}
+      APP_ENV: ${APP_ENV:-production}
+      APP_DEBUG: ${APP_DEBUG:-false}
       APP_URL: ${APP_URL:-http://192.168.1.199:9446}
-      LOG_LEVEL: error
+      APP_KEY: ${APP_KEY:-}
+      LOG_LEVEL: ${LOG_LEVEL:-error}
+      TZ: ${TZ:-Asia/Jakarta}
 
       # Port HTTP (dipakai docker/Caddyfile + entrypoint)
       APP_PORT: ${APP_PORT:-9446}
 
       OCTANE_SERVER: frankenphp
-      OCTANE_MAX_REQUESTS: "500"
-      OCTANE_WORKERS: ""   # kosong = auto (mengikuti jumlah CPU)
+      OCTANE_MAX_REQUESTS: ${OCTANE_MAX_REQUESTS:-500}
+      OCTANE_WORKERS: ${OCTANE_WORKERS:-}   # kosong = auto (mengikuti jumlah CPU)
 
-      DB_HOST: mariadb
-      DB_PORT: "3306"
-      DB_DATABASE: tempatcod
-      DB_USERNAME: kitabsuci
-      DB_PASSWORD: ${DB_PASSWORD:?Isi DB_PASSWORD di .env server}
+      # Database eksternal — juga dibaca docker/wait-db.php via getenv()
+      DB_CONNECTION: ${DB_CONNECTION:-mysql}
+      DB_HOST: ${DB_HOST:?Isi DB_HOST di .env — nama container MariaDB stack bahagia}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_DATABASE: ${DB_DATABASE:-nocv}
+      DB_USERNAME: ${DB_USERNAME:?Isi DB_USERNAME di .env}
+      DB_PASSWORD: ${DB_PASSWORD:?Isi DB_PASSWORD di .env}
 
-      # Belum ada queue worker — hindari job menumpuk
-      QUEUE_CONNECTION: sync
-
-      APP_KEY: ${APP_KEY:-}
-      TZ: Asia/Jakarta
+      # sync selama belum ada container queue worker
+      QUEUE_CONNECTION: ${QUEUE_CONNECTION:-sync}
     ports:
       - "${APP_PORT:-9446}:${APP_PORT:-9446}"
     volumes:
       - app-storage:/app/storage
       - ./.env:/app/.env:ro
+    networks:
+      - default
+      - dbnet
     healthcheck:
       test: ["CMD", "php", "artisan", "octane:status", "--server=frankenphp"]
       interval: 10s
@@ -58,31 +62,10 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  mariadb:
-    image: mariadb:11.4
-    container_name: tempatcod-mariadb
-    restart: unless-stopped
-    ports:
-      - "${DB_PORT_HOST:-3307}:3306"
-    environment:
-      MARIADB_DATABASE: tempatcod
-      MARIADB_USER: kitabsuci
-      MARIADB_PASSWORD: ${DB_PASSWORD:?Isi DB_PASSWORD di .env server}
-      MARIADB_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Isi MYSQL_ROOT_PASSWORD di .env server}
-    volumes:
-      - mariadb-data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
-      interval: 5s
-      timeout: 5s
-      retries: 20
-      start_period: 30s
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "3"
+networks:
+  dbnet:
+    external: true
+    name: ${DB_NETWORK:?Isi DB_NETWORK di .env — nama network Docker stack bahagia}
 
 volumes:
-  mariadb-data:
   app-storage:
