@@ -33,17 +33,9 @@ php artisan event:cache || echo "[entrypoint] event:cache dilewati."
 php artisan route:cache || echo "[entrypoint] route:cache dilewati (ada closure di routes)."
 php artisan storage:link || echo "[entrypoint] storage:link dilewati."
 
-# 5. Start: Octane -> FrankenPHP worker mode (HTTPS 8443); tanpa Octane -> HTTP 8080
+# 5. Start: Octane -> FrankenPHP worker mode (HTTP, APP_PORT); tanpa Octane -> HTTP 8080
 if php -r "require 'vendor/autoload.php'; exit(class_exists('Laravel\\Octane\\Octane') ? 0 : 1);"; then
-    echo "[entrypoint] Octane terdeteksi -> FrankenPHP WORKER MODE (https://${APP_DOMAIN:-} di port ${APP_PORT:-9446})."
-
-    if [ ! -f "${TLS_CERT:-/certs/cert.pem}" ] || [ ! -f "${TLS_KEY:-/certs/key.pem}" ]; then
-        echo "[entrypoint] ERROR: sertifikat TLS tidak ditemukan."
-        echo "[entrypoint] Sediakan di server (di-mount read-only ke /certs):"
-        echo "[entrypoint]   docker/certs/cert.pem  <- sertifikat + intermediate chain"
-        echo "[entrypoint]   docker/certs/key.pem   <- private key"
-        exit 1
-    fi
+    echo "[entrypoint] Octane terdeteksi -> FrankenPHP WORKER MODE (http://0.0.0.0:${APP_PORT:-9446})."
 
     # Satu string agar quoting aman di POSIX sh
     OCTANE_ARGS="--host=0.0.0.0 --port=${APP_PORT:-9446} --caddyfile=/app/docker/Caddyfile"

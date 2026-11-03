@@ -1,8 +1,8 @@
 # Stack production — Laravel 12 (FrankenPHP worker) + MariaDB
 #
 # Deploy: docker compose up -d --build
-# Akses : https://kitabsuci.serangkab.go.id:${APP_PORT:-9446}
-#         LAN-only via static DNS MikroTik; host 80/443 & 3306 dipakai aplikasi lain.
+# Akses : http://<ip-server>:${APP_PORT:-9446}   (HTTP, LAN-only, tanpa DNS)
+#         host 80/443 & 3306 dipakai aplikasi lain di server.
 # DB    : Navicat -> <ip-server>:${DB_PORT_HOST:-3307}, user kitabsuci, db tempatcod
 
 services:
@@ -20,14 +20,11 @@ services:
       APP_NAME: Kitab Suci
       APP_ENV: production
       APP_DEBUG: "false"
-      APP_URL: https://kitabsuci.serangkab.go.id:${APP_PORT:-9446}
+      APP_URL: ${APP_URL:-http://192.168.1.199:9446}
       LOG_LEVEL: error
 
-      # Domain & TLS (dipakai docker/Caddyfile; cert Sectigo di-mount dari server)
-      APP_DOMAIN: kitabsuci.serangkab.go.id
+      # Port HTTP (dipakai docker/Caddyfile + entrypoint)
       APP_PORT: ${APP_PORT:-9446}
-      TLS_CERT: /certs/cert.pem
-      TLS_KEY: /certs/key.pem
 
       OCTANE_SERVER: frankenphp
       OCTANE_MAX_REQUESTS: "500"
@@ -49,7 +46,6 @@ services:
     volumes:
       - app-storage:/app/storage
       - ./.env:/app/.env:ro
-      - ./docker/certs:/certs:ro
     healthcheck:
       test: ["CMD", "php", "artisan", "octane:status", "--server=frankenphp"]
       interval: 10s

@@ -11,11 +11,9 @@
 	}
 }
 
-# Site utama — HTTPS (cert Sectigo di-mount dari server), hanya merespons
-# Host: APP_DOMAIN. Akses via IP ditolak karena SNI/Host tidak match.
-https://{$APP_DOMAIN}:{$APP_PORT:9446} {
-	tls {$TLS_CERT} {$TLS_KEY}
-
+# HTTP saja — diakses via IP server: http://<ip-server>:APP_PORT (LAN-only).
+# Cert publik tidak mungkin untuk IP privat, jadi tanpa TLS. Menerima Host apa pun.
+http://:{$APP_PORT:9446} {
 	log {
 		level {$CADDY_SERVER_LOG_LEVEL}
 
@@ -30,8 +28,6 @@ https://{$APP_DOMAIN}:{$APP_PORT:9446} {
 	}
 
 	header {
-		# Security headers
-		Strict-Transport-Security "max-age=31536000; includeSubDomains"
 		X-Content-Type-Options "nosniff"
 		X-Frame-Options "SAMEORIGIN"
 		Referrer-Policy "strict-origin-when-cross-origin"

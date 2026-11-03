@@ -70,7 +70,7 @@ COPY --from=assets /app/public/build public/build
 
 # Container berjalan sebagai root: binary FrankenPHP memakai file-cap (setcap)
 # yang EPERM di bawah no-new-privileges/cap_drop ALL jika non-root.
-# Port HTTPS = APP_PORT (default 9446); 8080 = fallback HTTP tanpa Octane.
+# Port HTTP = APP_PORT (default 9446); 8080 = fallback tanpa Octane.
 EXPOSE 8080 9446
 
 ENTRYPOINT ["/app/docker/entrypoint.sh"]
