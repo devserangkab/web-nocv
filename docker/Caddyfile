@@ -11,9 +11,9 @@
 	}
 }
 
-# HTTP saja — diakses via IP server: http://<ip-server>:APP_PORT (LAN-only).
-# Cert publik tidak mungkin untuk IP privat, jadi tanpa TLS. Menerima Host apa pun.
-http://:{$APP_PORT:9446} {
+# HTTP saja — diakses lewat central reverse proxy (upstream nocv-app:APP_PORT).
+# Menerima Host apa pun; TLS diurus central Caddy.
+http://:{$APP_PORT:80} {
 	log {
 		level {$CADDY_SERVER_LOG_LEVEL}
 

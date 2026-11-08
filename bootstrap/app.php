@@ -12,6 +12,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        # Central reverse proxy (main_reverse_proxy) menambahkan X-Forwarded-* —
+        # percayai supaya Laravel menghasilkan URL https & cookie secure dengan benar.
+        $middleware->trustProxies(at: '*');
+
         $middleware->alias([
             'force.password' => EnsurePasswordChanged::class,
         ]);
