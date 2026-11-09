@@ -41,6 +41,7 @@ class Nas extends Model
         'raid_level',
         'os',
         'static_ip',
+        'public_ip',
         'username',
         'password',
         'status',
@@ -54,6 +55,7 @@ class Nas extends Model
             'position' => 'integer',
             'status' => NasStatus::class,
             'static_ip' => EncryptedAttr::class,
+            'public_ip' => EncryptedAttr::class,
             'username' => EncryptedAttr::class,
             'password' => EncryptedAttr::class,
         ];

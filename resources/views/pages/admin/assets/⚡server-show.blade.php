@@ -186,6 +186,10 @@ new class extends Component
                             <dd class="font-medium text-content-primary text-right">{{ $server->static_ip ?? '-' }}</dd>
                         </div>
                         <div class="flex justify-between gap-3">
+                            <dt class="text-content-tertiary">Public IP</dt>
+                            <dd class="font-medium text-content-primary text-right">{{ $server->public_ip ?? '-' }}</dd>
+                        </div>
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Username</dt>
                             <dd class="text-right font-medium text-content-primary">
                                 @if (filled($server->username))
@@ -194,7 +198,7 @@ new class extends Component
                                         <button
                                             type="button"
                                             class="text-content-tertiary transition-colors duration-150 hover:text-content-primary"
-                                            @click="navigator.clipboard.writeText($refs.value.innerText.trim()); copied = true; setTimeout(() => copied = false, 1500)"
+                                            @click="copyToClipboard($refs.value.innerText.trim()); copied = true; setTimeout(() => copied = false, 1500)"
                                             aria-label="Salin username"
                                             title="Salin username"
                                         >
@@ -225,7 +229,7 @@ new class extends Component
                                         <button
                                             type="button"
                                             class="text-content-tertiary transition-colors duration-150 hover:text-content-primary"
-                                            @click="navigator.clipboard.writeText($refs.value.innerText.trim()); copied = true; setTimeout(() => copied = false, 1500)"
+                                            @click="copyToClipboard($refs.value.innerText.trim()); copied = true; setTimeout(() => copied = false, 1500)"
                                             aria-label="Salin password"
                                             title="Salin password"
                                         >

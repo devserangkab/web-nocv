@@ -40,6 +40,7 @@ class Server extends Model
         'memory',
         'cpu',
         'static_ip',
+        'public_ip',
         'username',
         'password',
         'os',
@@ -54,6 +55,7 @@ class Server extends Model
             'memory_size' => 'integer',
             'status' => ServerStatus::class,
             'static_ip' => EncryptedAttr::class,
+            'public_ip' => EncryptedAttr::class,
             'username' => EncryptedAttr::class,
             'password' => EncryptedAttr::class,
         ];

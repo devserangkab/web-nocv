@@ -143,8 +143,61 @@ new class extends Component
                             <dd class="font-medium text-content-primary text-right">{{ $nas->static_ip ?? '-' }}</dd>
                         </div>
                         <div class="flex justify-between gap-3">
+                            <dt class="text-content-tertiary">Public IP</dt>
+                            <dd class="font-medium text-content-primary text-right">{{ $nas->public_ip ?? '-' }}</dd>
+                        </div>
+                        <div class="flex justify-between gap-3">
                             <dt class="text-content-tertiary">Username</dt>
-                            <dd class="font-medium text-content-primary text-right">{{ $nas->username ?? '-' }}</dd>
+                            <dd class="text-right font-medium text-content-primary">
+                                @if (filled($nas->username))
+                                    <span class="inline-flex items-center gap-1.5" x-data="{ copied: false }">
+                                        <span>{{ $nas->username }}</span>
+                                        <button
+                                            type="button"
+                                            class="text-content-tertiary transition-colors duration-150 hover:text-content-primary"
+                                            @click="copyToClipboard($refs.value.innerText.trim()); copied = true; setTimeout(() => copied = false, 1500)"
+                                            aria-label="Salin username"
+                                            title="Salin username"
+                                        >
+                                            <i class="ti text-base" :class="copied ? 'ti-check text-guide-600' : 'ti-copy'"></i>
+                                        </button>
+                                        <span x-ref="value" hidden>{{ $nas->username }}</span>
+                                    </span>
+                                @else
+                                    -
+                                @endif
+                            </dd>
+                        </div>
+                        <div class="flex justify-between gap-3">
+                            <dt class="text-content-tertiary">Password</dt>
+                            <dd class="text-right font-medium text-content-primary">
+                                @if (filled($nas->password))
+                                    <span class="inline-flex items-center gap-1.5" x-data="{ show: false, copied: false }">
+                                        <span x-show="!show">••••••••</span>
+                                        <span x-show="show" x-cloak>{{ $nas->password }}</span>
+                                        <button
+                                            type="button"
+                                            class="text-content-tertiary transition-colors duration-150 hover:text-content-primary"
+                                            @click="show = !show"
+                                            :aria-label="show ? 'Sembunyikan password' : 'Tampilkan password'"
+                                        >
+                                            <i class="ti text-base" :class="show ? 'ti-eye-off' : 'ti-eye'"></i>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="text-content-tertiary transition-colors duration-150 hover:text-content-primary"
+                                            @click="copyToClipboard($refs.value.innerText.trim()); copied = true; setTimeout(() => copied = false, 1500)"
+                                            aria-label="Salin password"
+                                            title="Salin password"
+                                        >
+                                            <i class="ti text-base" :class="copied ? 'ti-check text-guide-600' : 'ti-copy'"></i>
+                                        </button>
+                                        <span x-ref="value" hidden>{{ $nas->password }}</span>
+                                    </span>
+                                @else
+                                    -
+                                @endif
+                            </dd>
                         </div>
                     </dl>
                 </div>

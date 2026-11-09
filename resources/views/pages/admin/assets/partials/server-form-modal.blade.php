@@ -265,22 +265,40 @@
                     </div>
 
                     <div class="ina-text-field">
-                        <label for="os" class="ina-text-field__label">
-                            OS
+                        <label for="public_ip" class="ina-text-field__label">
+                            Public IP
                         </label>
-                        <div class="ina-text-field__wrapper ina-text-field__wrapper--size-md {{ $errors->has('os') ? 'ina-text-field__wrapper--status-error' : '' }}">
+                        <div class="ina-text-field__wrapper ina-text-field__wrapper--size-md {{ $errors->has('public_ip') ? 'ina-text-field__wrapper--status-error' : '' }}">
                             <input
                                 type="text"
-                                id="os"
-                                wire:model="os"
+                                id="public_ip"
+                                wire:model="public_ip"
                                 class="ina-text-field__input"
-                                placeholder="Ubuntu Server 22.04 LTS"
+                                placeholder="198.51.100.7"
                             >
                         </div>
-                        @error('os')
+                        @error('public_ip')
                             <p class="mt-1.5 text-sm text-negative-500">{{ $message }}</p>
                         @enderror
                     </div>
+                </div>
+
+                <div class="ina-text-field">
+                    <label for="os" class="ina-text-field__label">
+                        OS
+                    </label>
+                    <div class="ina-text-field__wrapper ina-text-field__wrapper--size-md {{ $errors->has('os') ? 'ina-text-field__wrapper--status-error' : '' }}">
+                        <input
+                            type="text"
+                            id="os"
+                            wire:model="os"
+                            class="ina-text-field__input"
+                            placeholder="Ubuntu Server 22.04 LTS"
+                        >
+                    </div>
+                    @error('os')
+                        <p class="mt-1.5 text-sm text-negative-500">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">

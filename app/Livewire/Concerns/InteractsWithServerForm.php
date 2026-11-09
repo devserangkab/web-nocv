@@ -44,6 +44,8 @@ trait InteractsWithServerForm
 
     public string $static_ip = '';
 
+    public string $public_ip = '';
+
     public string $location_id = '';
 
     public string $os = '';
@@ -86,6 +88,7 @@ trait InteractsWithServerForm
         $this->status = $server->status?->value ?? ServerStatus::Off->value;
         $this->cpu = (string) $server->cpu;
         $this->static_ip = (string) $server->static_ip;
+        $this->public_ip = (string) $server->public_ip;
         $this->os = (string) $server->os;
         $this->username = (string) $server->username;
         $this->password = '';
@@ -109,6 +112,7 @@ trait InteractsWithServerForm
             'status' => $this->status,
             'cpu' => $this->cpu === '' ? null : $this->cpu,
             'static_ip' => $this->static_ip === '' ? null : $this->static_ip,
+            'public_ip' => $this->public_ip === '' ? null : $this->public_ip,
             'os' => $this->os === '' ? null : $this->os,
             'username' => $this->username,
             'password' => $this->password,
@@ -177,6 +181,7 @@ trait InteractsWithServerForm
         $this->status = ServerStatus::Off->value;
         $this->cpu = '';
         $this->static_ip = '';
+        $this->public_ip = '';
         $this->os = '';
         $this->username = '';
         $this->password = '';

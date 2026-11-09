@@ -58,6 +58,8 @@ new class extends Component
 
     public string $static_ip = '';
 
+    public string $public_ip = '';
+
     public string $username = '';
 
     public string $password = '';
@@ -105,6 +107,7 @@ new class extends Component
         $this->os = (string) $nas->os;
         $this->status = $nas->status?->value ?? NasStatus::Off->value;
         $this->static_ip = (string) $nas->static_ip;
+        $this->public_ip = (string) $nas->public_ip;
         $this->username = (string) $nas->username;
         $this->password = '';
 
@@ -126,6 +129,7 @@ new class extends Component
             'os' => $this->os === '' ? null : $this->os,
             'status' => $this->status,
             'static_ip' => $this->static_ip,
+            'public_ip' => $this->public_ip,
             'username' => $this->username,
             'password' => $this->password,
         ];
@@ -179,6 +183,7 @@ new class extends Component
         $this->os = '';
         $this->status = NasStatus::Off->value;
         $this->static_ip = '';
+        $this->public_ip = '';
         $this->username = '';
         $this->password = '';
     }
@@ -655,23 +660,41 @@ new class extends Component
                     </div>
 
                     <div class="ina-text-field">
-                        <label for="nas-username" class="ina-text-field__label">
-                            Username
+                        <label for="nas_public_ip" class="ina-text-field__label">
+                            Public IP
                         </label>
-                        <div class="ina-text-field__wrapper ina-text-field__wrapper--size-md {{ $errors->has('username') ? 'ina-text-field__wrapper--status-error' : '' }}">
+                        <div class="ina-text-field__wrapper ina-text-field__wrapper--size-md {{ $errors->has('public_ip') ? 'ina-text-field__wrapper--status-error' : '' }}">
                             <input
                                 type="text"
-                                id="nas-username"
-                                wire:model="username"
+                                id="nas_public_ip"
+                                wire:model="public_ip"
                                 class="ina-text-field__input"
-                                autocomplete="off"
-                                placeholder="admin"
+                                placeholder="198.51.100.7"
                             >
                         </div>
-                        @error('username')
+                        @error('public_ip')
                             <p class="mt-1.5 text-sm text-negative-500">{{ $message }}</p>
                         @enderror
                     </div>
+                </div>
+
+                <div class="ina-text-field">
+                    <label for="nas-username" class="ina-text-field__label">
+                        Username
+                    </label>
+                    <div class="ina-text-field__wrapper ina-text-field__wrapper--size-md {{ $errors->has('username') ? 'ina-text-field__wrapper--status-error' : '' }}">
+                        <input
+                            type="text"
+                            id="nas-username"
+                            wire:model="username"
+                            class="ina-text-field__input"
+                            autocomplete="off"
+                            placeholder="admin"
+                        >
+                    </div>
+                    @error('username')
+                        <p class="mt-1.5 text-sm text-negative-500">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="ina-text-field">
