@@ -308,6 +308,20 @@
                         </div>
                     </div>
                 @endif
+
+                {{-- Sinkronisasi — item mandiri di luar grup, khusus superadmin --}}
+                @if (auth()->user()?->hasRole('superadmin'))
+                    <div class="pt-3">
+                        <a
+                            href="{{ route('admin.synchronization.index') }}"
+                            wire:navigate
+                            class="flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors duration-150 hover:bg-neutral-100 {{ request()->routeIs('admin.synchronization.*') ? 'bg-guide-50 text-guide-600' : 'text-content-secondary hover:text-content-primary' }}"
+                        >
+                            <i class="ti ti-refresh-dot text-lg"></i>
+                            Sinkronisasi
+                        </a>
+                    </div>
+                @endif
             </nav>
 
             {{-- User — klik untuk buka menu akun --}}

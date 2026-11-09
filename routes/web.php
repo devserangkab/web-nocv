@@ -77,6 +77,13 @@ Route::middleware(['auth', 'force.password'])->group(function () {
             ->name('admin.dev.bcrypt');
     });
 
+    // Sinkronisasi — halaman khusus superadmin. Cek role langsung (bukan can:)
+    // karena Gate::before juga meneruskan akun tanpa role ke semua permission.
+    Route::middleware('role:superadmin')->group(function () {
+        Route::livewire('/admin/synchronization', 'pages::admin.synchronization.sync-index')
+            ->name('admin.synchronization.index');
+    });
+
     Route::livewire('/admin/settings', 'pages::admin.settings')->name('admin.settings.index');
 
     // Dokumentasi & Gallery
