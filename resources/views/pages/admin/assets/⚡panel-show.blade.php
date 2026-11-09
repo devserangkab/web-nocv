@@ -154,7 +154,7 @@ new class extends Component
                                         <button
                                             type="button"
                                             class="text-content-tertiary transition-colors duration-150 hover:text-content-primary"
-                                            @click="navigator.clipboard.writeText($refs.value.innerText.trim()); copied = true; setTimeout(() => copied = false, 1500)"
+                                            @click="copyToClipboard($refs.value.innerText.trim()); copied = true; setTimeout(() => copied = false, 1500)"
                                             aria-label="Salin username"
                                             title="Salin username"
                                         >
@@ -185,13 +185,44 @@ new class extends Component
                                         <button
                                             type="button"
                                             class="text-content-tertiary transition-colors duration-150 hover:text-content-primary"
-                                            @click="navigator.clipboard.writeText($refs.value.innerText.trim()); copied = true; setTimeout(() => copied = false, 1500)"
+                                            @click="copyToClipboard($refs.value.innerText.trim()); copied = true; setTimeout(() => copied = false, 1500)"
                                             aria-label="Salin password"
                                             title="Salin password"
                                         >
                                             <i class="ti text-base" :class="copied ? 'ti-check text-guide-600' : 'ti-copy'"></i>
                                         </button>
                                         <span x-ref="value" hidden>{{ $panel->password }}</span>
+                                    </span>
+                                @else
+                                    -
+                                @endif
+                            </dd>
+                        </div>
+                        <div class="flex justify-between gap-3">
+                            <dt class="text-content-tertiary">API Key</dt>
+                            <dd class="text-right font-medium text-content-primary">
+                                @if (filled($panel->api_key))
+                                    <span class="inline-flex items-center gap-1.5" x-data="{ show: false, copied: false }">
+                                        <span x-show="!show">••••••••</span>
+                                        <span x-show="show" x-cloak>{{ $panel->api_key }}</span>
+                                        <button
+                                            type="button"
+                                            class="text-content-tertiary transition-colors duration-150 hover:text-content-primary"
+                                            @click="show = !show"
+                                            :aria-label="show ? 'Sembunyikan API key' : 'Tampilkan API key'"
+                                        >
+                                            <i class="ti text-base" :class="show ? 'ti-eye-off' : 'ti-eye'"></i>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="text-content-tertiary transition-colors duration-150 hover:text-content-primary"
+                                            @click="copyToClipboard($refs.value.innerText.trim()); copied = true; setTimeout(() => copied = false, 1500)"
+                                            aria-label="Salin API key"
+                                            title="Salin API key"
+                                        >
+                                            <i class="ti text-base" :class="copied ? 'ti-check text-guide-600' : 'ti-copy'"></i>
+                                        </button>
+                                        <span x-ref="value" hidden>{{ $panel->api_key }}</span>
                                     </span>
                                 @else
                                     -

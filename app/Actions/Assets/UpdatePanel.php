@@ -20,7 +20,7 @@ class UpdatePanel
         $normalized = CreatePanel::normalize($data);
 
         // Kredensial: kosong saat edit = biarkan nilai lama
-        foreach (['username', 'password'] as $credential) {
+        foreach (['username', 'password', 'api_key'] as $credential) {
             if (blank($normalized[$credential])) {
                 unset($normalized[$credential]);
             }

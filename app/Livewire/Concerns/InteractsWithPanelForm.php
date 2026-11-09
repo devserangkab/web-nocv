@@ -37,6 +37,8 @@ trait InteractsWithPanelForm
 
     public string $password = '';
 
+    public string $api_key = '';
+
     public function openCreate(): void
     {
         $this->resetForm();
@@ -58,6 +60,7 @@ trait InteractsWithPanelForm
         $this->version = (string) $panel->version;
         $this->username = (string) $panel->username;
         $this->password = '';
+        $this->api_key = '';
 
         $this->showModal = true;
     }
@@ -73,6 +76,7 @@ trait InteractsWithPanelForm
             'version' => $this->version === '' ? null : $this->version,
             'username' => $this->username,
             'password' => $this->password,
+            'api_key' => $this->api_key,
         ];
 
         if ($this->editingId !== null) {
@@ -153,5 +157,6 @@ trait InteractsWithPanelForm
         $this->version = '';
         $this->username = '';
         $this->password = '';
+        $this->api_key = '';
     }
 }

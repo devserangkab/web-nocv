@@ -182,6 +182,25 @@
                     </div>
                 </div>
 
+                <div class="ina-text-field">
+                    <label for="panel-api-key" class="ina-text-field__label">
+                        API Key
+                    </label>
+                    <div class="ina-text-field__wrapper ina-text-field__wrapper--size-md {{ $errors->has('api_key') ? 'ina-text-field__wrapper--status-error' : '' }}">
+                        <input
+                            type="text"
+                            id="panel-api-key"
+                            wire:model="api_key"
+                            class="ina-text-field__input"
+                            autocomplete="off"
+                            placeholder="{{ $editingId !== null ? 'Kosongkan bila tidak diubah' : '' }}"
+                        >
+                    </div>
+                    @error('api_key')
+                        <p class="mt-1.5 text-sm text-negative-500">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <div class="flex justify-end gap-2 pt-2">
                     <button type="button" class="ina-button ina-button--secondary ina-button--md" wire:click="closeModal">
                         Batal

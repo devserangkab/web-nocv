@@ -32,6 +32,7 @@ class Panel extends Model
         'type',
         'username',
         'password',
+        'api_key',
         'version',
     ];
 
@@ -43,6 +44,7 @@ class Panel extends Model
             'internal_address' => EncryptedAttr::class,
             'username' => EncryptedAttr::class,
             'password' => EncryptedAttr::class,
+            'api_key' => EncryptedAttr::class,
         ];
     }
 

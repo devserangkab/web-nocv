@@ -52,6 +52,7 @@ class CreatePanel
             'version' => ['nullable', 'max:20'],
             'username' => ['nullable', 'max:255'],
             'password' => ['nullable', 'max:255'],
+            'api_key' => ['nullable', 'max:255'],
         ];
     }
 
@@ -71,6 +72,7 @@ class CreatePanel
             'version.max' => 'Version maksimal 20 karakter.',
             'username.max' => 'Username maksimal 255 karakter.',
             'password.max' => 'Password maksimal 255 karakter.',
+            'api_key.max' => 'API key maksimal 255 karakter.',
         ];
     }
 
@@ -92,6 +94,7 @@ class CreatePanel
             'version' => filled($data['version'] ?? null) ? $data['version'] : null,
             'username' => filled($data['username'] ?? null) ? $data['username'] : null,
             'password' => filled($data['password'] ?? null) ? $data['password'] : null,
+            'api_key' => filled($data['api_key'] ?? null) ? $data['api_key'] : null,
         ];
     }
 }
