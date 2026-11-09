@@ -3,6 +3,26 @@ import './richtext';
 
 import '@tabler/icons-webfont/dist/tabler-icons.min.css';
 
+/**
+ * Salin teks ke clipboard dengan fallback untuk konteks non-secure (HTTP).
+ * navigator.clipboard hanya tersedia di HTTPS/localhost.
+ */
+window.copyToClipboard = (value) => {
+    if (window.navigator.clipboard?.writeText) {
+        return navigator.clipboard.writeText(value);
+    }
+
+    const area = document.createElement('textarea');
+
+    area.value = value;
+    area.style.position = 'fixed';
+    area.style.opacity = '0';
+    document.body.appendChild(area);
+    area.select();
+    document.execCommand('copy');
+    area.remove();
+};
+
 function getStoredTheme() {
     const theme = localStorage.getItem('theme');
 
