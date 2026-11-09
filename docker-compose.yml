@@ -40,8 +40,8 @@ services:
       # sync selama belum ada container queue worker
       QUEUE_CONNECTION: ${QUEUE_CONNECTION:-sync}
     volumes:
-      - app-storage:/app/storage
       - ./.env:/app/.env:ro
+      - ./storage:/app/storage
     networks:
       - proxynet
       - dbnet
@@ -64,6 +64,3 @@ networks:
   dbnet:
     external: true
     name: ${DB_NETWORK:-db_net}
-
-volumes:
-  app-storage:
