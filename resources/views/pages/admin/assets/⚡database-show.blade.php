@@ -116,7 +116,7 @@ new class extends Component
                                         <button
                                             type="button"
                                             class="text-content-tertiary transition-colors duration-150 hover:text-content-primary"
-                                            @click="navigator.clipboard.writeText($refs.value.innerText.trim()); copied = true; setTimeout(() => copied = false, 1500)"
+                                            @click="copyToClipboard($refs.value.innerText.trim()); copied = true; setTimeout(() => copied = false, 1500)"
                                             aria-label="Salin username"
                                             title="Salin username"
                                         >
@@ -147,7 +147,7 @@ new class extends Component
                                         <button
                                             type="button"
                                             class="text-content-tertiary transition-colors duration-150 hover:text-content-primary"
-                                            @click="navigator.clipboard.writeText($refs.value.innerText.trim()); copied = true; setTimeout(() => copied = false, 1500)"
+                                            @click="copyToClipboard($refs.value.innerText.trim()); copied = true; setTimeout(() => copied = false, 1500)"
                                             aria-label="Salin password"
                                             title="Salin password"
                                         >

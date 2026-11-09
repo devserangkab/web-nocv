@@ -161,7 +161,7 @@ new class extends Component
                             type="button"
                             class="ina-button ina-button--secondary ina-button--sm"
                             x-data="{ hash: @js($hash) }"
-                            x-on:click="navigator.clipboard.writeText(hash)"
+                            x-on:click="copyToClipboard(hash)"
                             :aria-label="'Salin hash ke clipboard'"
                         >
                             <i class="ti ti-copy text-base"></i>
