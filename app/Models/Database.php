@@ -13,7 +13,7 @@ class Database extends Model
     use GeneratesCode;
     use OwnsMedia;
 
-    protected $table = 'databases';
+    protected $table = 'database_schemas';
 
     protected static string $codeColumn = 'db_id';
 

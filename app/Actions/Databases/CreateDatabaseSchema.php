@@ -39,7 +39,7 @@ class CreateDatabaseSchema
             'name' => [
                 'required',
                 'max:255',
-                Rule::unique('databases', 'name')
+                Rule::unique('database_schemas', 'name')
                     ->where('dbi_id', $instance->dbi_id)
                     ->ignore($excludeId),
             ],

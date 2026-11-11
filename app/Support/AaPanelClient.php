@@ -33,26 +33,59 @@ class AaPanelClient
     public function __construct(private string $address, private string $secretKey) {}
 
     /**
-     * Ambil seluruh situs web terdaftar di panel, pagination otomatis.
-     * Panel baru menjawab {status:0, message:{...}} lewat /v2/data; panel
-     * BT/aaPanel lama menjawab {where, page, data} langsung lewat /data —
-     * fallback ke endpoint lama hanya saat endpoint baru tidak mengenali.
+     * Ambil seluruh baris sebuah table dari panel (sites, databases, dst.),
+     * pagination otomatis. Panel baru menjawab {status:0, message:{...}} lewat
+     * /v2/data; panel BT/aaPanel lama menjawab {where, page, data} langsung
+     * lewat /data — fallback ke endpoint lama hanya saat endpoint baru
+     * tidak mengenali.
      *
      * @return Collection<int, array<string, mixed>>
      */
-    public function fetchSites(): Collection
+    public function fetchTable(string $table): Collection
     {
         try {
-            return $this->fetchSitesVia(self::ENDPOINT_V2);
+            return $this->fetchRowsVia(self::ENDPOINT_V2, $table);
         } catch (RuntimeException $v2Error) {
-            // Coba endpoint gaya lama sebelum menyimpan pesan error berakhir.
+            // Coba endpoint gaya lama sebelum menyerahkan pesan error akhir.
         }
 
         try {
-            return $this->fetchSitesVia(self::ENDPOINT_LEGACY);
+            return $this->fetchRowsVia(self::ENDPOINT_LEGACY, $table);
         } catch (RuntimeException $legacyError) {
             throw new RuntimeException('Kedua endpoint aaPanel gagal. '.self::ENDPOINT_V2.' -> '.Str::limit($v2Error->getMessage(), 300).' | '.self::ENDPOINT_LEGACY.' -> '.Str::limit($legacyError->getMessage(), 300));
         }
+    }
+
+    /**
+     * Ambil satu nilai konfigurasi panel via action=getKey (table=config),
+     * mis. key=mysql_root untuk password root MySQL. Null bila tak tersedia.
+     */
+    public function getKey(string $key, int $id = 1): ?string
+    {
+        foreach ([self::ENDPOINT_V2, self::ENDPOINT_LEGACY] as $endpoint) {
+            $response = Http::timeout(self::REQUEST_TIMEOUT)
+                ->withOptions(['verify' => false])
+                ->get($this->origin().$endpoint, array_merge([
+                    'action' => 'getKey',
+                    'id' => $id,
+                    'key' => $key,
+                    'table' => 'config',
+                ], $this->tokenQuery()));
+
+            $payload = $response->json();
+
+            if (! $response->successful() || ! is_array($payload)) {
+                continue;
+            }
+
+            if (($payload['status'] ?? 1) === 0 && is_array($payload['message'] ?? null)) {
+                $result = $payload['message']['result'] ?? null;
+
+                return is_string($result) && filled($result) ? $result : null;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -60,16 +93,16 @@ class AaPanelClient
      *
      * @return Collection<int, array<string, mixed>>
      */
-    private function fetchSitesVia(string $endpoint): Collection
+    private function fetchRowsVia(string $endpoint, string $table): Collection
     {
-        $sites = collect();
+        $rows = collect();
 
         for ($page = 1; $page <= self::MAX_PAGES; $page++) {
             $response = Http::timeout(self::REQUEST_TIMEOUT)
                 // Panel aaPanel internal dominan memakai sertifikat self-signed
                 // (cURL error 60); API Key tetap aman karena dikirim sebagai hash.
                 ->withOptions(['verify' => false])
-                ->get($this->origin().$endpoint, array_merge($this->dataQuery($page), $this->tokenQuery()));
+                ->get($this->origin().$endpoint, array_merge($this->dataQuery($page, $table), $this->tokenQuery()));
 
             if ($response->failed()) {
                 throw new RuntimeException($endpoint.' HTTP '.$response->status().': '.$this->snippet($response->body()));
@@ -86,17 +119,17 @@ class AaPanelClient
                 break;
             }
 
-            $sites = $sites->concat($parsed['rows']);
+            $rows = $rows->concat($parsed['rows']);
 
             // Label pagination aaPanel menyembunyikan total ("Total N").
             $totalKnown = $this->extractTotal($parsed['pageLabel']);
 
-            if ($totalKnown !== null && $sites->count() >= $totalKnown) {
+            if ($totalKnown !== null && $rows->count() >= $totalKnown) {
                 break;
             }
         }
 
-        return $sites;
+        return $rows;
     }
 
     /**
@@ -199,17 +232,28 @@ class AaPanelClient
     }
 
     /**
+     * Host asal (tanpa scheme/port) — dipakai sebagai internal_address
+     * instance database otomatis (MySQL berada di machine panel).
+     */
+    public function hostAddress(): string
+    {
+        $host = parse_url(self::normalizeAddress($this->address), PHP_URL_HOST);
+
+        return is_string($host) ? $host : '';
+    }
+
+    /**
      * Parameter data standar aaPanel.
      *
      * @return array<string, mixed>
      */
-    private function dataQuery(int $page): array
+    private function dataQuery(int $page, string $table): array
     {
         return [
             'action' => 'getData',
             'p' => $page,
             'limit' => self::PAGE_SIZE,
-            'table' => 'sites',
+            'table' => $table,
             'search' => '',
             'order' => '',
             'type' => '-1',

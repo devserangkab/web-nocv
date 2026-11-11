@@ -57,7 +57,7 @@ class CrawlAaPanelSites
                 $sites = app(AaPanelClient::class, [
                     'address' => AaPanelClient::normalizeAddress((string) $address),
                     'secretKey' => (string) $panel->api_key,
-                ])->fetchSites();
+                ])->fetchTable('sites');
             } catch (Throwable $exception) {
                 $runs->push($this->failedRun($runGroup, $source, $panel, $exception->getMessage()));
 

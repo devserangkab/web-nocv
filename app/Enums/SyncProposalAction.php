@@ -11,6 +11,8 @@ enum SyncProposalAction: string
 
     case Update = 'update';
 
+    case Link = 'link';
+
     /**
      * Label Indonesia untuk UI (badge).
      */
@@ -19,6 +21,7 @@ enum SyncProposalAction: string
         return match ($this) {
             self::Create => 'Buat baru',
             self::Update => 'Perbarui',
+            self::Link => 'Tautkan',
         };
     }
 }

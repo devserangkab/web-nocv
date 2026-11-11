@@ -14,7 +14,7 @@ use App\Models\Panel;
 class AaPanelSiteMapper
 {
     /**
-     * Nama tampilan field di kartu proposal.
+     * Nama tampilan field di kartu proposal (situs & database).
      *
      * @var array<string, string>
      */
@@ -26,6 +26,11 @@ class AaPanelSiteMapper
         'language_version' => 'Versi bahasa',
         'description' => 'Keterangan',
         'hosting' => 'Hosting',
+        'db_name' => 'Database',
+        'db_user' => 'User DB',
+        'db_accept' => 'Akses host',
+        'db_note' => 'Keterangan',
+        'db_link' => 'Relasi aplikasi',
     ];
 
     /**
