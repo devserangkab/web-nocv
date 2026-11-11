@@ -9,6 +9,7 @@ use App\Models\Concerns\OwnsMedia;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Panel extends Model
 {
@@ -61,5 +62,13 @@ class Panel extends Model
     public function databases(): HasMany
     {
         return $this->hasMany(DatabaseInstance::class, 'panel_id', 'panel_id');
+    }
+
+    /**
+     * Aplikasi yang di-hosting di panel ini.
+     */
+    public function hostings(): MorphMany
+    {
+        return $this->morphMany(Hosting::class, 'hostable');
     }
 }

@@ -4,6 +4,7 @@ use App\Enums\VmsStatus;
 use App\Models\Activity;
 use App\Models\Document;
 use App\Models\Hosting;
+use App\Models\Panel;
 use App\Models\Proxmox;
 use App\Models\Vms;
 use Livewire\Attributes\Layout;
@@ -36,14 +37,26 @@ new class extends Component
     }
 
     /**
-     * Aplikasi yang dihosting di VM ini.
+     * Aplikasi yang dihosting di VM ini atau di panel yang terpasang di VM itu.
      */
     public function hostings()
     {
+        $panelIds = Panel::query()
+            ->where('vm_id', $this->vm->vm_id)
+            ->pluck('id')
+            ->all();
+
         return Hosting::query()
-            ->with('application')
-            ->where('hostable_type', Vms::class)
-            ->where('hostable_id', $this->vm->id)
+            ->with(['application', 'hostable'])
+            ->where(function ($query) use ($panelIds) {
+                $query->where(fn ($query) => $query
+                        ->where('hostable_type', Vms::class)
+                        ->where('hostable_id', $this->vm->id))
+                    ->orWhere(fn ($query) => $query
+                        ->where('hostable_type', Panel::class)
+                        ->whereIn('hostable_id', $panelIds));
+            })
+            ->orderBy('id')
             ->get();
     }
 
@@ -345,7 +358,12 @@ new class extends Component
                                     <a href="{{ route('admin.applications.show', $hosting->application->application_id) }}" wire:navigate class="block truncate text-sm font-medium text-content-primary hover:text-guide-600">
                                         {{ $hosting->application->name }}
                                     </a>
-                                    <p class="truncate text-xs text-content-tertiary">{{ $hosting->application->application_id }} · {{ $hosting->application->type->value }}</p>
+                                    <p class="truncate text-xs text-content-tertiary">
+                                        {{ $hosting->application->application_id }} · {{ $hosting->application->type->value }}
+                                        @if ($hosting->hostable_type === Panel::class)
+                                            · di Panel {{ $hosting->hostable->name }}
+                                        @endif
+                                    </p>
                                 </div>
                             </li>
                         @endforeach

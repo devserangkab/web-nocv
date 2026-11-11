@@ -6,6 +6,7 @@ use App\Models\Document;
 use App\Models\Hosting;
 use App\Models\Panel;
 use App\Models\Server;
+use App\Models\Vms;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -36,14 +37,38 @@ new class extends Component
     }
 
     /**
-     * Aplikasi yang dihosting langsung di server ini.
+     * Aplikasi yang dihosting di server ini atau pada aset di bawahnya:
+     * VM di bawah Proxmox server, serta panel yang terpasang di server
+     * dan di VM-VM tersebut.
      */
     public function hostings()
     {
+        $vms = $this->server->proxmox?->vms ?? collect();
+        $vmIds = $vms->pluck('id')->all();
+        $vmCodes = $vms->pluck('vm_id')->all();
+
+        $panelIds = Panel::query()
+            ->where(function ($query) use ($vmCodes) {
+                $query->where('server_id', $this->server->server_id)
+                    ->orWhereIn('vm_id', $vmCodes);
+            })
+            ->pluck('id')
+            ->all();
+
         return Hosting::query()
             ->with(['application', 'hostable'])
-            ->where('hostable_type', Server::class)
-            ->where('hostable_id', $this->server->id)
+            ->where(function ($query) use ($vmIds, $panelIds) {
+                $query->where(fn ($query) => $query
+                        ->where('hostable_type', Server::class)
+                        ->where('hostable_id', $this->server->id))
+                    ->orWhere(fn ($query) => $query
+                        ->where('hostable_type', Vms::class)
+                        ->whereIn('hostable_id', $vmIds))
+                    ->orWhere(fn ($query) => $query
+                        ->where('hostable_type', Panel::class)
+                        ->whereIn('hostable_id', $panelIds));
+            })
+            ->orderBy('id')
             ->get();
     }
 
@@ -357,10 +382,10 @@ new class extends Component
                 @endif
             </div>
 
-            {{-- Aplikasi langsung --}}
+            {{-- Aplikasi --}}
             <div class="ina-card ina-card--stack p-6 xl:col-span-2">
                 <h2 class="text-base font-semibold text-content-primary">Aplikasi</h2>
-                <p class="mt-0.5 text-sm text-content-secondary">Aplikasi yang dihosting langsung di server ini.</p>
+                <p class="mt-0.5 text-sm text-content-secondary">Aplikasi yang dihosting di server ini atau pada VM dan panel di bawahnya.</p>
 
                 @php $hostings = $this->hostings(); @endphp
                 @if ($hostings->isNotEmpty())
@@ -374,13 +399,20 @@ new class extends Component
                                     <a href="{{ route('admin.applications.show', $hosting->application->application_id) }}" wire:navigate class="block truncate text-sm font-medium text-content-primary hover:text-guide-600">
                                         {{ $hosting->application->name }}
                                     </a>
-                                    <p class="truncate text-xs text-content-tertiary">{{ $hosting->application->application_id }} · {{ $hosting->application->type->value }}</p>
+                                    <p class="truncate text-xs text-content-tertiary">
+                                        {{ $hosting->application->application_id }} · {{ $hosting->application->type->value }}
+                                        @if ($hosting->hostable_type === Panel::class)
+                                            · di Panel {{ $hosting->hostable->name }}
+                                        @elseif ($hosting->hostable_type === Vms::class)
+                                            · di VM {{ $hosting->hostable->name }}
+                                        @endif
+                                    </p>
                                 </div>
                             </li>
                         @endforeach
                     </ul>
                 @else
-                    <p class="py-6 text-center text-sm text-content-tertiary">Tidak ada aplikasi yang dihosting langsung di server ini.</p>
+                    <p class="py-6 text-center text-sm text-content-tertiary">Tidak ada aplikasi yang tercatat di server ini.</p>
                 @endif
             </div>
         </div>

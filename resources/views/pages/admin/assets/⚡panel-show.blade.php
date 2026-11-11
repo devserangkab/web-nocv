@@ -42,20 +42,15 @@ new class extends Component
     }
 
     /**
-     * Aplikasi yang berjalan di host tempat panel ini terpasang.
+     * Aplikasi yang di-hosting di panel ini (mis. situs aaPanel).
      */
-    public function hostApplications()
+    public function panelApplications()
     {
-        $host = $this->host();
-
-        if ($host === null) {
-            return collect();
-        }
-
         return Hosting::query()
             ->with('application')
-            ->where('hostable_type', get_class($host))
-            ->where('hostable_id', $host->id)
+            ->where('hostable_type', Panel::class)
+            ->where('hostable_id', $this->panel->id)
+            ->orderBy('id')
             ->get();
     }
 
@@ -383,13 +378,13 @@ new class extends Component
             </div>
 
             <div class="ina-card ina-card--stack p-6">
-                <h2 class="text-base font-semibold text-content-primary">Aplikasi pada Host</h2>
-                <p class="mt-0.5 text-sm text-content-secondary">Aplikasi yang berjalan di host tempat panel ini terpasang.</p>
+                <h2 class="text-base font-semibold text-content-primary">Aplikasi pada Panel</h2>
+                <p class="mt-0.5 text-sm text-content-secondary">Aplikasi yang di-hosting di panel ini.</p>
 
-                @php $hostApplications = $this->hostApplications(); @endphp
-                @if ($hostApplications->isNotEmpty())
+                @php $panelApplications = $this->panelApplications(); @endphp
+                @if ($panelApplications->isNotEmpty())
                     <ul class="divide-y divide-stroke-primary">
-                        @foreach ($hostApplications as $hosting)
+                        @foreach ($panelApplications as $hosting)
                             <li class="flex items-center gap-3 py-3" wire:key="hst-{{ $hosting->id }}">
                                 <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-background-tertiary text-content-secondary">
                                     <i class="ti ti-apps text-base"></i>
@@ -404,7 +399,7 @@ new class extends Component
                         @endforeach
                     </ul>
                 @else
-                    <p class="py-6 text-center text-sm text-content-tertiary">Tidak ada aplikasi yang tercatat di host ini.</p>
+                    <p class="py-6 text-center text-sm text-content-tertiary">Belum ada aplikasi yang ter-hosting di panel ini.</p>
                 @endif
             </div>
         </div>
