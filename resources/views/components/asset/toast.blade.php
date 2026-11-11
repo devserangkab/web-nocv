@@ -12,12 +12,12 @@
 >
     <template x-for="toast in toasts" :key="toast.id">
         <div
-            class="pointer-events-auto flex items-center gap-2.5 rounded-lg border px-4 py-2.5 shadow-lg"
+            class="pointer-events-auto flex max-w-md items-start gap-2.5 rounded-lg border px-4 py-2.5 shadow-lg"
             :class="toast.type === 'error' ? 'ina-toast-error' : 'ina-toast-success'"
             role="status"
         >
-            <i class="ti text-base" :class="toast.type === 'error' ? 'ti-circle-x' : 'ti-circle-check'"></i>
-            <span class="text-sm font-medium" x-text="toast.message"></span>
+            <i class="ti mt-0.5 text-base" :class="toast.type === 'error' ? 'ti-circle-x' : 'ti-circle-check'"></i>
+            <span class="min-w-0 flex-1 break-words text-sm font-medium" x-text="toast.message"></span>
             <button
                 type="button"
                 class="ml-1 text-content-tertiary transition-colors duration-150 hover:text-content-primary"
