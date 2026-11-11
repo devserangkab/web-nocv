@@ -94,6 +94,10 @@ trait InteractsWithVmsForm
 
         if ($this->editingVmsId !== null) {
             app(UpdateVms::class)(Vms::findOrFail($this->editingVmsId), $data);
+            // Refresh model yang ditampilkan halaman detail agar render langsung berubah.
+            if (isset($this->vm)) {
+                $this->vm->refresh();
+            }
             $this->notify('VM '.$this->vm_name.' berhasil diperbarui.');
         } else {
             app(CreateVms::class)($data);

@@ -74,6 +74,10 @@ trait InteractsWithDatabaseInstanceForm
 
         if ($this->editingId !== null) {
             app(UpdateDatabaseInstance::class)(DatabaseInstance::findOrFail($this->editingId), $data);
+            // Refresh model yang ditampilkan halaman detail agar render langsung berubah.
+            if (isset($this->instance)) {
+                $this->instance->refresh();
+            }
             $this->notify('Database server '.$this->name.' berhasil diperbarui.');
         } else {
             app(CreateDatabaseInstance::class)($data);

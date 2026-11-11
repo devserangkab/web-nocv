@@ -120,6 +120,10 @@ trait InteractsWithServerForm
 
         if ($this->editingId !== null) {
             app(UpdateServer::class)(Server::findOrFail($this->editingId), $data);
+            // Refresh model yang ditampilkan halaman detail agar render langsung berubah.
+            if (isset($this->server)) {
+                $this->server->refresh();
+            }
             $this->notify('Server '.$this->server_name.' berhasil diperbarui.');
         } else {
             app(CreateServer::class)($data);

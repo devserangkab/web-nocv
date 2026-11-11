@@ -65,6 +65,10 @@ trait InteractsWithProxmoxForm
 
         if ($this->editingProxmoxId !== null) {
             app(UpdateProxmox::class)(Proxmox::findOrFail($this->editingProxmoxId), $data);
+            // Refresh model yang ditampilkan halaman detail agar render langsung berubah.
+            if (isset($this->proxmox)) {
+                $this->proxmox->refresh();
+            }
             $this->notify('Proxmox '.$this->proxmox_name.' berhasil diperbarui.');
         } else {
             app(CreateProxmox::class)($data);

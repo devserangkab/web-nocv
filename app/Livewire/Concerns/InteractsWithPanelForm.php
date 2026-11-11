@@ -81,6 +81,10 @@ trait InteractsWithPanelForm
 
         if ($this->editingId !== null) {
             app(UpdatePanel::class)(Panel::findOrFail($this->editingId), $data);
+            // Refresh model yang ditampilkan halaman detail agar render langsung berubah.
+            if (isset($this->panel)) {
+                $this->panel->refresh();
+            }
             $this->notify('Panel '.$this->name.' berhasil diperbarui.');
         } else {
             app(CreatePanel::class)($data);

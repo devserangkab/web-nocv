@@ -77,6 +77,10 @@ trait InteractsWithWafForm
 
         if ($this->editingId !== null) {
             app(UpdateWaf::class)(Waf::findOrFail($this->editingId), $data);
+            // Refresh model yang ditampilkan halaman detail agar render langsung berubah.
+            if (isset($this->waf)) {
+                $this->waf->refresh();
+            }
             $this->notify('WAF '.$this->name.' berhasil diperbarui.');
         } else {
             app(CreateWaf::class)($data);
