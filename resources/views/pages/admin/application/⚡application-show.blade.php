@@ -20,11 +20,16 @@ new class extends Component
 
     public Application $application;
 
+    /** Konteks list asal (page/filter) untuk tombol kembali. */
+    public array $returnQuery = [];
+
     public function mount(string $applicationId): void
     {
         $this->application = Application::with(['developers.user', 'hostings.hostable', 'databases.instance'])
             ->where('application_id', $applicationId)
             ->firstOrFail();
+
+        $this->returnQuery = collect(request()->query())->all();
     }
 
     public function documents(): LengthAwarePaginator
@@ -52,10 +57,17 @@ new class extends Component
     @php $documents = $this->documents(); @endphp
     @php $activities = $this->activities(); @endphp
     {{-- Header --}}
+    @php
+        // Konteks list asal (page/filter) dibawa kembali agar index terbuka di posisi terakhir
+        $backQuery = collect($this->returnQuery)->filter(fn ($value) => filled($value))->all();
+        $backHref = empty($backQuery)
+            ? route('admin.applications.index')
+            : route('admin.applications.index').'?'.\Illuminate\Support\Arr::query($backQuery);
+    @endphp
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div class="flex items-start gap-3">
             <a
-                href="{{ route('admin.applications.index') }}"
+                href="{{ $backHref }}"
                 wire:navigate
                 class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-content-tertiary transition-colors duration-150 hover:bg-background-tertiary hover:text-content-primary"
                 aria-label="Kembali ke daftar application"

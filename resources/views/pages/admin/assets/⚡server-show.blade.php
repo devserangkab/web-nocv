@@ -21,6 +21,9 @@ new class extends Component
 
     public string $tab = 'overview';
 
+    /** Konteks list asal (page/filter) untuk tombol kembali dan link tab. */
+    public array $returnQuery = [];
+
     public function mount(string $serverId): void
     {
         $this->server = Server::query()
@@ -29,6 +32,7 @@ new class extends Component
             ->firstOrFail();
 
         $this->tab = request()->query('tab', 'overview');
+        $this->returnQuery = collect(request()->query())->except('tab')->all();
     }
 
     /**
@@ -61,6 +65,7 @@ new class extends Component
         :back-route="route('admin.assets.servers.index')"
         :title="$server->server_name"
         subtitle="Detail server beserta lokasi dan relasi terkait."
+        :back-query="$this->returnQuery"
     >
         @slot('right')
             @can('infrastructure.manage')
@@ -80,6 +85,7 @@ new class extends Component
         :url="route('admin.assets.servers.show', ['serverId' => $server->server_id])"
         :current="$tab"
         :tabs="$this->tabs()"
+        :carry="$this->returnQuery"
     />
 
     {{-- Tab: Overview --}}

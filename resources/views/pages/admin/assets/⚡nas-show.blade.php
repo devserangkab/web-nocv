@@ -17,6 +17,9 @@ new class extends Component
 
     public string $tab = 'overview';
 
+    /** Konteks list asal (page/filter) untuk tombol kembali dan link tab. */
+    public array $returnQuery = [];
+
     public function mount(string $nasId): void
     {
         $this->nas = Nas::query()
@@ -25,6 +28,7 @@ new class extends Component
             ->firstOrFail();
 
         $this->tab = request()->query('tab', 'overview');
+        $this->returnQuery = collect(request()->query())->except('tab')->all();
     }
 
     public function tabs(): array
@@ -45,6 +49,7 @@ new class extends Component
         :back-route="route('admin.assets.nas.index')"
         :title="$nas->name"
         subtitle="Detail perangkat NAS beserta lokasi dan dokumen terkait."
+        :back-query="$this->returnQuery"
     >
         @slot('right')
             <span class="ina-badge ina-badge--soft ina-badge--md {{ $nas->status === NasStatus::On ? 'ina-badge--success' : 'ina-badge--neutral' }}">{{ $nas->status->value }}</span>
@@ -55,6 +60,7 @@ new class extends Component
         :url="route('admin.assets.nas.show', ['nasId' => $nas->nas_id])"
         :current="$tab"
         :tabs="$this->tabs()"
+        :carry="$this->returnQuery"
     />
 
     {{-- Tab: Overview --}}

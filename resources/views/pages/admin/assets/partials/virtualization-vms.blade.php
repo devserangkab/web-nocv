@@ -38,6 +38,14 @@ use App\Models\Vms;
 
 {{-- Table --}}
 @php $vms = $this->vms(); @endphp
+@php
+    // Konteks daftar untuk link detail: halaman + filter aktif (param default dibuang)
+    $detailContext = array_filter([
+        'vms_page' => $vms->currentPage() > 1 ? $vms->currentPage() : null,
+        'vmSearch' => filled($vmSearch) ? $vmSearch : null,
+        'proxmoxFilter' => $proxmoxFilter !== 'ALL' ? $proxmoxFilter : null,
+    ], fn ($value) => $value !== null);
+@endphp
 @if ($vms->count() > 0)
     <div class="mt-4 overflow-hidden rounded-lg border border-stroke-primary bg-background-primary">
         <div class="overflow-x-auto">
@@ -84,7 +92,7 @@ use App\Models\Vms;
                             <td class="h-10 px-4">
                                 <div class="flex items-center justify-end gap-1">
                                     <a
-                                        href="{{ route('admin.assets.vms.show', $vm->vm_id) }}"
+                                        href="{{ route('admin.assets.vms.show', [...$detailContext, 'vmId' => $vm->vm_id]) }}"
                                         wire:navigate
                                         class="flex h-8 w-8 items-center justify-center rounded-md text-content-tertiary transition-colors duration-150 hover:bg-background-tertiary hover:text-content-primary"
                                         aria-label="Detail {{ $vm->name }}"

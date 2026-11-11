@@ -22,10 +22,13 @@ new class extends Component
     #[Layout('layouts::admin')]
     #[Title('Server')]
 
+    #[Url(except: '')]
     public string $search = '';
 
+    #[Url(except: '')]
     public string $locationFilter = '';
 
+    #[Url(except: 'ALL')]
     public string $rackFilter = 'ALL';
 
     public bool $showDeleteModal = false;
@@ -231,6 +234,14 @@ new class extends Component
     </div>
 
     {{-- Data: kelompok per rack --}}
+    @php
+        // Konteks daftar untuk link detail: filter aktif (halaman server tidak berpagination)
+        $detailContext = array_filter([
+            'search' => filled($search) ? $search : null,
+            'locationFilter' => $locationFilter !== '' ? $locationFilter : null,
+            'rackFilter' => $rackFilter !== 'ALL' ? $rackFilter : null,
+        ], fn ($value) => $value !== null);
+    @endphp
     @if (count($this->raks()) > 0)
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 mt-8 ">
             @foreach ($this->raks() as $rak)
@@ -367,7 +378,7 @@ new class extends Component
                                 </div>
     
                                 <div class="mt-5 flex items-center gap-2 border-t border-stroke-primary pt-4">
-                                    <a href="{{ route('admin.assets.servers.show', $server->server_id) }}" wire:navigate class="ina-button ina-button--primary ina-button--sm">
+                                    <a href="{{ route('admin.assets.servers.show', [...$detailContext, 'serverId' => $server->server_id]) }}" wire:navigate class="ina-button ina-button--primary ina-button--sm">
                                         <i class="ti ti-eye text-base" aria-hidden="true"></i>
                                         Detail
                                     </a>

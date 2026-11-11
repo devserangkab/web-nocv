@@ -4,12 +4,21 @@
     'title',
     'code' => null,
     'subtitle' => null,
+    'backQuery' => [],
 ])
+
+@php
+    // Konteks list asal (page/filter) dibawa kembali agar index terbuka di posisi terakhir
+    $backParams = collect($backQuery)->filter(fn ($value) => filled($value))->all();
+    $backHref = empty($backParams)
+        ? $backRoute
+        : $backRoute.(str_contains($backRoute, '?') ? '&' : '?').\Illuminate\Support\Arr::query($backParams);
+@endphp
 
 <div class="flex flex-wrap items-start justify-between gap-4">
     <div class="flex items-start gap-3">
         <a
-            href="{{ $backRoute }}"
+            href="{{ $backHref }}"
             wire:navigate
             class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-content-tertiary transition-colors duration-150 hover:bg-background-tertiary hover:text-content-primary"
             aria-label="Kembali"

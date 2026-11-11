@@ -18,6 +18,9 @@ new class extends Component
 
     public string $tab = 'overview';
 
+    /** Konteks list asal (page/filter) untuk tombol kembali dan link tab. */
+    public array $returnQuery = [];
+
     public function mount(string $proxmoxId): void
     {
         $this->proxmox = Proxmox::query()
@@ -26,6 +29,7 @@ new class extends Component
             ->firstOrFail();
 
         $this->tab = request()->query('tab', 'overview');
+        $this->returnQuery = collect(request()->query())->except('tab')->all();
     }
 
     public function tabs(): array
@@ -46,6 +50,7 @@ new class extends Component
         :back-route="route('admin.assets.virtualization.index', ['tab' => 'proxmox'])"
         :title="$proxmox->name"
         subtitle="Detail host Proxmox beserta server host dan VM di atasnya."
+        :back-query="$this->returnQuery"
     >
         @slot('right')
             @can('infrastructure.manage')
@@ -65,6 +70,7 @@ new class extends Component
         :url="route('admin.assets.proxmox.show', ['proxmoxId' => $proxmox->proxmox_id])"
         :current="$tab"
         :tabs="$this->tabs()"
+        :carry="$this->returnQuery"
     />
 
     {{-- Tab: Overview --}}

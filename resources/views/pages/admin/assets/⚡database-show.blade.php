@@ -23,6 +23,9 @@ new class extends Component
 
     public string $tab = 'overview';
 
+    /** Konteks list asal (page/filter) untuk tombol kembali dan link tab. */
+    public array $returnQuery = [];
+
     public function mount(string $dbiId): void
     {
         $this->instance = DatabaseInstance::query()
@@ -31,6 +34,7 @@ new class extends Component
             ->firstOrFail();
 
         $this->tab = request()->query('tab', 'overview');
+        $this->returnQuery = collect(request()->query())->except('tab')->all();
     }
 
     public function tabs(): array
@@ -51,6 +55,7 @@ new class extends Component
         :back-route="route('admin.assets.databases.index')"
         :title="$instance->name"
         subtitle="Detail database server beserta host dan database di dalamnya."
+        :back-query="$this->returnQuery"
     >
         @slot('right')
             @can('infrastructure.manage')
@@ -70,6 +75,7 @@ new class extends Component
         :url="route('admin.assets.databases.show', ['dbiId' => $instance->dbi_id])"
         :current="$tab"
         :tabs="$this->tabs()"
+        :carry="$this->returnQuery"
     />
 
     {{-- Tab: Overview --}}

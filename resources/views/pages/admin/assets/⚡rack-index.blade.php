@@ -8,6 +8,7 @@ use App\Actions\Assets\UpdateRack;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -20,8 +21,10 @@ new class extends Component
     #[Layout('layouts::admin')]
     #[Title('Rack')]
 
+    #[Url(except: '')]
     public string $search = '';
 
+    #[Url(except: 'ALL')]
     public string $locationFilter = 'ALL';
 
     public bool $showModal = false;
@@ -219,6 +222,14 @@ new class extends Component
 
     {{-- Table --}}
     @php $racks = $this->racks(); @endphp
+    @php
+        // Konteks daftar untuk link detail: halaman + filter aktif (param default dibuang)
+        $detailContext = array_filter([
+            'page' => $racks->currentPage() > 1 ? $racks->currentPage() : null,
+            'search' => filled($search) ? $search : null,
+            'locationFilter' => $locationFilter !== 'ALL' ? $locationFilter : null,
+        ], fn ($value) => $value !== null);
+    @endphp
     @if ($racks->count() > 0)
         <div class="mt-4 overflow-hidden rounded-lg border border-stroke-primary bg-background-primary">
             <div class="overflow-x-auto">
@@ -244,7 +255,7 @@ new class extends Component
                                 <td class="h-10 px-4">
                                     <div class="flex items-center justify-end gap-1">
                                         <a
-                                            href="{{ route('admin.assets.racks.show', $rack->rack_id) }}"
+                                            href="{{ route('admin.assets.racks.show', [...$detailContext, 'rackId' => $rack->rack_id]) }}"
                                             wire:navigate
                                             class="flex h-8 w-8 items-center justify-center rounded-md text-content-tertiary transition-colors duration-150 hover:bg-background-tertiary hover:text-content-primary"
                                             aria-label="Detail {{ $rack->name }}"

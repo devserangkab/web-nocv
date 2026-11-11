@@ -10,6 +10,7 @@ use App\Actions\Locations\UpdateLocation;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -22,6 +23,7 @@ new class extends Component
     #[Layout('layouts::admin')]
     #[Title('Server Room')]
 
+    #[Url(except: '')]
     public string $search = '';
 
     public bool $showModal = false;
@@ -186,6 +188,13 @@ new class extends Component
 
     {{-- Table --}}
     @php $locations = $this->locations(); $serverCounts = $this->serverCounts(); @endphp
+    @php
+        // Konteks daftar untuk link detail: halaman + filter aktif (param default dibuang)
+        $detailContext = array_filter([
+            'page' => $locations->currentPage() > 1 ? $locations->currentPage() : null,
+            'search' => filled($search) ? $search : null,
+        ], fn ($value) => $value !== null);
+    @endphp
     @if ($locations->count() > 0)
         <div class="mt-4 overflow-hidden rounded-lg border border-stroke-primary bg-background-primary">
             <div class="overflow-x-auto">
@@ -209,7 +218,7 @@ new class extends Component
                                 <td class="h-10 px-4">
                                     <div class="flex items-center justify-end gap-1">
                                         <a
-                                            href="{{ route('admin.server-rooms.show', $location->location_id) }}"
+                                            href="{{ route('admin.server-rooms.show', [...$detailContext, 'locationId' => $location->location_id]) }}"
                                             wire:navigate
                                             class="flex h-8 w-8 items-center justify-center rounded-md text-content-tertiary transition-colors duration-150 hover:bg-background-tertiary hover:text-content-primary"
                                             aria-label="Detail {{ $location->name }}"

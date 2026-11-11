@@ -3,16 +3,20 @@
     'url',
     'current',
     'tabs',
+    'carry' => [],
 ])
 
 @php
+    // Konteks list asal (page/filter) dipertahankan antar tab
+    $carryParams = collect($carry)->except('tab')->filter(fn ($value) => filled($value))->all();
+    $carryQs = empty($carryParams) ? '' : '&'.\Illuminate\Support\Arr::query($carryParams);
     $baseTabUrl = str_contains($url, '?') ? $url.'&tab=' : $url.'?tab=';
 @endphp
 
 <div class="mt-6 flex flex-wrap gap-1 rounded-lg border border-stroke-primary bg-background-primary p-1">
     @foreach ($tabs as $tab)
         <a
-            href="{{ $tab['disabled'] ?? false ? '#' : $baseTabUrl.$tab['key'] }}"
+            href="{{ $tab['disabled'] ?? false ? '#' : $baseTabUrl.$tab['key'].$carryQs }}"
             wire:navigate
             @class([
                 'flex h-9 items-center gap-2 rounded-md px-4 text-[13px] font-medium transition-colors duration-150',

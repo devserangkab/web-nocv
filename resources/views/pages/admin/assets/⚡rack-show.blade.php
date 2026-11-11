@@ -18,6 +18,9 @@ new class extends Component
 
     public string $tab = 'overview';
 
+    /** Konteks list asal (page/filter) untuk tombol kembali dan link tab. */
+    public array $returnQuery = [];
+
     public function mount(string $rackId): void
     {
         $this->rack = Rack::query()
@@ -26,6 +29,7 @@ new class extends Component
             ->firstOrFail();
 
         $this->tab = request()->query('tab', 'overview');
+        $this->returnQuery = collect(request()->query())->except('tab')->all();
     }
 
     public function tabs(): array
@@ -80,12 +84,14 @@ new class extends Component
         :back-route="route('admin.assets.racks.index')"
         :title="$rack->name"
         subtitle="Detail rack beserta server yang ditempatkan di dalamnya."
+        :back-query="$this->returnQuery"
     />
 
     <x-asset.tab-nav
         :url="route('admin.assets.racks.show', ['rackId' => $rack->rack_id])"
         :current="$tab"
         :tabs="$this->tabs()"
+        :carry="$this->returnQuery"
     />
 
     {{-- Tab: Overview --}}

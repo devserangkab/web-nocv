@@ -12,6 +12,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -24,8 +25,10 @@ new class extends Component
     #[Layout('layouts::admin')]
     #[Title('NAS')]
 
+    #[Url(except: '')]
     public string $search = '';
 
+    #[Url(except: 'ALL')]
     public string $statusFilter = 'ALL';
 
     public bool $showModal = false;
@@ -303,6 +306,14 @@ new class extends Component
 
     {{-- Table --}}
     @php $nasList = $this->nasList(); @endphp
+    @php
+        // Konteks daftar untuk link detail: halaman + filter aktif (param default dibuang)
+        $detailContext = array_filter([
+            'page' => $nasList->currentPage() > 1 ? $nasList->currentPage() : null,
+            'search' => filled($search) ? $search : null,
+            'statusFilter' => $statusFilter !== 'ALL' ? $statusFilter : null,
+        ], fn ($value) => $value !== null);
+    @endphp
     @if ($nasList->count() > 0)
         <div class="mt-4 overflow-hidden rounded-lg border border-stroke-primary bg-background-primary">
             <div class="overflow-x-auto">
@@ -349,7 +360,7 @@ new class extends Component
                                 <td class="h-14 px-4">
                                     <div class="flex items-center justify-end gap-1">
                                         <a
-                                            href="{{ route('admin.assets.nas.show', $nas->nas_id) }}"
+                                            href="{{ route('admin.assets.nas.show', [...$detailContext, 'nasId' => $nas->nas_id]) }}"
                                             wire:navigate
                                             class="flex h-8 w-8 items-center justify-center rounded-md text-content-tertiary transition-colors duration-150 hover:bg-background-tertiary hover:text-content-primary"
                                             aria-label="Detail {{ $nas->name }}"

@@ -22,6 +22,7 @@ use App\Models\Vms;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
@@ -37,10 +38,13 @@ new class extends Component
     #[Layout('layouts::admin')]
     #[Title('Applications')]
 
+    #[Url(except: '')]
     public string $search = '';
 
+    #[Url(except: 'ALL')]
     public string $statusFilter = 'ALL';
 
+    #[Url(except: 'ALL')]
     public string $typeFilter = 'ALL';
 
     public bool $showModal = false;
@@ -646,6 +650,15 @@ new class extends Component
 
     {{-- Table --}}
     @php $applications = $this->applications(); @endphp
+    @php
+        // Konteks daftar untuk link detail: halaman + filter aktif (param default dibuang)
+        $detailContext = array_filter([
+            'page' => $applications->currentPage() > 1 ? $applications->currentPage() : null,
+            'search' => filled($search) ? $search : null,
+            'statusFilter' => $statusFilter !== 'ALL' ? $statusFilter : null,
+            'typeFilter' => $typeFilter !== 'ALL' ? $typeFilter : null,
+        ], fn ($value) => $value !== null);
+    @endphp
     @if ($applications->count() > 0)
         <div class="mt-4 overflow-hidden rounded-lg border border-stroke-primary bg-background-primary">
             <div class="overflow-x-auto">
@@ -711,7 +724,7 @@ new class extends Component
                                 <td class="h-14 px-4">
                                     <div class="flex items-center justify-end gap-1">
                                         <a
-                                            href="{{ route('admin.applications.show', $application->application_id) }}"
+                                            href="{{ route('admin.applications.show', [...$detailContext, 'applicationId' => $application->application_id]) }}"
                                             wire:navigate
                                             class="flex h-8 w-8 items-center justify-center rounded-md text-content-tertiary transition-colors duration-150 hover:bg-background-tertiary hover:text-content-primary"
                                             aria-label="Detail {{ $application->name }}"

@@ -23,6 +23,13 @@ use App\Models\Proxmox;
 
 {{-- Table --}}
 @php $proxmoxs = $this->proxmoxs(); @endphp
+@php
+    // Konteks daftar untuk link detail: halaman + filter aktif (param default dibuang)
+    $detailContext = array_filter([
+        'proxmox_page' => $proxmoxs->currentPage() > 1 ? $proxmoxs->currentPage() : null,
+        'proxmoxSearch' => filled($proxmoxSearch) ? $proxmoxSearch : null,
+    ], fn ($value) => $value !== null);
+@endphp
 @if ($proxmoxs->count() > 0)
     <div class="mt-4 overflow-hidden rounded-lg border border-stroke-primary bg-background-primary">
         <div class="overflow-x-auto">
@@ -74,7 +81,7 @@ use App\Models\Proxmox;
                             <td class="h-10 px-4">
                                 <div class="flex items-center justify-end gap-1">
                                     <a
-                                        href="{{ route('admin.assets.proxmox.show', $proxmox->proxmox_id) }}"
+                                        href="{{ route('admin.assets.proxmox.show', [...$detailContext, 'proxmoxId' => $proxmox->proxmox_id]) }}"
                                         wire:navigate
                                         class="flex h-8 w-8 items-center justify-center rounded-md text-content-tertiary transition-colors duration-150 hover:bg-background-tertiary hover:text-content-primary"
                                         aria-label="Detail {{ $proxmox->name }}"

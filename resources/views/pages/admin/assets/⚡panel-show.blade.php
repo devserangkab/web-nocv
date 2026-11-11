@@ -19,6 +19,9 @@ new class extends Component
 
     public string $tab = 'overview';
 
+    /** Konteks list asal (page/filter) untuk tombol kembali dan link tab. */
+    public array $returnQuery = [];
+
     public function mount(string $panelId): void
     {
         $this->panel = Panel::query()
@@ -27,6 +30,7 @@ new class extends Component
             ->firstOrFail();
 
         $this->tab = request()->query('tab', 'overview');
+        $this->returnQuery = collect(request()->query())->except('tab')->all();
     }
 
     /**
@@ -73,6 +77,7 @@ new class extends Component
         :back-route="route('admin.assets.panels.index')"
         :title="$panel->name"
         subtitle="Detail panel beserta host dan relasi terkait."
+        :back-query="$this->returnQuery"
     >
         @slot('right')
             @can('infrastructure.manage')
@@ -92,6 +97,7 @@ new class extends Component
         :url="route('admin.assets.panels.show', ['panelId' => $panel->panel_id])"
         :current="$tab"
         :tabs="$this->tabs()"
+        :carry="$this->returnQuery"
     />
 
     {{-- Tab: Overview --}}

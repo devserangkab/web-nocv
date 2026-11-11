@@ -13,6 +13,7 @@ use App\Models\Server;
 use App\Models\Vms;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -33,6 +34,7 @@ new class extends Component
     public string $tab = 'proxmox';
 
     // Proxmox
+    #[Url(except: '')]
     public string $proxmoxSearch = '';
 
 
@@ -48,8 +50,10 @@ new class extends Component
 
 
     // VM
+    #[Url(except: '')]
     public string $vmSearch = '';
 
+    #[Url(except: 'ALL')]
     public string $proxmoxFilter = 'ALL';
 
 
