@@ -36,7 +36,10 @@ KITAB SUCI UPDATED.xlsx
 /docker/certs
 
 # Kelompok belum siap di-commit (dikerjakan terpisah)
-/database/seeders
+# Seeder data aset tetap lokal; hanya seeder struktur aplikasi yang di-track.
+/database/seeders/*
+!/database/seeders/PermissionSeeder.php
+!/database/seeders/RoleSeeder.php
 /database/factories
 /backup
 /tests
