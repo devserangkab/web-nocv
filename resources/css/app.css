@@ -43,6 +43,20 @@
 }
 
 /*
+ * Kanvas topologi: lembaran putih bertitik grid halus di atas "meja" abu-abu.
+ * Titik memakai token stroke (ikut tema terang/gelap) yang diredam agar tidak mengganggu.
+ */
+.topology-canvas-grid {
+    background-color: var(--ina-background-primary);
+    background-image: radial-gradient(
+        circle,
+        color-mix(in srgb, var(--ina-stroke-primary) 35%, transparent) 1px,
+        transparent 1.4px
+    );
+    background-size: 22px 22px;
+}
+
+/*
  * Badge soft neutral di dark mode: IDDS memakai teks langkah gelap
  * (var(--ina-neutral-800), #1f1f1f) di atas background gelap —
  * hasilnya hitam-di-atas-hitam. Petakan teks ke token konten gelap.

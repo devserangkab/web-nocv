@@ -3,6 +3,7 @@
 use App\Models\Application;
 use App\Models\Database;
 use App\Models\DatabaseInstance;
+use App\Models\Hosting;
 use App\Models\Location;
 use App\Models\Panel;
 use App\Models\Proxmox;
@@ -21,18 +22,18 @@ new class extends Component
 
     public string $search = '';
 
-    /** @var array<string, bool> jenis aset yang ditampilkan (re-parent bila dimatikan) */
+    /** @var array<string, bool> jenis aset yang ditampilkan (re-parent bila dimatikan) — default hanya lapisan fisik */
     public array $visibleTypes = [
         'location' => true,
         'rack' => true,
         'server' => true,
-        'nas' => true,
-        'proxmox' => true,
-        'vms' => true,
-        'panel' => true,
-        'waf' => true,
-        'dbi' => true,
-        'application' => true,
+        'nas' => false,
+        'proxmox' => false,
+        'vms' => false,
+        'panel' => false,
+        'waf' => false,
+        'dbi' => false,
+        'application' => false,
     ];
 
     public string $mode = 'hierarchy';
@@ -66,22 +67,26 @@ new class extends Component
             ->with([
                 'racks.servers.proxmox.vms.panels',
                 'racks.servers.proxmox.vms.panels.databases.schemas',
+                'racks.servers.proxmox.vms.panels.hostings.application',
                 'racks.servers.proxmox.vms.databases.schemas',
                 'racks.servers.proxmox.vms.wafs',
                 'racks.servers.proxmox.vms.hostings.application',
                 'racks.servers.panels',
                 'racks.servers.panels.databases.schemas',
+                'racks.servers.panels.hostings.application',
                 'racks.servers.databases.schemas',
                 'racks.servers.wafs',
                 'racks.servers.hostings.application',
                 'racks.nas',
                 'servers.proxmox.vms.panels',
                 'servers.proxmox.vms.panels.databases.schemas',
+                'servers.proxmox.vms.panels.hostings.application',
                 'servers.proxmox.vms.databases.schemas',
                 'servers.proxmox.vms.wafs',
                 'servers.proxmox.vms.hostings.application',
                 'servers.panels',
                 'servers.panels.databases.schemas',
+                'servers.panels.hostings.application',
                 'servers.databases.schemas',
                 'servers.wafs',
                 'servers.hostings.application',
@@ -105,7 +110,8 @@ new class extends Component
      * Pohon yang difilter: jenis tidak aktif di-re-parent ke induk,
      * pencarian memangkas cabang yang tidak memuat kecocokan (induk tetap utuh).
      */
-    public function tree(): array    {
+    public function tree(): array
+    {
         $tree = $this->typeFilteredTree($this->rawTree());
 
         if (trim($this->search) !== '') {
@@ -113,6 +119,96 @@ new class extends Component
         }
 
         return $tree;
+    }
+
+    /**
+     * Tata letak kanvas mode diagram: kolom per kedalaman (kiri→kanan),
+     * urutan daun menentukan baris, induk di tengah anak-anaknya.
+     *
+     * @return array{nodes: array<string, array{key: string, type: string, label: string, code: string|null, icon: string, url: string|null, colorClass: string, x: int, y: int}>, edges: array<int, array{from: string, to: string}>, nodeWidth: int, nodeHeight: int, width: int, height: int}
+     */
+    public function diagramLayout(): array
+    {
+        $nodeWidth = 190;
+        $nodeHeight = 36;
+        $gapX = 32;
+        $rowPitch = 46;
+        $padding = 16;
+
+        $nodes = [];
+        $edges = [];
+        $leafIndex = 0;
+        $maxDepth = 0;
+
+        $walk = function (array $node, int $depth, string $key, string $parentKey) use (&$walk, &$nodes, &$edges, &$leafIndex, &$maxDepth, $nodeWidth, $gapX, $rowPitch, $padding) {
+            $maxDepth = max($maxDepth, $depth);
+
+            $childKeys = [];
+
+            foreach (array_values($node['children']) as $index => $child) {
+                $childKey = $key.'-'.$index;
+                $walk($child, $depth + 1, $childKey, $key);
+                $childKeys[] = $childKey;
+            }
+
+            if ($childKeys !== []) {
+                $ys = array_map(fn ($childKey) => $nodes[$childKey]['y'], $childKeys);
+                $y = (min($ys) + max($ys)) / 2;
+            } else {
+                $y = $padding + $leafIndex * $rowPitch;
+                $leafIndex++;
+            }
+
+            $nodes[$key] = [
+                'key' => $key,
+                'type' => $node['type'],
+                'label' => $node['label'],
+                'code' => $node['code'],
+                'icon' => $node['icon'],
+                'url' => $node['url'],
+                'colorClass' => $this->nodeColorClass($node['type']),
+                'x' => (int) round($padding + $depth * ($nodeWidth + $gapX)),
+                'y' => (int) round($y),
+            ];
+
+            if ($parentKey !== '') {
+                $edges[] = ['from' => $parentKey, 'to' => $key];
+            }
+        };
+
+        $walk($this->tree(), 0, 'n0', '');
+
+        return [
+            'nodes' => $nodes,
+            'edges' => $edges,
+            'nodeWidth' => $nodeWidth,
+            'nodeHeight' => $nodeHeight,
+            'width' => $padding * 2 + ($maxDepth + 1) * $nodeWidth + $maxDepth * $gapX,
+            'height' => $padding * 2 + max($leafIndex - 1, 0) * $rowPitch + $nodeHeight,
+        ];
+    }
+
+    /**
+     * Kelas warna ikon node per jenis aset (konsisten dengan node-tree).
+     */
+    private function nodeColorClass(string $type): string
+    {
+        $colorClasses = [
+            'location' => 'bg-guide-500 text-white',
+            'rack' => 'bg-background-tertiary text-content-secondary',
+            'server' => 'bg-guide-50 text-guide-600',
+            'nas' => 'bg-guide-100 text-guide-600',
+            'proxmox' => 'bg-warning-50 text-warning-600',
+            'vms' => 'bg-background-tertiary text-content-secondary',
+            'panel' => 'bg-guide-50 text-guide-600',
+            'waf' => 'bg-negative-50 text-negative-600',
+            'dbi' => 'bg-guide-100 text-guide-600',
+            'db_schema' => 'bg-background-tertiary text-content-secondary',
+            'application' => 'bg-guide-100 text-guide-600',
+            'root' => 'bg-guide-500 text-white',
+        ];
+
+        return $colorClasses[$type] ?? $colorClasses['vms'];
     }
 
     /**
@@ -284,11 +380,17 @@ new class extends Component
         return [
             'type' => 'panel',
             'label' => $panel->name,
-            'code' => $panel->panel_id.($host !== null ? ' · di '.$host->name : ''),
+            'code' => $panel->panel_id.($host !== null ? ' · di '.($host->name ?? $host->server_name ?? '') : ''),
             'icon' => 'ti-app-window',
             'color' => 'neutral',
             'url' => route('admin.assets.panels.show', $panel->panel_id),
-            'children' => $panel->databases->map(fn (DatabaseInstance $instance) => $this->dbiNode($instance))->all(),
+            'children' => array_merge(
+                $panel->databases->map(fn (DatabaseInstance $instance) => $this->dbiNode($instance))->all(),
+                $panel->hostings
+                    ->filter(fn (Hosting $hosting) => $hosting->application !== null)
+                    ->map(fn (Hosting $hosting) => $this->applicationNode($hosting->application))
+                    ->all(),
+            ),
         ];
     }
 
@@ -347,6 +449,16 @@ new class extends Component
     }
 
     /**
+     * Jenis node terlihat; database (schema) mengikuti toggle Database Server.
+     */
+    private function typeVisible(string $type): bool
+    {
+        $type = $type === 'db_schema' ? 'dbi' : $type;
+
+        return $this->visibleTypes[$type] ?? true;
+    }
+
+    /**
      * Jenis yang tidak ditampilkan dilepas dari pohon; anak-anaknya
      * dipindah (re-parent) ke induk agar tetap terlihat.
      */
@@ -361,7 +473,7 @@ new class extends Component
                 continue;
             }
 
-            if ($this->visibleTypes[$child['type']] ?? true) {
+            if ($this->typeVisible($child['type'])) {
                 $children[] = $pruned;
             } else {
                 // Node disembunyikan, anak-anaknya naik satu level
@@ -369,7 +481,7 @@ new class extends Component
             }
         }
 
-        if (! ($this->visibleTypes[$node['type']] ?? true)) {
+        if (! $this->typeVisible($node['type'])) {
             return [
                 'type' => $node['type'],
                 'label' => $node['label'],
@@ -422,7 +534,7 @@ new class extends Component
     <div class="flex flex-wrap items-center justify-between gap-4">
         <div>
             <h1 class="text-xl font-semibold text-content-primary">Topology Explorer</h1>
-            <p class="mt-1 text-sm text-content-secondary">Jelajahi rantai infrastruktur: Server Room → Rack → Server → Proxmox → VM → Panel → Database → Application.</p>
+            <p class="mt-1 text-sm text-content-secondary">Jelajahi rantai infrastruktur: Server Room → Rack → Server → Proxmox → VM → Panel → Database Server → Database → Application, termasuk NAS dan WAF.</p>
         </div>
 
         {{-- Mode --}}
@@ -509,8 +621,10 @@ new class extends Component
 
     {{-- Tree --}}
     @php $tree = $this->tree(); @endphp
-    @if (count($tree['children']) > 0)
-        <div class="mt-4 rounded-lg border border-stroke-primary bg-background-primary p-4 {{ $mode === 'diagram' ? 'overflow-x-auto' : '' }}">
+    @if (count($tree['children']) > 0 && $mode === 'diagram')
+        @include('components.topology.canvas', ['layout' => $this->diagramLayout()])
+    @elseif (count($tree['children']) > 0)
+        <div class="mt-4 rounded-lg border border-stroke-primary bg-background-primary p-4">
             @include('components.topology.node-tree', ['node' => $tree])
         </div>
     @else
