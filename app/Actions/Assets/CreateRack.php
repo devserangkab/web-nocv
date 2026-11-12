@@ -14,7 +14,7 @@ class CreateRack
      */
     public function __invoke(array $data): Rack
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('racks.create', 'Tidak berwenang menambah rack.');
         $data = Validator::make($data, static::rules(), static::messages())->validate();
 
         $rack = Rack::create($this->normalize($data));

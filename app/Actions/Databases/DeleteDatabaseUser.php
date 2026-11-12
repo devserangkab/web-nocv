@@ -10,7 +10,7 @@ class DeleteDatabaseUser
 {
     public function __invoke(DatabaseUser $user): bool
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('databases.delete', 'Tidak berwenang menghapus user database.');
 
         $deleted = $user->delete();
 

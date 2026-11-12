@@ -16,7 +16,7 @@ class CreateVms
      */
     public function __invoke(array $data): Vms
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('vms.create', 'Tidak berwenang menambah virtual machine.');
         $data = Validator::make($data, static::rules(), static::messages())->validate();
 
         $vms = Vms::create($this->normalize($data));

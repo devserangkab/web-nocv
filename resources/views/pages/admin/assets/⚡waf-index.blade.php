@@ -122,7 +122,7 @@ new class extends Component
             <h1 class="text-xl font-semibold text-content-primary">WAF</h1>
             <p class="mt-1 text-sm text-content-secondary">Daftar Web Application Firewall terpasang di VM atau server.</p>
         </div>
-        @can('infrastructure.manage')
+        @can('wafs.create')
         <button type="button" wire:click="openCreate" class="ina-button ina-button--primary ina-button--md">
             <i class="ti ti-plus text-lg" aria-hidden="true"></i>
             Tambah WAF
@@ -217,7 +217,7 @@ new class extends Component
                                         >
                                             <i class="ti ti-eye text-base"></i>
                                         </a>
-                                        @can("infrastructure.manage")
+                                        @can("wafs.update")
                                         <button
                                             type="button"
                                             wire:click="edit({{ $waf->id }})"
@@ -228,7 +228,7 @@ new class extends Component
                                             <i class="ti ti-pencil text-base"></i>
                                         </button>
                                         @endcan
-                                        @can("infrastructure.manage")
+                                        @can("wafs.delete")
                                         <button
                                             type="button"
                                             wire:click="askDelete({{ $waf->id }})"

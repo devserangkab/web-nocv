@@ -16,7 +16,7 @@ class CreateDatabaseSchema
      */
     public function __invoke(DatabaseInstance $instance, array $data): Database
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('databases.create', 'Tidak berwenang menambah schema database.');
 
         $data = Validator::make($data, static::rules($instance), static::messages())->validate();
 

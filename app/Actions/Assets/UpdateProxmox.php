@@ -14,7 +14,7 @@ class UpdateProxmox
      */
     public function __invoke(Proxmox $proxmox, array $data): Proxmox
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('proxmox.update', 'Tidak berwenang mengubah host Proxmox.');
         $data = Validator::make($data, CreateProxmox::rules($proxmox->id), CreateProxmox::messages())->validate();
 
         $normalized = CreateProxmox::normalize($data);

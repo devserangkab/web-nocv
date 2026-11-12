@@ -199,6 +199,7 @@ new class extends Component
                                 <td class="h-14 px-4 text-content-secondary">{{ $report->updated_at->format('d M Y') }}</td>
                                 <td class="h-14 px-4">
                                     <div class="flex items-center justify-end gap-1">
+                                        @if (auth()->user()?->can('monthly-reports.view-all') || (auth()->user()?->can('monthly-reports.update-own') && $report->created_by === auth()->id()))
                                         <a href="{{ route('admin.reports.edit', $report->report_id) }}" wire:navigate
                                             class="flex h-8 w-8 items-center justify-center rounded-md text-content-tertiary transition-colors duration-150 hover:bg-background-tertiary hover:text-content-primary"
                                             aria-label="Buka {{ $report->title }}" title="Buka">
@@ -209,11 +210,14 @@ new class extends Component
                                             aria-label="Cetak {{ $report->title }}" title="Cetak">
                                             <i class="ti ti-printer text-base"></i>
                                         </a>
+                                        @endif
+                                        @if (auth()->user()?->can('monthly-reports.view-all') || (auth()->user()?->can('monthly-reports.delete-own') && $report->created_by === auth()->id()))
                                         <button type="button" wire:click="confirmDelete({{ $report->id }})"
                                             class="flex h-8 w-8 items-center justify-center rounded-md text-content-tertiary transition-colors duration-150 hover:bg-negative-50 hover:text-negative-600"
                                             aria-label="Hapus {{ $report->title }}" title="Hapus">
                                             <i class="ti ti-trash text-base"></i>
                                         </button>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>

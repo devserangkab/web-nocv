@@ -28,7 +28,7 @@ class StoreDocument
      */
     public function __invoke(?Model $documentable, array $data, ?int $addedBy = null): Document
     {
-        Authorize::documentsCreate();
+        Authorize::permission('documents.create', 'Tidak berwenang mengunggah dokumen.');
 
         $data = Validator::make($data, static::rules(), static::messages())->validate();
 

@@ -12,7 +12,7 @@ class DeleteApplication
 {
     public function __invoke(Application $application): bool
     {
-        Authorize::applicationsManage();
+        Authorize::permission('applications.delete', 'Tidak berwenang menghapus application.');
 
         return DB::transaction(function () use ($application): bool {
             if (filled($application->icon)) {

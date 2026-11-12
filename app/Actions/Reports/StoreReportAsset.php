@@ -14,7 +14,7 @@ class StoreReportAsset
      */
     public function __invoke(UploadedFile $file, ?int $userId): array
     {
-        Authorize::monthlyReportsCreate();
+        Authorize::permission('monthly-reports.view', 'Tidak berwenang mengunggah asset laporan.');
         $validated = Validator::make(
             ['file' => $file],
             ['file' => ['image', 'max:4096']],

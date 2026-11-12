@@ -13,7 +13,7 @@ class DeleteUser
      */
     public function __invoke(User $user): bool
     {
-        Authorize::managementManage();
+        Authorize::permission('users.delete', 'Tidak berwenang menghapus user.');
         if ($user->id === auth()->id()) {
             throw ValidationException::withMessages([
                 'deletingId' => 'Tidak bisa menghapus akun sendiri.',

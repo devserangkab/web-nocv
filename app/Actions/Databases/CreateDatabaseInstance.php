@@ -19,7 +19,7 @@ class CreateDatabaseInstance
      */
     public function __invoke(array $data): DatabaseInstance
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('databases.create', 'Tidak berwenang menambah database.');
         $data = Validator::make($data, static::rules(), static::messages())->validate();
 
         $instance = DatabaseInstance::create($this->normalize($data));

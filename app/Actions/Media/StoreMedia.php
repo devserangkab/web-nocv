@@ -23,7 +23,7 @@ class StoreMedia
      */
     public function __invoke(Model $mediable, array $data, ?int $addedBy = null): Media
     {
-        Authorize::mediaCreate();
+        Authorize::permission('media.create', 'Tidak berwenang mengunggah media gallery.');
 
         $data['mediable_type'] = $mediable->getMorphClass();
         $data['mediable_id'] = $mediable->id;

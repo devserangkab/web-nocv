@@ -13,7 +13,7 @@ class CreateInstitution
      */
     public function __invoke(array $data): Institution
     {
-        Authorize::managementManage();
+        Authorize::permission('institutions.create', 'Tidak berwenang menambah institution.');
         $data = Validator::make($data, static::rules(null), static::messages())->validate();
 
         return Institution::create($data);

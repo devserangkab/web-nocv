@@ -100,7 +100,7 @@ use App\Models\Vms;
                                     >
                                         <i class="ti ti-eye text-base"></i>
                                     </a>
-                                    @can('infrastructure.manage')
+                                    @can('vms.update')
                                     <button
                                         type="button"
                                         wire:click="editVms({{ $vm->id }})"
@@ -110,6 +110,8 @@ use App\Models\Vms;
                                     >
                                         <i class="ti ti-pencil text-base"></i>
                                     </button>
+                                    @endcan
+                                    @can('vms.delete')
                                     <button
                                         type="button"
                                         wire:click="askDeleteVms({{ $vm->id }})"

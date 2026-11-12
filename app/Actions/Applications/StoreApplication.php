@@ -39,7 +39,10 @@ class StoreApplication
      */
     public function __invoke(Application $application, array $data): Application
     {
-        Authorize::applicationsManage();
+        Authorize::permission(
+            $application->exists ? 'applications.update' : 'applications.create',
+            $application->exists ? 'Tidak berwenang mengubah application.' : 'Tidak berwenang menambah application.'
+        );
         $data = Validator::make($data, static::rules($application->exists ? $application->id : null), static::messages())->validate();
 
         $developerRows = collect($data['developers'] ?? [])

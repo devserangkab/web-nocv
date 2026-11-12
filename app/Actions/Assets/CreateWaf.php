@@ -18,7 +18,7 @@ class CreateWaf
      */
     public function __invoke(array $data): Waf
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('wafs.create', 'Tidak berwenang menambah WAF.');
         $data = Validator::make($data, static::rules(), static::messages())->validate();
 
         $waf = Waf::create($this->normalize($data));

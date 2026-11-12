@@ -10,7 +10,7 @@ class DeleteDatabaseInstance
 {
     public function __invoke(DatabaseInstance $instance): bool
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('databases.delete', 'Tidak berwenang menghapus database.');
         $deleted = $instance->delete();
 
         // Schema di dalamnya ikut terhapus via FK cascade

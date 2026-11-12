@@ -14,7 +14,7 @@ class RejectSyncProposal
 {
     public function __invoke(SyncProposal $proposal): SyncProposal
     {
-        Authorize::applicationsManage();
+        Authorize::permission('applications.update', 'Tidak berwenang menolak usulan sinkronisasi.');
 
         if ($proposal->status !== SyncProposalStatus::Pending) {
             throw ValidationException::withMessages([

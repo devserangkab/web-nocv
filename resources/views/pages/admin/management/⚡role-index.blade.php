@@ -137,15 +137,24 @@ new class extends Component
     private function moduleLabels(): array
     {
         return [
+            'locations' => 'Ruang Server',
             'racks' => 'Rack',
             'servers' => 'Server',
             'proxmox' => 'Proxmox',
             'vms' => 'Virtual Machine',
             'panels' => 'Panel',
+            'wafs' => 'WAF',
+            'databases' => 'Database Server',
+            'nas' => 'NAS',
+            'applications' => 'Application',
             'users' => 'User',
             'roles' => 'Role',
             'institutions' => 'Institution',
-            'applications' => 'Application',
+            'documents' => 'Dokumen',
+            'media' => 'Media Gallery',
+            'activities' => 'Aktivitas',
+            'monthly-reports' => 'Laporan Bulanan',
+            'devtools' => 'Developer Tool',
         ];
     }
 
@@ -200,10 +209,12 @@ new class extends Component
             <h1 class="text-xl font-semibold text-content-primary">Roles</h1>
             <p class="mt-1 text-sm text-content-secondary">Kelola role beserta permission masing-masing modul.</p>
         </div>
+        @can('roles.create')
         <button type="button" wire:click="openCreate" class="ina-button ina-button--primary ina-button--md">
             <i class="ti ti-plus text-lg" aria-hidden="true"></i>
             Tambah Role
         </button>
+        @endcan
     </div>
 
     {{-- Search kanan --}}
@@ -252,6 +263,7 @@ new class extends Component
                                 <td class="h-10 px-4">
                                     <div class="flex items-center justify-end gap-1">
                                         @if ($role->name !== 'superadmin')
+                                            @can('roles.update')
                                             <button
                                                 type="button"
                                                 wire:click="edit({{ $role->id }})"
@@ -261,6 +273,8 @@ new class extends Component
                                             >
                                                 <i class="ti ti-pencil text-base"></i>
                                             </button>
+                                            @endcan
+                                            @can('roles.delete')
                                             <button
                                                 type="button"
                                                 wire:click="askDelete({{ $role->id }})"
@@ -270,6 +284,7 @@ new class extends Component
                                             >
                                                 <i class="ti ti-trash text-base"></i>
                                             </button>
+                                            @endcan
                                         @else
                                             <span class="ina-badge ina-badge--soft ina-badge--neutral ina-badge--sm me-1">Terproteksi</span>
                                         @endif
@@ -305,7 +320,7 @@ new class extends Component
         <div class="fixed inset-0 z-50 bg-black/50" x-show="open" x-transition.opacity @click="open = false" aria-hidden="true"></div>
 
         <div
-            class="fixed left-1/2 top-1/2 z-50 w-full max-w-xl max-h-[calc(100vh-32px)] overflow-y-auto -translate-x-1/2 -translate-y-1/2 rounded-xl border border-stroke-primary bg-background-primary p-6 shadow-lg"
+            class="fixed left-1/2 top-1/2 z-50 w-full max-w-xl max-h-[calc(100vh-32px)] -translate-x-1/2 -translate-y-1/2 rounded-xl border border-stroke-primary bg-background-primary p-6 shadow-lg"
             x-show="open"
             x-transition.opacity.duration.150ms
             role="dialog"

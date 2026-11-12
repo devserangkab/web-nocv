@@ -117,7 +117,7 @@ new class extends Component
             <h1 class="text-xl font-semibold text-content-primary">Database</h1>
             <p class="mt-1 text-sm text-content-secondary">Daftar database server (MySQL, PostgreSQL, dll) ter-install di server, VM, atau panel.</p>
         </div>
-        @can('infrastructure.manage')
+        @can('databases.create')
         <button type="button" wire:click="openCreate" class="ina-button ina-button--primary ina-button--md">
             <i class="ti ti-plus text-lg" aria-hidden="true"></i>
             Tambah Database Server
@@ -218,7 +218,7 @@ new class extends Component
                                         >
                                             <i class="ti ti-eye text-base"></i>
                                         </a>
-                                        @can("infrastructure.manage")
+                                        @can("databases.update")
                                         <button
                                             type="button"
                                             wire:click="edit({{ $instance->id }})"
@@ -229,7 +229,7 @@ new class extends Component
                                             <i class="ti ti-pencil text-base"></i>
                                         </button>
                                         @endcan
-                                        @can("infrastructure.manage")
+                                        @can("databases.delete")
                                         <button
                                             type="button"
                                             wire:click="askDelete({{ $instance->id }})"

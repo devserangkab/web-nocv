@@ -15,7 +15,7 @@ class UpdateDatabaseInstance
      */
     public function __invoke(DatabaseInstance $instance, array $data): DatabaseInstance
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('databases.update', 'Tidak berwenang mengubah database.');
         $data = Validator::make($data, CreateDatabaseInstance::rules(), CreateDatabaseInstance::messages())->validate();
 
         $normalized = CreateDatabaseInstance::normalize($data);

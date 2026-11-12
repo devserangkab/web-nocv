@@ -89,7 +89,7 @@ use App\Models\Proxmox;
                                     >
                                         <i class="ti ti-eye text-base"></i>
                                     </a>
-                                    @can('infrastructure.manage')
+                                    @can('proxmox.update')
                                     <button
                                         type="button"
                                         wire:click="editProxmox({{ $proxmox->id }})"
@@ -99,6 +99,8 @@ use App\Models\Proxmox;
                                     >
                                         <i class="ti ti-pencil text-base"></i>
                                     </button>
+                                    @endcan
+                                    @can('proxmox.delete')
                                     <button
                                         type="button"
                                         wire:click="askDeleteProxmox({{ $proxmox->id }})"

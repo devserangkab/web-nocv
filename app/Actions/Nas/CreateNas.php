@@ -17,7 +17,7 @@ class CreateNas
      */
     public function __invoke(array $data): Nas
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('nas.create', 'Tidak berwenang menambah NAS.');
         $data = Validator::make($data, static::rules(), static::messages())->validate();
 
         $nas = Nas::create($this->normalize($data));

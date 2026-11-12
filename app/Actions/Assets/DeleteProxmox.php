@@ -10,7 +10,7 @@ class DeleteProxmox
 {
     public function __invoke(Proxmox $proxmox): bool
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('proxmox.delete', 'Tidak berwenang menghapus host Proxmox.');
         $deleted = $proxmox->delete();
 
         app(RecordActivity::class)->audit($proxmox, 'Menghapus proxmox '.($proxmox->name ?? '-').' ('.($proxmox->proxmox_id ?? '-').')');

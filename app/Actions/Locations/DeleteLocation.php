@@ -14,7 +14,7 @@ class DeleteLocation
      */
     public function __invoke(Location $location): bool
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('locations.delete', 'Tidak berwenang menghapus ruang server.');
         if ($location->racks()->exists()) {
             throw ValidationException::withMessages([
                 'deletingId' => 'Tidak dapat dihapus karena masih ada rack di server room ini.',

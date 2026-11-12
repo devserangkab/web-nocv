@@ -14,7 +14,7 @@ class DeleteRole
      */
     public function __invoke(Role $role): bool
     {
-        Authorize::managementManage();
+        Authorize::permission('roles.delete', 'Tidak berwenang menghapus role.');
         if ($role->name === 'superadmin') {
             throw ValidationException::withMessages([
                 'deletingId' => 'Role superadmin tidak bisa dihapus.',

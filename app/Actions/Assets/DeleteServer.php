@@ -11,7 +11,7 @@ class DeleteServer
 {
     public function __invoke(Server $server): bool
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('servers.delete', 'Tidak berwenang menghapus server fisik.');
         // FK related panel nullOnDelete dan proxmox cascadeOnDelete otomatis.
         $deleted = DB::transaction(fn () => $server->delete());
 

@@ -97,6 +97,7 @@
                         <i class="ti ti-chevron-right text-base text-content-tertiary transition-transform duration-200" :class="open && 'rotate-90'" aria-hidden="true"></i>
                     </button>
                     <div id="nav-infrastructure" x-show="open" x-transition:enter="transition duration-150 ease-out" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-cloak class="space-y-0.5 pt-0.5">
+                        @can('locations.view')
                         <a
                             href="{{ route('admin.server-rooms.index') }}"
                             wire:navigate
@@ -105,6 +106,8 @@
                             <i class="ti ti-building text-base"></i>
                             Server Room
                         </a>
+                        @endcan
+                        @can('racks.view')
                         <a
                             href="{{ route('admin.assets.racks.index') }}"
                             wire:navigate
@@ -113,6 +116,8 @@
                             <i class="ti ti-server-2 text-base"></i>
                             Rack
                         </a>
+                        @endcan
+                        @can('servers.view')
                         <a
                             href="{{ route('admin.assets.servers.index') }}"
                             wire:navigate
@@ -121,6 +126,8 @@
                             <i class="ti ti-server text-base"></i>
                             Server
                         </a>
+                        @endcan
+                        @if (auth()->user()?->can('proxmox.view') || auth()->user()?->can('vms.view'))
                         <a
                             href="{{ route('admin.assets.virtualization.index') }}"
                             wire:navigate
@@ -129,6 +136,8 @@
                             <i class="ti ti-stack-2 text-base"></i>
                             Virtualisasi
                         </a>
+                        @endif
+                        @can('wafs.view')
                         <a
                             href="{{ route('admin.assets.wafs.index') }}"
                             wire:navigate
@@ -137,6 +146,8 @@
                             <i class="ti ti-shield-lock text-base"></i>
                             WAF
                         </a>
+                        @endcan
+                        @can('databases.view')
                         <a
                             href="{{ route('admin.assets.databases.index') }}"
                             wire:navigate
@@ -145,6 +156,8 @@
                             <i class="ti ti-database text-base"></i>
                             Database
                         </a>
+                        @endcan
+                        @can('panels.view')
                         <a
                             href="{{ route('admin.assets.panels.index') }}"
                             wire:navigate
@@ -153,6 +166,8 @@
                             <i class="ti ti-app-window text-base"></i>
                             Panel
                         </a>
+                        @endcan
+                        @can('nas.view')
                         <a
                             href="{{ route('admin.assets.nas.index') }}"
                             wire:navigate
@@ -161,6 +176,8 @@
                             <i class="ti ti-vault text-base"></i>
                             NAS
                         </a>
+                        @endcan
+                        @can('applications.view')
                         <a
                             href="{{ route('admin.applications.index') }}"
                             wire:navigate
@@ -169,6 +186,7 @@
                             <i class="ti ti-apps text-base"></i>
                             Aplikasi
                         </a>
+                        @endcan
                         {{-- Topology Explorer --}}
                         <a
                             href="{{ route('admin.topology.index') }}"
@@ -181,6 +199,7 @@
                     </div>
                 </div>
 
+                @can('documents.view')
                 {{-- Dokumentasi --}}
                 <div class="pt-3">
                     <a
@@ -192,8 +211,10 @@
                         Dokumentasi
                     </a>
                 </div>
+                @endcan
 
                 {{-- Grup: Aktivitas --}}
+                @if (auth()->user()?->can('activities.view') || auth()->user()?->can('monthly-reports.view'))
                 <div x-data="{ open: true }" class="pt-3">
                     <button
                         type="button"
@@ -207,6 +228,7 @@
                         <i class="ti ti-chevron-right text-base text-content-tertiary transition-transform duration-200" :class="open && 'rotate-90'" aria-hidden="true"></i>
                     </button>
                     <div id="nav-activities" x-show="open" x-transition:enter="transition duration-150 ease-out" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-cloak class="space-y-0.5 pt-0.5">
+                        @can('activities.view')
                         <a
                             href="{{ route('admin.activities.index') }}"
                             wire:navigate
@@ -215,7 +237,9 @@
                             <i class="ti ti-list-check text-base"></i>
                             Semua Aktivitas
                         </a>
+                        @endcan
                         {{-- Laporan Bulanan --}}
+                        @can('monthly-reports.view')
                         <a
                             href="{{ route('admin.reports.index') }}"
                             wire:navigate
@@ -224,9 +248,12 @@
                             <i class="ti ti-file-report text-base"></i>
                             Laporan Bulanan
                         </a>
+                        @endcan
                     </div>
                 </div>
+                @endif
 
+                @can('media.view')
                 {{-- Gallery --}}
                 <div class="pt-3">
                     <a
@@ -238,9 +265,10 @@
                         Gallery
                     </a>
                 </div>
+                @endcan
 
                 {{-- Grup: Pengaturan (User, Role, Institution) — modul manajemen --}}
-                @if (auth()->user()?->can('management.manage'))
+                @if (auth()->user()?->can('users.view') || auth()->user()?->can('roles.view') || auth()->user()?->can('institutions.view'))
                     <div x-data="{ open: true }" class="pt-3">
                         <button
                             type="button"
@@ -254,6 +282,7 @@
                             <i class="ti ti-chevron-right text-base text-content-tertiary transition-transform duration-200" :class="open && 'rotate-90'" aria-hidden="true"></i>
                         </button>
                         <div id="nav-settings" x-show="open" x-transition:enter="transition duration-150 ease-out" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-cloak class="space-y-0.5 pt-0.5">
+                            @can('users.view')
                             <a
                                 href="{{ route('admin.users.index') }}"
                                 wire:navigate
@@ -262,6 +291,8 @@
                                 <i class="ti ti-users text-base"></i>
                                 Pengguna
                             </a>
+                            @endcan
+                            @can('roles.view')
                             <a
                                 href="{{ route('admin.roles.index') }}"
                                 wire:navigate
@@ -270,6 +301,8 @@
                                 <i class="ti ti-shield-check text-base"></i>
                                 Role &amp; Permission
                             </a>
+                            @endcan
+                            @can('institutions.view')
                             <a
                                 href="{{ route('admin.institutions.index') }}"
                                 wire:navigate
@@ -278,6 +311,7 @@
                                 <i class="ti ti-building text-base"></i>
                                 Referensi Data
                             </a>
+                            @endcan
                         </div>
                     </div>
                 @endif

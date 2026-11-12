@@ -10,7 +10,7 @@ class DeleteInstitution
 {
     public function __invoke(Institution $institution): bool
     {
-        Authorize::managementManage();
+        Authorize::permission('institutions.delete', 'Tidak berwenang menghapus institution.');
 
         // applications.requested_by akan set null via FK.
         return DB::transaction(fn () => $institution->delete());

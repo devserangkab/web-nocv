@@ -206,10 +206,12 @@ new class extends Component
             <h1 class="text-xl font-semibold text-content-primary">Users</h1>
             <p class="mt-1 text-sm text-content-secondary">Daftar user, role, dan akses ke aplikasi.</p>
         </div>
+        @can('users.create')
         <button type="button" wire:click="openCreate" class="ina-button ina-button--primary ina-button--md">
             <i class="ti ti-plus text-lg" aria-hidden="true"></i>
             Tambah User
         </button>
+        @endcan
     </div>
 
     {{-- Filter kiri + Search kanan --}}
@@ -275,6 +277,7 @@ new class extends Component
                                 <td class="h-10 px-4 text-content-secondary">{{ $user->created_at->format('d M Y') }}</td>
                                 <td class="h-10 px-4">
                                     <div class="flex items-center justify-end gap-1">
+                                        @can('users.update')
                                         <button
                                             type="button"
                                             wire:click="edit({{ $user->id }})"
@@ -284,6 +287,8 @@ new class extends Component
                                         >
                                             <i class="ti ti-pencil text-base"></i>
                                         </button>
+                                        @endcan
+                                        @can('users.delete')
                                         <button
                                             type="button"
                                             wire:click="askDelete({{ $user->id }})"
@@ -293,6 +298,7 @@ new class extends Component
                                         >
                                             <i class="ti ti-trash text-base"></i>
                                         </button>
+                                        @endcan
                                     </div>
                                 </td>
                             </tr>

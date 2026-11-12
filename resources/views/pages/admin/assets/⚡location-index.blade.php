@@ -162,7 +162,7 @@ new class extends Component
             <h1 class="text-xl font-semibold text-content-primary">Server Room</h1>
             <p class="mt-1 text-sm text-content-secondary">Daftar ruang penempatan server dan rack.</p>
         </div>
-        @can('infrastructure.manage')
+        @can('locations.create')
         <button type="button" wire:click="openCreate" class="ina-button ina-button--primary ina-button--md">
             <i class="ti ti-plus text-lg" aria-hidden="true"></i>
             Tambah Server Room
@@ -226,7 +226,7 @@ new class extends Component
                                         >
                                             <i class="ti ti-eye text-base"></i>
                                         </a>
-                                        @can("infrastructure.manage")
+                                        @can("locations.update")
                                         <button
                                             type="button"
                                             wire:click="edit({{ $location->id }})"
@@ -237,7 +237,7 @@ new class extends Component
                                             <i class="ti ti-pencil text-base"></i>
                                         </button>
                                         @endcan
-                                        @can("infrastructure.manage")
+                                        @can("locations.delete")
                                         <button
                                             type="button"
                                             wire:click="askDelete({{ $location->id }})"

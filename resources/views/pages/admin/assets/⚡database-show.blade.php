@@ -58,7 +58,7 @@ new class extends Component
         :back-query="$this->returnQuery"
     >
         @slot('right')
-            @can('infrastructure.manage')
+            @can('databases.update')
             <button
                 type="button"
                 wire:click="edit({{ $instance->id }})"
@@ -228,7 +228,7 @@ new class extends Component
                         <h2 class="text-base font-semibold text-content-primary">Database</h2>
                         <p class="mt-0.5 text-sm text-content-secondary">Basis data yang berada di instance ini.</p>
                     </div>
-                    @can('infrastructure.manage')
+                    @can('databases.create')
                     <button type="button" wire:click="openSchemaCreate" class="ina-button ina-button--secondary ina-button--sm">
                         <i class="ti ti-plus text-base" aria-hidden="true"></i>
                         Tambah Database
@@ -249,7 +249,7 @@ new class extends Component
                                         <span class="block truncate text-sm font-medium text-content-primary" title="{{ $database->name }}">{{ $database->name }}</span>
                                         <span class="block truncate text-xs text-content-tertiary" title="{{ $database->note ?? '' }}">{{ $database->note ?? $database->db_id }}</span>
                                     </div>
-                                    @can('infrastructure.manage')
+                                    @can('databases.update')
                                     <button
                                         type="button"
                                         wire:click="editSchema({{ $database->id }})"
@@ -259,6 +259,8 @@ new class extends Component
                                     >
                                         <i class="ti ti-pencil text-base"></i>
                                     </button>
+                                    @endcan
+                                    @can('databases.delete')
                                     <button
                                         type="button"
                                         wire:click="askSchemaDelete({{ $database->id }})"
@@ -284,7 +286,7 @@ new class extends Component
                         <h2 class="text-base font-semibold text-content-primary">User Database</h2>
                         <p class="mt-0.5 text-sm text-content-secondary">Kredensial user di instance ini — aplikasi menautkannya lewat relasi.</p>
                     </div>
-                    @can('infrastructure.manage')
+                    @can('databases.create')
                     <button type="button" wire:click="openUserCreate" class="ina-button ina-button--secondary ina-button--sm">
                         <i class="ti ti-plus text-base" aria-hidden="true"></i>
                         Tambah User
@@ -310,7 +312,7 @@ new class extends Component
                                             {{ $dbUser->note ?? $dbUser->dbu_id }}{{ $usageCount > 0 ? ' · dipakai '.$usageCount.' application' : '' }}
                                         </span>
                                     </div>
-                                    @can('infrastructure.manage')
+                                    @can('databases.update')
                                     <button
                                         type="button"
                                         wire:click="editUser({{ $dbUser->id }})"
@@ -320,6 +322,8 @@ new class extends Component
                                     >
                                         <i class="ti ti-pencil text-base"></i>
                                     </button>
+                                    @endcan
+                                    @can('databases.delete')
                                     <button
                                         type="button"
                                         wire:click="askUserDelete({{ $dbUser->id }})"

@@ -166,7 +166,7 @@ new class extends Component
             <h1 class="text-xl font-semibold text-content-primary">Panels</h1>
             <p class="mt-1 text-sm text-content-secondary">Daftar control panel (aaPanel/cPanel) terpasang di VM atau server.</p>
         </div>
-        @can('infrastructure.manage')
+        @can('panels.create')
         <button type="button" wire:click="openCreate" class="ina-button ina-button--primary ina-button--md">
             <i class="ti ti-plus text-lg" aria-hidden="true"></i>
             Tambah Panel
@@ -270,7 +270,7 @@ new class extends Component
                                         >
                                             <i class="ti ti-eye text-base"></i>
                                         </a>
-                                        @can("infrastructure.manage")
+                                        @can("panels.update")
                                         <button
                                             type="button"
                                             wire:click="edit({{ $panel->id }})"
@@ -281,7 +281,7 @@ new class extends Component
                                             <i class="ti ti-pencil text-base"></i>
                                         </button>
                                         @endcan
-                                        @can("infrastructure.manage")
+                                        @can("panels.delete")
                                         <button
                                             type="button"
                                             wire:click="askDelete({{ $panel->id }})"

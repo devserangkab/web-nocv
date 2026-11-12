@@ -93,7 +93,7 @@ new class extends Component
         :back-query="$this->returnQuery"
     >
         @slot('right')
-            @can('infrastructure.manage')
+            @can('servers.update')
             <button
                 type="button"
                 wire:click="edit({{ $server->id }})"

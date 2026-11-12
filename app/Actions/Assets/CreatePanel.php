@@ -18,7 +18,7 @@ class CreatePanel
      */
     public function __invoke(array $data): Panel
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('panels.create', 'Tidak berwenang menambah panel.');
         $data = Validator::make($data, static::rules(), static::messages())->validate();
 
         $panel = Panel::create($this->normalize($data));

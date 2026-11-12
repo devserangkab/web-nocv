@@ -14,7 +14,7 @@ class UpdatePanel
      */
     public function __invoke(Panel $panel, array $data): Panel
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('panels.update', 'Tidak berwenang mengubah panel.');
         $data = Validator::make($data, CreatePanel::rules(), CreatePanel::messages())->validate();
 
         $normalized = CreatePanel::normalize($data);

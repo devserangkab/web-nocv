@@ -13,7 +13,7 @@ class UpdateRole
      */
     public function __invoke(Role $role, array $data): Role
     {
-        Authorize::managementManage();
+        Authorize::permission('roles.update', 'Tidak berwenang mengubah role.');
         $data = Validator::make($data, CreateRole::rules($role->id), CreateRole::messages())->validate();
 
         $role->update(['name' => $data['name']]);

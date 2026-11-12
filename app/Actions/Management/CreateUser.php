@@ -13,7 +13,7 @@ class CreateUser
      */
     public function __invoke(array $data): User
     {
-        Authorize::managementManage();
+        Authorize::permission('users.create', 'Tidak berwenang menambah user.');
         $data = Validator::make($data, static::rules(), static::messages())->validate();
 
         $user = User::create([

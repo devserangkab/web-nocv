@@ -14,7 +14,7 @@ class CreateProxmox
      */
     public function __invoke(array $data): Proxmox
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('proxmox.create', 'Tidak berwenang menambah host Proxmox.');
         $data = Validator::make($data, static::rules(null), static::messages())->validate();
 
         $proxmox = Proxmox::create($this->normalize($data));

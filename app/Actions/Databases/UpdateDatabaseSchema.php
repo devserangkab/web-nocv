@@ -14,7 +14,7 @@ class UpdateDatabaseSchema
      */
     public function __invoke(Database $database, array $data): Database
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('databases.update', 'Tidak berwenang mengubah schema database.');
         $data = Validator::make($data, CreateDatabaseSchema::rules($database->instance, $database->id), CreateDatabaseSchema::messages())->validate();
 
         $oldName = $database->name;

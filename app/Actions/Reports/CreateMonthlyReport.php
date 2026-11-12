@@ -16,7 +16,7 @@ class CreateMonthlyReport
      */
     public function __invoke(array $data, ?int $userId): MonthlyReport
     {
-        Authorize::monthlyReportsCreate();
+        Authorize::permission('monthly-reports.create', 'Tidak berwenang membuat laporan bulanan.');
 
         return DB::transaction(function () use ($data, $userId): MonthlyReport {
             $exists = MonthlyReport::query()

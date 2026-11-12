@@ -212,14 +212,14 @@ new class extends Component
             <p class="mt-1 text-sm text-content-secondary">Host Proxmox dan virtual machine yang berjalan di atasnya.</p>
         </div>
         @if ($tab === 'proxmox')
-            @can('infrastructure.manage')
+            @can('proxmox.create')
             <button type="button" wire:click="openProxmoxCreate" class="ina-button ina-button--primary ina-button--md">
                 <i class="ti ti-plus text-lg" aria-hidden="true"></i>
                 Tambah Proxmox
             </button>
             @endcan
         @else
-            @can('infrastructure.manage')
+            @can('vms.create')
             <button type="button" wire:click="openVmsCreate" class="ina-button ina-button--primary ina-button--md">
                 <i class="ti ti-plus text-lg" aria-hidden="true"></i>
                 Tambah VM

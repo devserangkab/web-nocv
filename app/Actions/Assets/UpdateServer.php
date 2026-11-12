@@ -14,7 +14,7 @@ class UpdateServer
      */
     public function __invoke(Server $server, array $data): Server
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('servers.update', 'Tidak berwenang mengubah server fisik.');
         $data = Validator::make($data, CreateServer::rules(), CreateServer::messages())->validate();
 
         $normalized = CreateServer::normalize($data);

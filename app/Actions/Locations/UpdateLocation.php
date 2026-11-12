@@ -14,7 +14,7 @@ class UpdateLocation
      */
     public function __invoke(Location $location, array $data): Location
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('locations.update', 'Tidak berwenang mengubah ruang server.');
         $data = Validator::make($data, CreateLocation::rules(), CreateLocation::messages())->validate();
 
         $location->update(CreateLocation::normalize($data));

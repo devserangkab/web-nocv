@@ -29,7 +29,7 @@ class ApplySyncProposal
 {
     public function __invoke(SyncProposal $proposal): ?Application
     {
-        Authorize::applicationsManage();
+        Authorize::permission('applications.update', 'Tidak berwenang menerapkan usulan sinkronisasi.');
 
         if ($proposal->status !== SyncProposalStatus::Pending) {
             throw ValidationException::withMessages([

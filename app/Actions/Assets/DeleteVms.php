@@ -10,7 +10,7 @@ class DeleteVms
 {
     public function __invoke(Vms $vm): bool
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('vms.delete', 'Tidak berwenang menghapus virtual machine.');
         $deleted = $vm->delete();
 
         app(RecordActivity::class)->audit($vm, 'Menghapus vm '.($vm->name ?? '-').'('.($vm->vm_id ?? '-').')');

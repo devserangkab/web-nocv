@@ -14,7 +14,7 @@ class UpdateNas
      */
     public function __invoke(Nas $nas, array $data): Nas
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('nas.update', 'Tidak berwenang mengubah NAS.');
         $data = Validator::make($data, CreateNas::rules(), CreateNas::messages())->validate();
 
         $normalized = CreateNas::normalize($data);

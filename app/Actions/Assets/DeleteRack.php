@@ -14,7 +14,7 @@ class DeleteRack
      */
     public function __invoke(Rack $rack): bool
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('racks.delete', 'Tidak berwenang menghapus rack.');
         if ($rack->servers()->exists()) {
             throw ValidationException::withMessages([
                 'deletingId' => 'Tidak dapat dihapus karena masih ada server di dalam rack ini.',

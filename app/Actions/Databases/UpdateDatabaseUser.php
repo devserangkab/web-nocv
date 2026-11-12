@@ -14,7 +14,7 @@ class UpdateDatabaseUser
      */
     public function __invoke(DatabaseUser $user, array $data): DatabaseUser
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('databases.update', 'Tidak berwenang mengubah user database.');
         $data = Validator::make($data, CreateDatabaseUser::rules($user->instance, $user->id), CreateDatabaseUser::messages())->validate();
 
         $user->update([

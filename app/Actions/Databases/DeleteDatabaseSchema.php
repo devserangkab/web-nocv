@@ -10,7 +10,7 @@ class DeleteDatabaseSchema
 {
     public function __invoke(Database $database): bool
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('databases.delete', 'Tidak berwenang menghapus schema database.');
 
         $deleted = $database->delete();
 

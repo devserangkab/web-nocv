@@ -10,7 +10,7 @@ class DeleteWaf
 {
     public function __invoke(Waf $waf): bool
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('wafs.delete', 'Tidak berwenang menghapus WAF.');
         $deleted = $waf->delete();
 
         app(RecordActivity::class)->audit($waf, 'Menghapus WAF '.($waf->name ?? '-').' ('.($waf->waf_id ?? '-').')');

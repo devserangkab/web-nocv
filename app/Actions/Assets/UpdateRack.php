@@ -14,7 +14,7 @@ class UpdateRack
      */
     public function __invoke(Rack $rack, array $data): Rack
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('racks.update', 'Tidak berwenang mengubah rack.');
         $data = Validator::make($data, CreateRack::rules(), CreateRack::messages())->validate();
 
         $rack->update(CreateRack::normalize($data));

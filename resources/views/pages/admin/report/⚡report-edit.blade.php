@@ -13,6 +13,7 @@ use App\Models\Rack;
 use App\Models\Server;
 use App\Models\Vms;
 use App\Enums\ActivityType;
+use App\Support\Authorize;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -54,6 +55,9 @@ new class extends Component
             ->with(['items', 'creator'])
             ->where('report_id', $reportId)
             ->firstOrFail();
+
+        // Editor hanya untuk pembuat laporan (atau pemilik view-all).
+        Authorize::monthlyReportOwn($this->report);
 
         $this->introduction = $this->report->introduction;
         $this->conclusion = $this->report->conclusion;

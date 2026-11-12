@@ -14,7 +14,7 @@ class CreateLocation
      */
     public function __invoke(array $data): Location
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('locations.create', 'Tidak berwenang menambah ruang server.');
         $data = Validator::make($data, static::rules(), static::messages())->validate();
 
         $location = Location::create($this->normalize($data));

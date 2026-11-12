@@ -94,7 +94,7 @@ new class extends Component
         :back-query="$this->returnQuery"
     >
         @slot('right')
-            @can('infrastructure.manage')
+            @can('wafs.update')
             <button
                 type="button"
                 wire:click="edit({{ $waf->id }})"

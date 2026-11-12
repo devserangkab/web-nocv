@@ -7,29 +7,24 @@ use App\Models\Media;
 use App\Models\MonthlyReport;
 
 /**
- * Gerbang otorisasi koarse-grained untuk Action class.
+ * Gerbang otorisasi untuk Action class (permission format modul.aksi).
  * Superadmin & user legacy tanpa role dilewatkan otomatis oleh Gate::before.
  */
 class Authorize
 {
-    public static function infrastructureManage(): void
+    /**
+     * Tolak bila user tidak punya permission tunggal (mis. racks.create).
+     */
+    public static function permission(string $permission, string $message = 'Tidak berwenang melakukan aksi ini.'): void
     {
-        self::deny('infrastructure.manage', 'Tidak berwenang mengubah data infrastruktur.');
-    }
+        $user = auth()->user();
 
-    public static function applicationsManage(): void
-    {
-        self::deny('applications.manage', 'Tidak berwenang mengubah application.');
-    }
+        // Konteks sistem/konsol (tanpa user HTTP) — rute sudah di-guard login.
+        if ($user === null) {
+            return;
+        }
 
-    public static function managementManage(): void
-    {
-        self::deny('management.manage', 'Tidak berwenang mengelola user, role, dan institution.');
-    }
-
-    public static function documentsCreate(): void
-    {
-        self::deny('documents.create', 'Tidak berwenang mengunggah dokumen.');
+        abort_unless($user->can($permission), 403, $message);
     }
 
     public static function documentDelete(Document $document): void
@@ -42,11 +37,6 @@ class Authorize
         );
     }
 
-    public static function mediaCreate(): void
-    {
-        self::deny('media.create', 'Tidak berwenang mengunggah media gallery.');
-    }
-
     public static function mediaDelete(Media $media): void
     {
         self::ownOrPermissions(
@@ -57,16 +47,6 @@ class Authorize
         );
     }
 
-    public static function activitiesCreate(): void
-    {
-        self::deny('activities.create', 'Tidak berwenang mencatat work log.');
-    }
-
-    public static function monthlyReportsCreate(): void
-    {
-        self::deny('monthly-reports.create', 'Tidak berwenang membuat laporan bulanan.');
-    }
-
     public static function monthlyReportOwn(MonthlyReport $report): void
     {
         self::ownOrPermissions(
@@ -75,18 +55,6 @@ class Authorize
             'monthly-reports.update-own',
             'Laporan bulanan hanya dapat dikelola oleh pembuatnya.'
         );
-    }
-
-    private static function deny(string $permission, string $message): void
-    {
-        $user = auth()->user();
-
-        // Konteks sistem/konsol (tanpa user HTTP) — rute sudah di-guard login.
-        if ($user === null) {
-            return;
-        }
-
-        abort_unless($user->can($permission), 403, $message);
     }
 
     private static function ownOrPermissions(?int $ownerId, string $allPermission, string $ownPermission, string $message): void

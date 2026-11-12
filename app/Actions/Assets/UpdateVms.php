@@ -14,7 +14,7 @@ class UpdateVms
      */
     public function __invoke(Vms $vm, array $data): Vms
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('vms.update', 'Tidak berwenang mengubah virtual machine.');
         $data = Validator::make($data, CreateVms::rules(), CreateVms::messages())->validate();
 
         $normalized = CreateVms::normalize($data);

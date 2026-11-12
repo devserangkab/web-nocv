@@ -13,7 +13,7 @@ class CreateRole
      */
     public function __invoke(array $data): Role
     {
-        Authorize::managementManage();
+        Authorize::permission('roles.create', 'Tidak berwenang menambah role.');
         $data = Validator::make($data, static::rules(null), static::messages())->validate();
 
         $role = Role::create(['name' => $data['name'], 'guard_name' => 'web']);

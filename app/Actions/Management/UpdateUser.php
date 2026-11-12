@@ -13,7 +13,7 @@ class UpdateUser
      */
     public function __invoke(User $user, array $data): User
     {
-        Authorize::managementManage();
+        Authorize::permission('users.update', 'Tidak berwenang mengubah user.');
         $data = Validator::make($data, CreateUser::rules($user->id), CreateUser::messages())->validate();
 
         $payload = [

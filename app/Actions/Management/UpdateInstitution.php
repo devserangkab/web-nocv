@@ -13,7 +13,7 @@ class UpdateInstitution
      */
     public function __invoke(Institution $institution, array $data): Institution
     {
-        Authorize::managementManage();
+        Authorize::permission('institutions.update', 'Tidak berwenang mengubah institution.');
         $data = Validator::make($data, CreateInstitution::rules($institution->id), CreateInstitution::messages())->validate();
 
         $institution->update($data);

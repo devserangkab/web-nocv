@@ -11,7 +11,7 @@ class DeleteNas
 {
     public function __invoke(Nas $nas): bool
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('nas.delete', 'Tidak berwenang menghapus NAS.');
         $deleted = DB::transaction(fn () => $nas->delete());
 
         app(RecordActivity::class)->audit($nas, 'Menghapus NAS '.($nas->name ?? '-').' ('.($nas->nas_id ?? '-').')');

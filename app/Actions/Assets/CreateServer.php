@@ -17,7 +17,7 @@ class CreateServer
      */
     public function __invoke(array $data): Server
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('servers.create', 'Tidak berwenang menambah server fisik.');
         $data = Validator::make($data, static::rules(), static::messages())->validate();
 
         $server = Server::create($this->normalize($data));

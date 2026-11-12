@@ -10,7 +10,7 @@ class DeletePanel
 {
     public function __invoke(Panel $panel): bool
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('panels.delete', 'Tidak berwenang menghapus panel.');
         $deleted = $panel->delete();
 
         app(RecordActivity::class)->audit($panel, 'Menghapus panel '.($panel->name ?? '-').' ('.($panel->panel_id ?? '-').')');

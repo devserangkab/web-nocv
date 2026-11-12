@@ -81,7 +81,7 @@ new class extends Component
         :back-query="$this->returnQuery"
     >
         @slot('right')
-            @can('infrastructure.manage')
+            @can('vms.update')
             <button
                 type="button"
                 wire:click="editVms({{ $vm->id }})"

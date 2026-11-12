@@ -14,7 +14,7 @@ class UpdateWaf
      */
     public function __invoke(Waf $waf, array $data): Waf
     {
-        Authorize::infrastructureManage();
+        Authorize::permission('wafs.update', 'Tidak berwenang mengubah WAF.');
         $data = Validator::make($data, CreateWaf::rules(), CreateWaf::messages())->validate();
 
         $normalized = CreateWaf::normalize($data);

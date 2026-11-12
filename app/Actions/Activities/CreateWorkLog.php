@@ -29,7 +29,7 @@ class CreateWorkLog
      */
     public function __invoke(?Model $subject, array $data, ?int $userId): array
     {
-        Authorize::activitiesCreate();
+        Authorize::permission('activities.create', 'Tidak berwenang mencatat work log.');
 
         $data = Validator::make($data, static::rules(), static::messages())->validate();
 
